@@ -25,13 +25,13 @@ $prerequisitesSourcePath=Get-ISHBootstrapperContextValue -ValuePath "Prerequisit
 $ishVersion=Get-ISHBootstrapperContextValue -ValuePath "ISHVersion"
 $ishServerVersion=($ishVersion -split "\.")[0]
 
-#& $scriptsPaths\PowerShellGet\Install-Module.ps1 -Computer $computerName -ModuleName Carbon -Repository PSGallery
-#& $scriptsPaths\PowerShellGet\Install-Module.ps1 -Computer $computerName -ModuleName ISHServer.13 -Repository $ishServerRepository
+& $scriptsPaths\PowerShellGet\Install-Module.ps1 -Computer $computerName -ModuleName Carbon -Repository PSGallery
+& $scriptsPaths\PowerShellGet\Install-Module.ps1 -Computer $computerName -ModuleName ISHServer.13 -Repository $ishServerRepository
 
-#& $scriptsPaths\ISHServer\Upload-ISHServerPrerequisites.ps1 -Computer $computerName -PrerequisitesSourcePath $prerequisitesSourcePath -ISHServerVersion $ishServerVersion
-#& $scriptsPaths\ISHServer\Install-ISHServerPrerequisites.ps1 -Computer $computerName -ISHServerVersion $ishServerVersion
+& $scriptsPaths\ISHServer\Upload-ISHServerPrerequisites.ps1 -Computer $computerName -PrerequisitesSourcePath $prerequisitesSourcePath -ISHServerVersion $ishServerVersion
+& $scriptsPaths\ISHServer\Install-ISHServerPrerequisites.ps1 -Computer $computerName -ISHServerVersion $ishServerVersion
 
-#& $scriptsPaths\ISHServer\Initialize-ISHServerOSUser.ps1 -Computer $fqdn -ISHServerVersion $ishServerVersion -CrentialForCredSSP $credentialForCredSSP -OSUser ($osUserCredential.UserName)
-#& $scriptsPaths\ISHServer\Initialize-ISHServerOSUserRegion.ps1 -Computer $computerName -ISHServerVersion $ishServerVersion -OSUserCredential $osUserCredential
+& $scriptsPaths\ISHServer\Initialize-ISHServerOSUser.ps1 -Computer $fqdn -ISHServerVersion $ishServerVersion -CrentialForCredSSP $credentialForCredSSP -OSUser ($osUserCredential.UserName)
+& $scriptsPaths\ISHServer\Initialize-ISHServerOSUserRegion.ps1 -Computer $computerName -ISHServerVersion $ishServerVersion -OSUserCredential $osUserCredential
 
 & $scriptsPaths\Helpers\Invoke-Restart.ps1 -Computer $computerName
