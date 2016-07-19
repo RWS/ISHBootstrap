@@ -12,14 +12,20 @@ An example JSON file looks like this
 {
   "ComputerName": "SERVER01",
   "ISHVersion": "12.0.0",
+  "EnableSecureWinRM": true,
+  "ISHServerRepository": "Repository1",
+  "PrerequisitesSourcePath": "C:\\inetpubopen\\ISHServer",
+  "CredentialForCredSSPExpression":"New-MyCredential",
+  "OSUserCredentialExpression":"New-InfoShareServiceUserCredential",
   "PSRepository": [
     {
-      "Name": "Name",
+      "Name": "Repository1",
       "SourceLocation": "SourceLocationUri",
       "InstallationPolicy": "Trusted"
     }  
   ]
 }
+
 ```
 
 - `ComputerName` is the target computer name. If not set then all script execute locally

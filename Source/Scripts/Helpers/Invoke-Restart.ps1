@@ -3,7 +3,7 @@ param (
     [string[]]$Computer
 ) 
     
-. "$PSScriptRoot\Invoke-CommandWrap.ps1"
+. "$PSScriptRoot\..\..\Cmdlets\Helpers\Invoke-CommandWrap.ps1"
 Write-Verbose "Restarting $Computer"
 Restart-Computer -ComputerName  $Computer -Force
 Write-Host "Initiated $Computer restart"

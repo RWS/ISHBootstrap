@@ -1,0 +1,31 @@
+function Install-ISHWindowsFeature
+{
+    $featureNames=@(
+        #http://docs.sdl.com/LiveContent/content/en-US/SDL%20Knowledge%20Center%20full%20documentation-v2/GUID-47EC6977-C62C-493E-B6DA-F0A3D0003C9D
+        #"Application-Server"
+        "AS-NET-Framework"
+        "NET-WCF-Services45"
+		"NET-WCF-HTTP-Activation45"
+		"NET-WCF-TCP-PortSharing45"
+        #http://docs.sdl.com/LiveContent/content/en-US/SDL%20Knowledge%20Center%20full%20documentation-v2/GUID-F0F2DB60-4C4F-4962-9FC1-AE8D2F1929FE
+        "Web-Default-Doc"
+        "Web-Dir-Browsing"
+        "Web-Http-Errors"
+        "Web-Static-Content"
+        "Web-Http-Logging"
+        "Web-Request-Monitor"
+        "Web-Stat-Compression"
+        "Web-Dyn-Compression"
+        "Web-Net-Ext45"
+        "Web-ASP"
+        "Web-Asp-Net45"
+        "Web-ISAPI-Ext"
+        "Web-ISAPI-Filter"
+        "Web-Mgmt-Console"
+        #http://docs.sdl.com/LiveContent/content/en-US/SDL%20Knowledge%20Center%20full%20documentation-v2/GUID-B06F62DB-9D30-4C2E-8C89-C116BD8F0829
+        "AS-WS-Atomic"
+        "AS-Incoming-Trans"
+        "AS-Outgoing-Trans"
+    )
+    Install-WindowsFeature -Name $featureNames |Out-Null #-WhatIf
+}
