@@ -9,7 +9,7 @@ Function Get-ISHBootstrapperContextValue
 
     $data = Get-Variable -Name $variableName -Scope Global -ValueOnly
 
-    $value = $data.$ValuePath;
+    $value = Invoke-Expression "`$data.$ValuePath";
     if (-not $value)
     {
         Write-Warning "$ValuePath path does not exist or is null"
