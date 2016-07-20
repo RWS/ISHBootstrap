@@ -1,3 +1,5 @@
+#Requires –RunAsAdministrator
+
 . $PSScriptRoot\Get-ISHServerFolderPath.ps1
 
 #region Ports

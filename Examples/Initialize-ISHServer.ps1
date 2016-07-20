@@ -34,4 +34,5 @@ $ishServerVersion=($ishVersion -split "\.")[0]
 & $scriptsPaths\ISHServer\Initialize-ISHServerOSUser.ps1 -Computer $fqdn -ISHServerVersion $ishServerVersion -CrentialForCredSSP $credentialForCredSSP -OSUser ($osUserCredential.UserName)
 & $scriptsPaths\ISHServer\Initialize-ISHServerOSUserRegion.ps1 -Computer $computerName -ISHServerVersion $ishServerVersion -OSUserCredential $osUserCredential
 
+& $scriptsPaths\IIS\New-IISSslBinding.ps1 -Computer $computerName
 & $scriptsPaths\Helpers\Invoke-Restart.ps1 -Computer $computerName
