@@ -14,8 +14,6 @@ if(-not $computerName)
     & "$scriptsPaths\Helpers\Test-Administrator.ps1"
 }
 
-& $scriptsPaths\PowerShellGet\Install-Module.ps1 -Computer $computerName -ModuleName @("CertificatePS") -Repository PSGallery
-
 if($computerName)
 {
     $enableSecureWinRM=Get-ISHBootstrapperContextValue -ValuePath "EnableSecureWinRM"

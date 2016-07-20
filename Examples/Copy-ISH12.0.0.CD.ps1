@@ -63,7 +63,6 @@ try
         & "$scriptsPaths\Helpers\Test-Administrator.ps1"
     }
 
-    & $scriptsPaths\PowerShellGet\Install-Module.ps1 -Computer $computerName -ModuleName @("PSFTP") -Repository PSGallery
     Invoke-CommandWrap -ComputerName $computerName -ScriptBlock $copyBlock -BlockName "Copy and Extract ISH.12.0.0" -UseParameters @("ftpHost","ftpIp","ftpUser","ftpPassword","ftpCDFolder","ftpCDFileName")
 }
 finally

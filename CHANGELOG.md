@@ -6,6 +6,8 @@
 - Script to assign certificate on IIS
 - Script to install [ProcessExplorer](https://technet.microsoft.com/en-us/sysinternals/processexplorer.aspx)
 - **Very** experimental/simlified automation of install/uninstall of ISH. Mostly focused on testing purposes
+- Moved the module dependency in the examples to one script `Install-Module`.
+- Install ISHDeploy
 
 **20160719**
 

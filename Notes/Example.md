@@ -15,7 +15,8 @@ An example JSON file looks like this
   "EnableSecureWinRM": true,
   "InstallProcessExplorer": true,
   "ISHServerRepository": "Repository1",
-  "xISHInstallRepository": "asarafian",
+  "xISHInstallRepository": "Repository1",
+  "ISHDeployRepository": "Repository1",
   "PrerequisitesSourcePath": "C:\\inetpubopen\\ISHServer",
   "CredentialForCredSSPExpression":"New-MyCredential",
   "OSUserCredentialExpression":"New-InfoShareServiceUserCredential",
@@ -35,6 +36,7 @@ An example JSON file looks like this
 - `InstallProcessExplorer` controls if the script should install process explorer.
 - `ISHServerRepository` is the repository name where ISHServer module can be found.
 - `xISHInstallRepository` is the repository name where xISHInstall module can be found.
+- `ISHDeployRepository` is the repository name where ISHDeploy module can be found.
 - `PrerequisitesSourcePath` is the source path for all ISHServer 3rd party dependencies.
 - `CredentialForCredSSPExpression` is the cmdlet or expression that return a `PSCredential` to use for *CredSSP* sessions.
 - `OSUserCredentialExpression` is the cmdlet or expression that return a `PSCredential` to use for sessions on behalf of the `osuser`.

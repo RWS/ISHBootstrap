@@ -20,13 +20,9 @@ else
     $osUserCredential=Invoke-Expression (Get-ISHBootstrapperContextValue -ValuePath "OSUserCredentialExpression")
 }
 
-$ishServerRepository=Get-ISHBootstrapperContextValue -ValuePath "ISHServerRepository"
 $prerequisitesSourcePath=Get-ISHBootstrapperContextValue -ValuePath "PrerequisitesSourcePath"
 $ishVersion=Get-ISHBootstrapperContextValue -ValuePath "ISHVersion"
 $ishServerVersion=($ishVersion -split "\.")[0]
-
-& $scriptsPaths\PowerShellGet\Install-Module.ps1 -Computer $computerName -ModuleName Carbon -Repository PSGallery
-& $scriptsPaths\PowerShellGet\Install-Module.ps1 -Computer $computerName -ModuleName ISHServer.13 -Repository $ishServerRepository
 
 & $scriptsPaths\ISHServer\Upload-ISHServerPrerequisites.ps1 -Computer $computerName -PrerequisitesSourcePath $prerequisitesSourcePath -ISHServerVersion $ishServerVersion
 & $scriptsPaths\ISHServer\Install-ISHServerPrerequisites.ps1 -Computer $computerName -ISHServerVersion $ishServerVersion

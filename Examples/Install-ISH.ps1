@@ -11,8 +11,6 @@ $computerName=Get-ISHBootstrapperContextValue -ValuePath "ComputerName"
 
 . "$cmdletsPaths\Helpers\Invoke-CommandWrap.ps1"
 
-$xISHInstallRepository=Get-ISHBootstrapperContextValue -ValuePath "xISHInstallRepository"
-
 $ishDeployments=Get-ISHBootstrapperContextValue -ValuePath "ISHDeployment"
 $osUserNetworkCredential=(Invoke-Expression (Get-ISHBootstrapperContextValue -ValuePath "OSUserCredentialExpression")).GetNetworkCredential();
 if($osUserNetworkCredential.Domain -and ($osUserNetworkCredential.Domain -ne ""))
@@ -69,8 +67,6 @@ try
     {
         & "$scriptsPaths\Helpers\Test-Administrator.ps1"
     }
-    & $scriptsPaths\PowerShellGet\Install-Module.ps1 -Computer $computerName -ModuleName @("xISHInstall") -Repository $xISHInstallRepository
-
     Invoke-CommandWrap -ComputerName $computerName -ScriptBlock $installBlock -BlockName "Install ISH" -UseParameters @("ishDeployments","osUser","osPassword")
 
 }
