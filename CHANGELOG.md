@@ -1,5 +1,9 @@
 # Change log
 
+**20160720**
+
+- Copy ISHCD script
+
 **20160719**
 
 - ISHServer module
