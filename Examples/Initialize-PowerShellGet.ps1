@@ -21,3 +21,9 @@ $psRepository=Get-ISHBootstrapperContextValue -ValuePath "PSRepository"
 $psRepository |ForEach-Object {
     & $scriptsPaths\PowerShellGet\Register-Repository.ps1 -Computer $computerName -Name $_.Name -SourceLocation $_.SourceLocation -PublishLocation $_.PublishLocation -InstallationPolicy $_.InstallationPolicy
 }
+
+$installProcessExplorer=Get-ISHBootstrapperContextValue -ValuePath "InstallProcessExplorer"
+if($installProcessExplorer)
+{
+    & $scriptsPaths\Helpers\Install-ProcessExplorer.ps1 -Computer $computerName
+}

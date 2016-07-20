@@ -4,6 +4,7 @@
 
 - Copy ISHCD script
 - Script to assign certificate on IIS
+- Script to install [ProcessExplorer](https://technet.microsoft.com/en-us/sysinternals/processexplorer.aspx)
 - **Very** experimental/simlified automation of install/uninstall of ISH. Mostly focused on testing purposes
 
 **20160719**
