@@ -14,6 +14,7 @@ An example JSON file looks like this
   "ISHVersion": "12.0.0",
   "EnableSecureWinRM": true,
   "ISHServerRepository": "Repository1",
+  "xISHInstallRepository": "asarafian",
   "PrerequisitesSourcePath": "C:\\inetpubopen\\ISHServer",
   "CredentialForCredSSPExpression":"New-MyCredential",
   "OSUserCredentialExpression":"New-InfoShareServiceUserCredential",
@@ -25,13 +26,13 @@ An example JSON file looks like this
     }  
   ]
 }
-
 ```
 
 - `ComputerName` is the target computer name. If not set then all script execute locally
 - `ISHVersion` is the target content manager version.
 - `EnableSecureWinRM` controls if the script should initialize the secure WinRm
 - `ISHServerRepository` is the repository name where ISHServer module can be found
+- `xISHInstallRepository` is the repository name where xISHInstall module can be found
 - `PrerequisitesSourcePath` is the source path for all ISHServer 3rd party dependencies
 - `CredentialForCredSSPExpression` is the cmdlet or expression that return a `PSCredential` to use for *CredSSP* sessions.
 - `OSUserCredentialExpression` is the cmdlet or expression that return a `PSCredential` to use for sessions on behalf of the `osuser`.

@@ -3,6 +3,8 @@
 **20160720**
 
 - Copy ISHCD script
+- Script to assign certificate on IIS
+- **Very** experimental/simlified automation of install/uninstall of ISH. Mostly focused on testing purposes
 
 **20160719**
 
