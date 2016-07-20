@@ -6,7 +6,7 @@ $sourcePath=Resolve-Path "$PSScriptRoot\..\Source"
 $cmdletsPaths="$sourcePath\Cmdlets"
 $scriptsPaths="$sourcePath\Scripts"
 
-. "$cmdletsPaths\Helpers\Get-ISHBootstrapperContextValue.ps1"
+. "$PSScriptRoot\Cmdlets\Get-ISHBootstrapperContextValue.ps1"
 $computerName=Get-ISHBootstrapperContextValue -ValuePath "ComputerName"
 
 if(-not $computerName)
