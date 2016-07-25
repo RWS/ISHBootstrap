@@ -3,7 +3,9 @@ Function Get-ISHBootstrapperContextValue
     param (
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        $ValuePath
+        $ValuePath,
+        [Parameter(Mandatory=$false)]
+        $DefaultValue=$null
     ) 
     $variableName="__ISHBootstrapper_Data__"
 
@@ -12,7 +14,14 @@ Function Get-ISHBootstrapperContextValue
     $value = Invoke-Expression "`$data.$ValuePath";
     if (-not $value)
     {
-        Write-Warning "$ValuePath path does not exist or is null"
+        if($DefaultValue)
+        {
+            $value=$DefaultValue
+        }
+        else
+        {
+            Write-Warning "$ValuePath path does not exist and DefaultValue is specified"
+        }
     }
     $value
 }

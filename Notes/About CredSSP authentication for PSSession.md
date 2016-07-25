@@ -1,4 +1,4 @@
-# Allowing remoting with double hop access using CredSSP authentication
+# About CredSSP authentication for PSSession
 
 When through remoting we try to access a kerberos protected asset then by default it fails.
 To solve the issue we need to configure windows to allow the creation of CredSSP session.

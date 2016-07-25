@@ -12,8 +12,8 @@ try
 {
     switch ($ISHServerVersion)
     {
-        '12' {$ishServerModuleName="ISHServer.12"}
-        '13' {$ishServerModuleName="ISHServer.13"}
+        '12' {$ishServerModuleName="xISHServer.12"}
+        '13' {$ishServerModuleName="xISHServer.13"}
     }
     if($Computer)
     {

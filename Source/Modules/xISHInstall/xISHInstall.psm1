@@ -1,4 +1,4 @@
-#Requires –RunAsAdministrator
+#requires -runasadministrator
 
 . $PSScriptRoot\Install-ISHDeployment.ps1
 . $PSScriptRoot\New-ISHDeploymentInputParameters.ps1

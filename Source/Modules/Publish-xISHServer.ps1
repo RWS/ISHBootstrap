@@ -1,6 +1,6 @@
 Param (
     [Parameter(Mandatory=$true)]
-    [ValidateSet("ISHServer.12","ISHServer.13")]
+    [ValidateSet("xISHServer.12","xISHServer.13")]
     [string]$ModuleName,
     [Parameter(Mandatory=$true)]
     [string]$Repository,
@@ -35,7 +35,7 @@ $company="SDL Plc"
 $copyright="(c) $($date.Year) $company. All rights reserved."
 $description="A module to help automate installation of prerequisites for Content Manager"
 
-$sourcePath=Resolve-Path "$PSScriptRoot\ISHServer"
+$sourcePath=Resolve-Path "$PSScriptRoot\xISHServer"
 
 $psm1File=Get-ChildItem $sourcePath -Filter "$ModuleName.psm1"
 

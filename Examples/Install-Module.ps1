@@ -22,8 +22,8 @@ try
     $ishVersion=Get-ISHBootstrapperContextValue -ValuePath "ISHVersion"
     $ishServerVersion=($ishVersion -split "\.")[0]
 
-    $ishServerRepository=Get-ISHBootstrapperContextValue -ValuePath "ISHServerRepository"
-    $ishServerModuleName="ISHServer.$ishServerVersion"
+    $ishServerRepository=Get-ISHBootstrapperContextValue -ValuePath "xISHServerRepository"
+    $ishServerModuleName="xISHServer.$ishServerVersion"
 
     $ishDeployRepository=Get-ISHBootstrapperContextValue -ValuePath "ISHDeployRepository"
     $ishDeployModuleName="ISHDeploy.$ishVersion"
