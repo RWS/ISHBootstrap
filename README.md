@@ -1,3 +1,7 @@
+# Badges 
+
+- [![Gitter](https://badges.gitter.im/Sarafian/ISHBootstrap.svg)](https://gitter.im/Sarafian/ISHBootstrap?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+
 # ISHBootstrap
 Bootstrapper for SDL Knowledge Center Content Manager deployments
 
