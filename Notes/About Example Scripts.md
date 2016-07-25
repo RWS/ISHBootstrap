@@ -1,4 +1,4 @@
-# Example scripts
+# About Example Scripts
 
 The exacmple scripts depend on data indirection. 
 I'm using this to test the validity of scripts.
@@ -17,7 +17,7 @@ An example JSON file looks like this
   "ISHServerRepository": "Repository1",
   "xISHInstallRepository": "Repository1",
   "ISHDeployRepository": "Repository1",
-  "PrerequisitesSourcePath": "C:\\inetpubopen\\ISHServer",
+  "PrerequisitesSourcePath": "C:\\inetpubopen\\xISHServer",
   "CredentialForCredSSPExpression":"New-MyCredential",
   "OSUserCredentialExpression":"New-InfoShareServiceUserCredential",
   "PSRepository": [
@@ -33,11 +33,12 @@ An example JSON file looks like this
 - `ComputerName` is the target computer name. If not set then all script execute locally
 - `ISHVersion` is the target content manager version.
 - `EnableSecureWinRM` controls if the script should initialize the secure WinRm.
+- `CertificateAuthority` is the domain authority than issues certificates.
 - `InstallProcessExplorer` controls if the script should install process explorer.
-- `ISHServerRepository` is the repository name where ISHServer module can be found.
+- `xISHServerRepository` is the repository name where xISHServer module can be found.
 - `xISHInstallRepository` is the repository name where xISHInstall module can be found.
 - `ISHDeployRepository` is the repository name where ISHDeploy module can be found.
-- `PrerequisitesSourcePath` is the source path for all ISHServer 3rd party dependencies.
+- `PrerequisitesSourcePath` is the source path for all xISHServer 3rd party dependencies.
 - `CredentialForCredSSPExpression` is the cmdlet or expression that return a `PSCredential` to use for *CredSSP* sessions.
 - `OSUserCredentialExpression` is the cmdlet or expression that return a `PSCredential` to use for sessions on behalf of the `osuser`.
 - `PSRepository` is an array with `PSRepository` values. Look up `Register-PSRepository` to understand the values. Leave empty to not register any repository.
@@ -53,7 +54,7 @@ An example for localhost doesn't need the following values because nothing execu
 Here is an example script
 ```powershell
 # Load the file with the target values
-& Load-Json.ps1 -JSONFile "ISH1200.server01.example.com.json"
+& Load-Json.ps1 -JSONFile "server01.json"
 
 & Initialize-PowerShellGet.ps1
 & Initialize-ServerForRemote.ps1

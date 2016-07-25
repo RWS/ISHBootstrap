@@ -1,4 +1,4 @@
-#Requires –RunAsAdministrator
+#requires -runasadministrator
 
 . $PSScriptRoot\Get-ISHServerFolderPath.ps1
 

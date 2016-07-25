@@ -17,13 +17,14 @@ if(-not $computerName)
 if($computerName)
 {
     $enableSecureWinRM=Get-ISHBootstrapperContextValue -ValuePath "EnableSecureWinRM"
+    $certificateAuthority=Get-ISHBootstrapperContextValue -ValuePath "CertificateAuthority"
     $targetPath="\\$computerName\C$\Users\$env:USERNAME\Documents\WindowsPowerShell\"
     if(-not (Test-Path $targetPath))
     {
         New-Item $targetPath -ItemType Directory | Out-Null
     }
     Copy-Item -Path "$scriptsPaths\Remote\Initialize-Remote.ps1" -Destination $targetPath -Force
-    Write-Host "Login to $Computer and execute locally C:\Users\$env:USERNAME\Documents\WindowsPowerShell\Initialize-Remote.ps1"
+    Write-Host "Login to $Computer and execute locally C:\Users\$env:USERNAME\Documents\WindowsPowerShell\Initialize-Remote.ps1 -CertificateAuthority `"$certificateAuthority`""
 }
 else
 {

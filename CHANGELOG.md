@@ -1,5 +1,11 @@
 # Change log
 
+**20160725**
+
+- Renamed ISHServer to xISHServer (Experimental)
+- Improved notes
+- Added note **How to use the repository**
+
 **20160720**
 
 - Copy ISHCD script

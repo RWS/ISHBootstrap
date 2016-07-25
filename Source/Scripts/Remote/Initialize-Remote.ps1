@@ -1,3 +1,8 @@
+param(
+    [Parameter(Mandatory=$true)]
+    [ValidateNotNullOrEmpty()]
+    [string]$CertificateAuthority
+)
 Write-Verbose "Installing WinRM-IIS-Ext"
 Add-WindowsFeature WinRM-IIS-Ext | Out-Null
 Write-Host "WinRM-IIS-Ext feature is ok"
@@ -12,7 +17,7 @@ $certificate=Get-ChildItem "Cert:\LocalMachine\My" |Where-Object {$_.Subject -ma
 if(-not $certificate)
 {
     Write-Verbose "Requesting Web server certificate."
-    New-DomainSignedCertificate -Hostname $hostname -Organization "SDL" -OrganizationalUnit "SDL" -Locality "Mechelen" -State "Antwerp" -Country "BE"  -CertificateAuthority "SDLCORPCA.sdl.corp\SDLCorpCA" | Out-Null
+    New-DomainSignedCertificate -Hostname $hostname -CertificateAuthority "SDLCORPCA.sdl.corp\SDLCorpCA" | Out-Null
     $certificate=Get-ChildItem "Cert:\LocalMachine\My" |Where-Object {$_.Subject -match $hostname -and (Get-CertificateTemplate $_) -eq "WebServer"}
     Write-Host "Installed new certificate with friendly name $($certificate.FriendlyName)"
 }
