@@ -1,13 +1,19 @@
 param(
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory=$true,ParameterSetName="Name")]
     [ValidateNotNullOrEmpty()]
-    [string]$JSONFile
+    [string]$JSONFile,
+    [Parameter(Mandatory=$true,ParameterSetName="Path")]
+    [ValidateNotNullOrEmpty()]
+    [string]$JSONPath
 )
 try
 {
-    $jsonPath="$PSScriptRoot\$JSONFile"
-    $uri = [System.Uri]"file://$jsonPath"
-    Write-Debug "jsonPath=$jsonPath"
+    if($PSCmdlet.ParameterSetName -eq "Name")
+    {
+        $JSONPath="$PSScriptRoot\$JSONFile"
+    }
+    $uri = [System.Uri]"file://$JSONPath"
+    Write-Debug "jsonPath=$JSONPath"
     Write-Debug "uri=$($uri.AbsoluteUri)"
 
     $client = New-Object System.Net.Webclient
@@ -16,7 +22,7 @@ try
     $variableName="__ISHBootstrapper_Data__"
     Set-Variable $variableName -Value ($data| ConvertFrom-Json) -Scope Global -Force
 
-    Write-Host "ISHBootstrapper initialized from $JSONFile in variable $variableName"
+    Write-Host "ISHBootstrapper initialized from $JSONPath in variable $variableName"
 }
 catch
 {
