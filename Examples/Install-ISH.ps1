@@ -34,7 +34,7 @@ $installBlock= {
 
         $hash=@{
             CDPath=$cdPath
-            Version=$ishDeployment.Version
+            Version=$ishVersion
             OSUser=$osUser
             OSPassword=$osPassword
             ConnectionString=$ishDeployment.ConnectionString
@@ -68,7 +68,7 @@ try
     {
         & "$scriptsPaths\Helpers\Test-Administrator.ps1"
     }
-    Invoke-CommandWrap -ComputerName $computerName -ScriptBlock $installBlock -BlockName "Install ISH" -UseParameters @("ishDeployments","osUser","osPassword")
+    Invoke-CommandWrap -ComputerName $computerName -ScriptBlock $installBlock -BlockName "Install ISH" -UseParameters @("ishDeployments","ishVersion","osUser","osPassword")
 
 }
 finally
