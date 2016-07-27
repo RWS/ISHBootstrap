@@ -1,4 +1,4 @@
-# How to use the repository
+# How to use the repository (Examples)
 
 Starting from a clean **Windows Server 2012 R2** installation this how you end up with a [SDL Knowledge Center 2016](sdl.com/xml) Content Manager 12.0.0 Deployment.
 
@@ -84,12 +84,15 @@ An obfuscated file looks like this
   },
   "ISHDeployment": [
 	{
-	  "Version": "12.0.0",
 	  "Suffix": "SQL",
 	  "IsOracle": false,
 	  "ConnectionString": "",
 	  "LucenePort": 9010,
-	  "UseRelativePaths": false
+	  "UseRelativePaths": false,
+	  "Scripts": [
+		"ISHDeploy\\Set-UIFeatures.ps1",
+		"ISHDeploy\\Set-ADFSIntegration.ps1"
+	  ]
 	}
   ]
 }
@@ -169,12 +172,85 @@ If you have access to a Content Manager CD then you already know what these valu
 
 ## Apply code as configuration scripts
 
-```powershell
-To be filled in.
+This section is the one that is expected to modified as much as possible. 
+For this reason, all references here are for showcase purpose only.
+
+I've created a script `Invoke-ISHDeployScript.ps1` that picks up the `Scripts` defined in the json's `ISHDeployment`
+
+```json
+"ISHDeployment": [
+	{
+	  "Suffix": "SQL",
+	  "IsOracle": false,
+	  "ConnectionString": "",
+	  "LucenePort": 9010,
+	  "UseRelativePaths": false,
+	  "Scripts": [
+		"ISHDeploy\\Set-UIFeatures.ps1",
+		"ISHDeploy\\Set-ADFSIntegration.ps1"
+	  ]
+	}
+  ]
 ```
+
+To showcase the potential of ISHDeploy I've crafted a two scripts with a variation. 
+Each script works against a target computer and a specific deployment that is generated like this `InfoShare$Suffix`.
+
+- `Set-UIFeatures.ps1` shows a small script that 
+  - Enables Content Editor and sets the license.
+  - Enables Quality Assurance.
+  - Enables Externa Preview for a specific user.
+  - Adds a dummy tab to Content Manager Event Monitor.
+- `Set-ADFSIntegration.ps1` combines the **ADFS** PowerShell module to
+  1. Figure out all values configured on a specific ADFS**
+  1. Configure the Content Manager with them 
+  1. Extract a script from the deployment that configures ADFS**
+  1. Execute the script
+ 
+`Set-ADFSIntegration.ps1` is prime example of how someone can utilize multiple modules to fully automate a manual process.
+
+You can trigger the sequence with 
+
+```powershell
+& .\Examples\Invoke-ISHDeployScript.ps1
+```
+
+The above scripts are based on executing script blocks on the remote servers. 
+This pattern is not very friendly to the concept of code as configuration as described on [code as configuration](https://sarafian.github.io/post/code%20as%20configuration/). 
+Although much of the noise is hidden away using the `Invoke-CommandWrap` which is available on [gist](https://gist.github.com/Sarafian/a277cd64468a570dff74682eb929ff3c) for some people it is not good enough. 
+For this reason both scripts have a sibling counterpart that uses implicit remoting as described on [import and use module from a remote server](https://sarafian.github.io/post/powershell/Import-Use-Module-Remote-Server/).
+
+- `Set-UIFeatures.ImplicitRemoting.ps1`
+- `Set-ADFSIntegration.ImplicitRemoting.ps1`
+
+Both scripts do exactly the same thing but the code is conceptually different. 
+You must also watch out because the code executes also differently. 
+There are some important aspects of PowerShell remoting that one needs to be aware of. 
+Read more about it on [PowerShell remoting caveats](https://sarafian.github.io/post/powershell/powershell-remoting-caveats/) and google.
+
+You can trigger the sequence with 
+
+```powershell
+& .\Examples\Invoke-ISHDeployScript.ps1 -UseImplicitRemoting
+```
+
+The `Invoke-ISHDeployScript.ps1` converts any script references from `path\filename.ps1` to `path\filename.ImplicitRemoting.ps1` when `-UseImplicitRemoting` parameter is used.
+
+For development purposes, if you need to undo all changes made by these scripts on the deployment then execute
+
+```powershell
+& .\Examples\Undo-ISHDeployment.ps1
+#or
+& .\Examples\Undo-ISHDeployment.ImplicitRemoting.ps1
+```
+
+The scripts with implicit remoting use the `Invoke-ImplicitRemoting` cmdlet defined in the repository. 
+This is a variation of `Invoke-CommandWrap` and it executes a script block that uses cmdlets from a module that is available on a remote server by first importing implicitly the defined modules. 
+It will also do some cleanup. 
+The most amazing thing is that you can debug each line of the block!
 
 # Final remarks
 
-- With some minor modifications the entire process can be executed against the local operating system. Start with not defining `ComputerName` in the json file. Since everything executes locally we don't need to configure **Enable the CredSSP authentication for PSSession** but please take notice on the remark.
+- With some minor modifications the entire process can be executed against the local operating system. Start with not defining `ComputerName` in the json file. Since everything executes locally we don't need to configure **Enable the CredSSP authentication for PSSession** but please take notice on the remark. 
 - The flow is split into what I considered isolated steps. This repository is a showcase and some steps need to be adjusted accordingly to match production level requirements. 
 **Please keep in mind the acknowledgements of the repository**.

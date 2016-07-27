@@ -8,6 +8,7 @@ $scriptsPaths="$sourcePath\Scripts"
 
 . "$PSScriptRoot\Cmdlets\Get-ISHBootstrapperContextValue.ps1"
 $computerName=Get-ISHBootstrapperContextValue -ValuePath "ComputerName"
+$ishVersion=Get-ISHBootstrapperContextValue -ValuePath "ISHVersion"
 
 . "$cmdletsPaths\Helpers\Invoke-CommandWrap.ps1"
 
@@ -26,7 +27,7 @@ $osPassword=$osUserNetworkCredential.Password
 $installBlock= {
     foreach($ishDeployment in $ishDeployments)
     {
-        $rootPath="C:\IshCD\$($ishDeployment.Version)"
+        $rootPath="C:\IshCD\$ishVersion"
         Write-Debug "rootPath=$rootPath"
         $cdPath=(Get-ChildItem $rootPath |Where-Object{Test-Path $_.FullName -PathType Container}| Sort-Object FullName -Descending)[0]|Select-Object -ExpandProperty FullName
         Write-Debug "cdPath=$cdPath"

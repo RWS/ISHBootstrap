@@ -3,7 +3,7 @@
 - [![Gitter](https://badges.gitter.im/Sarafian/ISHBootstrap.svg)](https://gitter.im/Sarafian/ISHBootstrap)
 
 # ISHBootstrap
-Bootstrapper for [SDL Knowledge Center](sdl.com/xml) Content Manager deployments
+Bootstrapper for [SDL Knowledge Center](https://sdl.com/xml) Content Manager deployments
 
 # Description
 
@@ -18,7 +18,7 @@ With the ISHBootstrapper the following flow gets automated for a clean/default W
 
 1. Install the `PowerShellGet` powershell module to easily install modules. Windows Server 2012 R2 offers out of the box Powershell v4.0. Content Manager 12.0.* supports version v4.0.
 1. Enable and configure the **WinRM** (Windows Remoting) for secure connections and `CredSSP`
-1. Install Content Manager prerequisites as described in the [documentation](docs.sdl.com/LiveContent/web/pub.xql?action=home&pub=SDL Knowledge Center full documentation-v2&lang=en-US)
+1. Install Content Manager prerequisites as described in the [documentation](https://docs.sdl.com/LiveContent/web/pub.xql?action=home&pub=SDL Knowledge Center full documentation-v2&lang=en-US)
 1. Copy the deliverable of the Content Manager CD
 1. Install Content Manager. One or more deployments.
 1. Execute [ISHDeploy](powershellgallery.com/packages/ISHDeploy.12.0.0/) based code as configuration scripts
@@ -33,6 +33,12 @@ For this reason, some remote instructions fill face the double hop limitation de
 - Not all modules available here will be published to PowerShell gallery. Setting up an internal nuger repository is easy. The process is described [here](https://docs.nuget.org/create/hosting-your-own-nuget-feeds).
 - The code base will work against current **Knowledge Center 2016 Content Manager 12.0.0** but the code base will support future minor releases like **Knowledge Center 2016 Content Manager 12.0.1** and future major releases that is only internally available.
 - To avoid revealing internal asset names some variables will not be defined in code but we'll be acquired with cmdlets such as `Get-Variable`
+
+# Using the repository
+
+Please refer to topic [How to use the repository (Examples)](Topics\How to use the repository (Examples).md).
+
+Additional topics are also provided in [Topics](Topics) folder.
 
 # Future
 

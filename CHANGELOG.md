@@ -1,10 +1,16 @@
 # Change log
 
+**20160727**
+
+- Removed topic `About example script`
+- New pipeline for ISHDeploy code as configuration scripts. Support for implicit remoting.
+- Updated the `How to use the repository (Examples)` topic.
+
 **20160725**
 
 - Renamed ISHServer to xISHServer (Experimental)
-- Improved notes
-- Added note **How to use the repository**
+- Improved topics
+- Added topic **How to use the repository**
 
 **20160720**
 
