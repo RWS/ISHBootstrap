@@ -87,6 +87,30 @@ function New-ISHDeploymentInputParameters {
     $inputParametersPath=Join-Path $CDPath "__InstallTool\inputparameters.xml"
     [xml]$xml=Get-Content $inputParametersPath
     
+    if($Suffix -ne "")
+    {
+        if(-not $node)
+        {
+            $param = $xml.CreateElement('param')
+            $param.SetAttribute('name','projectsuffix') |Out-Null
+            
+            $currentValue = $xml.CreateElement('currentvalue')
+            $currentValue.InnerText=$Suffix
+            $param.AppendChild($currentValue) |Out-Null
+
+            $defaultvalue = $xml.CreateElement('defaultvalue')
+            $param.AppendChild($defaultvalue) |Out-Null
+
+            $description = $xml.CreateElement('description')
+            $param.AppendChild($description) |Out-Null
+
+            $validate = $xml.CreateElement('validate')
+            $param.AppendChild($validate) |Out-Null
+
+            $xml.inputconfig.AppendChild($param) |Out-Null
+        }
+    }
+
     foreach($key in $inputParameters.Keys)
     {
         $node=$xml | Select-Xml -XPath "//param[@name='$key']/currentvalue"
@@ -95,6 +119,7 @@ function New-ISHDeploymentInputParameters {
             $node.Node.InnerText=$inputParameters[$key]
         }
     }
+
     
     #Desible validations
     
