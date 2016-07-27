@@ -16,4 +16,6 @@ function Install-ISHToolJAVA
         Start-Process $filePath -ArgumentList $arguments -Wait -Verb RunAs
         Write-Verbose "Installed $fileName"
     }
+
+    [Environment]::SetEnvironmentVariable("JAVA_HOME", "C:\Program Files\Java\jre1.8.0_60", "Machine")
 }
