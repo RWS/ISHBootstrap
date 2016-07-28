@@ -20,16 +20,22 @@ if(-not (Get-Command Invoke-ImplicitRemoting -ErrorAction SilentlyContinue))
     . $cmdletsPaths\Helpers\Invoke-ImplicitRemoting.ps1
 }        
 
+
+
+$getStatusBlock= {
+    Write-Host "History"
+    Get-ISHDeploymentHistory -ISHDeployment $DeploymentName
+    Write-Host "Changed parameters"
+    Get-ISHDeploymentParameters -ISHDeployment $DeploymentName -Changed | Format-Table
+}
+
+
 try
 {
-    $undoBlock={
-        Undo-ISHDeployment -ISHDeployment $DeploymentName
-        Clear-ISHDeploymentHistory -ISHDeployment $DeploymentName
-    }
-
-    $ishDelpoyModuleName="ISHDeploy.$ISHVersion"
-    Invoke-ImplicitRemoting -ScriptBlock $undoBlock -BlockName "Undo deployment" -ComputerName $computerName -ImportModule $ishDelpoyModuleName
+    $ishDelpoyModuleName="ISHDeploy.$ishVersion"
+    Invoke-ImplicitRemoting -ScriptBlock $getStatusBlock -BlockName "Status on $DeploymentName" -ComputerName $Computer -ImportModule $ishDelpoyModuleName
 }
 finally
 {
+
 }

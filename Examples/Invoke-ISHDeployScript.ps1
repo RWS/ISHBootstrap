@@ -1,6 +1,12 @@
 param(
     [Parameter(Mandatory=$false)]
-    [switch]$UseISHDeployImplicit=$false
+    [switch]$UseISHDeployImplicit=$false,
+    [Parameter(Mandatory=$true,ParameterSetName="Undo")]
+    [switch]$Undo,
+    [Parameter(Mandatory=$true,ParameterSetName="Status")]
+    [switch]$Status,
+    [Parameter(Mandatory=$true,ParameterSetName="Configure")]
+    [switch]$Configure
 )
 if ($PSBoundParameters['Debug']) {
     $DebugPreference = 'Continue'
@@ -30,13 +36,32 @@ try
     foreach($ishDeployment in $ishDeployments)
     {
         $deploymentName="InfoShare$($ishDeployment.Suffix)"
-        $ishDeployment.Scripts | ForEach-Object {
-            $scriptFileName=$_
-            $folderPath=Get-ISHBootstrapperContextValue -ValuePath "FolderPath"
-            $scriptPath=Join-Path $folderPath $scriptFileName
-            Write-Debug "scriptFileName=$scriptFileName"
-            Write-Debug "folderPath=$folderPath"
-
+        $scriptsToExecute=@()
+        switch ($PSCmdlet.ParameterSetName)
+        {
+            'Undo' {
+                $scriptFileName="Undo-ISHDeployment.ps1"
+                $folderPath=Join-Path $PSScriptRoot "ISHDeploy"
+                $scriptPath=Join-Path $folderPath $scriptFileName
+                $scriptsToExecute+=$scriptPath
+            }
+            'Configure' {
+                $ishDeployment.Scripts | ForEach-Object {
+                    $scriptFileName=$_
+                    $folderPath=Get-ISHBootstrapperContextValue -ValuePath "FolderPath"
+                    $scriptPath=Join-Path $folderPath $scriptFileName
+                    $scriptsToExecute+=$scriptPath
+                }            
+            }
+            'Status' {
+                $scriptFileName="Get-Status.ps1"
+                $folderPath=Join-Path $PSScriptRoot "ISHDeploy"
+                $scriptPath=Join-Path $folderPath $scriptFileName
+                $scriptsToExecute+=$scriptPath
+            }
+        }
+        $scriptsToExecute | ForEach-Object {
+            $scriptPath=$_
             if($UseISHDeployImplicit)
             {
                 $scriptPath=$scriptPath.Replace(".ps1",".ImplicitRemoting.ps1")

@@ -175,7 +175,7 @@ If you have access to a Content Manager CD then you already know what these valu
 This section is the one that is expected to modified as much as possible. 
 For this reason, all references here are for showcase purpose only.
 
-I've created a script `Invoke-ISHDeployScript.ps1` that picks up the `Scripts` defined in the json's `ISHDeployment`
+I've created a script `Invoke-ISHDeployScript.ps1` that wraps up functionality for the ISHDeploy module.
 
 ```json
 "ISHDeployment": [
@@ -212,42 +212,51 @@ Each script works against a target computer and a specific deployment that is ge
 You can trigger the sequence with 
 
 ```powershell
-& .\Examples\Invoke-ISHDeployScript.ps1
+& .\Examples\Invoke-ISHDeployScript.ps1 -Configure
+```
+
+`Invoke-ISHDeployScript.ps1` accepts two other parameters:
+
+- `-Status` return the history and input parameter delta as defined in the [Get-Status.ps1]`/Exampes/ISHDeploy/Get-Status.ps1` script.
+- `-Undo` undos all action done to the repository using ISHDeploy cmdlets using the [Undo-ISHDeployment.ps1]`/Exampes/ISHDeploy/Undo-ISHDeployment`. This is very useful for development purposes and I use is it as my quick reset mechanism.
+
+```powershell
+& .\Examples\Invoke-ISHDeployScript.ps1 -Status 
+& .\Examples\Invoke-ISHDeployScript.ps1 -Undo 
 ```
 
 The above scripts are based on executing script blocks on the remote servers. 
 This pattern is not very friendly to the concept of code as configuration as described on [code as configuration](https://sarafian.github.io/post/code%20as%20configuration/). 
 Although much of the noise is hidden away using the `Invoke-CommandWrap` which is available on [gist](https://gist.github.com/Sarafian/a277cd64468a570dff74682eb929ff3c) for some people it is not good enough. 
-For this reason both scripts have a sibling counterpart that uses implicit remoting as described on [import and use module from a remote server](https://sarafian.github.io/post/powershell/Import-Use-Module-Remote-Server/).
+For this reason all scripts have a sibling counterpart that uses implicit remoting as described on [import and use module from a remote server](https://sarafian.github.io/post/powershell/Import-Use-Module-Remote-Server/).
 
 - `Set-UIFeatures.ImplicitRemoting.ps1`
 - `Set-ADFSIntegration.ImplicitRemoting.ps1`
+- `Get-Status.ImplicitRemoting.ps1`
+- `Undo-ISHDeployment.ImplicitRemoting.ps1`
 
-Both scripts do exactly the same thing but the code is conceptually different. 
+All *ImplicitRemoting.ps1* variants do exactly the same thing but the code is conceptually different. 
 You must also watch out because the code executes also differently. 
 There are some important aspects of PowerShell remoting that one needs to be aware of. 
 Read more about it on [PowerShell remoting caveats](https://sarafian.github.io/post/powershell/powershell-remoting-caveats/) and google.
 
-You can trigger the sequence with 
-
-```powershell
-& .\Examples\Invoke-ISHDeployScript.ps1 -UseImplicitRemoting
-```
-
-The `Invoke-ISHDeployScript.ps1` converts any script references from `path\filename.ps1` to `path\filename.ImplicitRemoting.ps1` when `-UseImplicitRemoting` parameter is used.
-
-For development purposes, if you need to undo all changes made by these scripts on the deployment then execute
-
-```powershell
-& .\Examples\Undo-ISHDeployment.ps1
-#or
-& .\Examples\Undo-ISHDeployment.ImplicitRemoting.ps1
-```
+> What you see is not exactly what you get!
 
 The scripts with implicit remoting use the `Invoke-ImplicitRemoting` cmdlet defined in the repository. 
 This is a variation of `Invoke-CommandWrap` and it executes a script block that uses cmdlets from a module that is available on a remote server by first importing implicitly the defined modules. 
 It will also do some cleanup. 
 The most amazing thing is that you can debug each line of the block!
+
+You can any of the above options for `Invoke-ISHDeployScript.ps1` with the `-UseImplicitRemoting` parameter 
+
+```powershell
+# Configure
+& .\Examples\Invoke-ISHDeployScript.ps1 -Configure -UseImplicitRemoting
+# Status
+& .\Examples\Invoke-ISHDeployScript.ps1 -Status -UseImplicitRemoting
+# Undo
+& .\Examples\Invoke-ISHDeployScript.ps1 -Undo -UseImplicitRemoting
+```
 
 # Final remarks
 

@@ -17,17 +17,23 @@ if(-not $Computer)
 if(-not (Get-Command Invoke-CommandWrap -ErrorAction SilentlyContinue))
 {
     . $cmdletsPaths\Helpers\Invoke-CommandWrap.ps1
+}        
+
+
+$getStatusBlock= {
+    Write-Host "History"
+    Get-ISHDeploymentHistory -ISHDeployment $DeploymentName
+    Write-Host "Changed parameters"
+    Get-ISHDeploymentParameters -ISHDeployment $DeploymentName -Changed | Format-Table
 }
 
+
+#Install the packages
 try
 {
-    $undoBlock={
-        $deployment = Get-ISHDeployment -Name $DeploymentName
-        Undo-ISHDeployment -ISHDeployment $DeploymentName
-        Clear-ISHDeploymentHistory -ISHDeployment $DeploymentName
-    }
-    Invoke-CommandWrap -ComputerName $Computer -ScriptBlock $undoBlock -BlockName "Undo deployment $deploymentName" -UseParameters @("DeploymentName")
+    Invoke-CommandWrap -ComputerName $Computer -ScriptBlock $getStatusBlock -BlockName "Status on $DeploymentName" -UseParameters @("DeploymentName")
 }
 finally
 {
+
 }

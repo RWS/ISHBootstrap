@@ -59,7 +59,7 @@ $setUIFeaturesScirptBlock= {
 
 try
 {
-    $ishDelpoyModuleName="ISHDeploy.$ishVersion"
+    $ishDelpoyModuleName="ISHDeploy.$ISHVersion"
     Invoke-ImplicitRemoting -ScriptBlock $setUIFeaturesScirptBlock -BlockName "Set UI Features on $DeploymentName" -ComputerName $Computer -ImportModule $ishDelpoyModuleName
 }
 finally
