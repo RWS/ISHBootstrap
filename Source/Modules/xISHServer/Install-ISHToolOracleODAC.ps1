@@ -10,7 +10,7 @@ function Install-ISHToolOracleODAC
     $targetPath=Join-Path $env:TEMP "$baseFileName"
     if(Test-Path $targetPath)
     {
-        Write-Warning "$fileName is already installed in $targetPath"
+        Write-Warning "$fileName is already available in $targetPath"
     }
     else
     {

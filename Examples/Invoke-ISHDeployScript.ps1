@@ -21,7 +21,7 @@ try
 {
 
     . "$PSScriptRoot\Cmdlets\Get-ISHBootstrapperContextValue.ps1"
-    $computerName=Get-ISHBootstrapperContextValue -ValuePath "ComputerName"
+    $computerName=Get-ISHBootstrapperContextValue -ValuePath "ComputerName" -DefaultValue $null
 
     if(-not $computerName)
     {

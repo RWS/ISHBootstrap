@@ -1,11 +1,11 @@
 ﻿param (
     [Parameter(Mandatory=$true,ParameterSetName="Remote")]
-    [string]$Computer=$null,
+    [string]$Computer,
     [Parameter(Mandatory=$true,ParameterSetName="Remote")]
     [PSCredential]$CrentialForCredSSP,
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory=$true,ParameterSetName="Loacal,Remote")]
     [string]$OSUser,
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory=$true,ParameterSetName="Loacal,Remote")]
     [ValidateSet("12","13")]
     [string]$ISHServerVersion
 )    

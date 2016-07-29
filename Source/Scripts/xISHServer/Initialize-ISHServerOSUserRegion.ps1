@@ -1,30 +1,22 @@
 ﻿param (
     [Parameter(Mandatory=$true)]
-    [string]$Computer=$null,
+    [string]$Computer,
     [Parameter(Mandatory=$true)]
-    [PSCredential]$OSUserCredential,
-    [Parameter(Mandatory=$true)]
-    [ValidateSet("12","13")]
-    [string]$ISHServerVersion
+    [PSCredential]$OSUserCredential
 )    
 . $PSScriptRoot\..\..\Cmdlets\Helpers\Invoke-CommandWrap.ps1
 try
 {
-    switch ($ISHServerVersion)
-    {
-        '12' {$ishServerModuleName="xISHServer.12"}
-        '13' {$ishServerModuleName="xISHServer.13"}
-    }
     $session=New-PSSession -ComputerName $Computer -Credential $OSUserCredential
-    Import-Module $ishServerModuleName -PSSession $session -Force
-    Invoke-CommandWrap -Session $session -BlockName "Initialize Debug/Verbose preference on session" -ScriptBlock {}
+    $block={
+        Initialize-ISHRegional
+    }
+    Invoke-CommandWrap -Session $session -BlockName "Initialize $OSUser" -ScriptBlock $block
 
-    Initialize-ISHRegional
 }
 
 finally
 {
-    Get-Module $ishServerModuleName |Remove-Module    
     if($session)
     {
         $session |Remove-PSSession

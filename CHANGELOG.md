@@ -1,5 +1,10 @@
 # Change log
 
+**20160729**
+
+- Fixes to support non-remote execution
+- Install-ISHWindowsFeatures now works with both ServerManager and DISM modules. 
+
 **20160727**
 
 - Removed topic `About example script`

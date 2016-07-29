@@ -14,13 +14,13 @@ Function Get-ISHBootstrapperContextValue
     $value = Invoke-Expression "`$data.$ValuePath";
     if (-not $value)
     {
-        if($DefaultValue)
+        if($PSBoundParameters.ContainsKey('DefaultValue'))
         {
             $value=$DefaultValue
         }
         else
         {
-            Write-Warning "$ValuePath path does not exist and DefaultValue is specified"
+            Write-Warning "$ValuePath path does not exist and DefaultValue is not specified"
         }
     }
     $value

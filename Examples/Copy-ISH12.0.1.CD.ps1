@@ -7,7 +7,7 @@ $cmdletsPaths="$sourcePath\Cmdlets"
 $scriptsPaths="$sourcePath\Scripts"
 
 . "$PSScriptRoot\Cmdlets\Get-ISHBootstrapperContextValue.ps1"
-$computerName=Get-ISHBootstrapperContextValue -ValuePath "ComputerName"
+$computerName=Get-ISHBootstrapperContextValue -ValuePath "ComputerName" -DefaultValue $null
 
 . "$cmdletsPaths\Helpers\Invoke-CommandWrap.ps1"
 

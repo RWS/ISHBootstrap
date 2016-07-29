@@ -7,7 +7,7 @@ $cmdletsPaths="$sourcePath\Cmdlets"
 $scriptsPaths="$sourcePath\Scripts"
 
 . "$PSScriptRoot\Cmdlets\Get-ISHBootstrapperContextValue.ps1"
-$computerName=Get-ISHBootstrapperContextValue -ValuePath "ComputerName"
+$computerName=Get-ISHBootstrapperContextValue -ValuePath "ComputerName" -DefaultValue $null
 
 . "$cmdletsPaths\Helpers\Invoke-CommandWrap.ps1"
 
@@ -48,13 +48,14 @@ try
     if(-not $computerName)
     {
         & "$scriptsPaths\Helpers\Test-Administrator.ps1"
+		$session=$null
     }
     else
     {
         $fqdn=[System.Net.Dns]::GetHostByName($computerName)| FL HostName | Out-String | %{ "{0}" -f $_.Split(':')[1].Trim() };
         $credentialForCredSSP=Invoke-Expression (Get-ISHBootstrapperContextValue -ValuePath "CredentialForCredSSPExpression")
+		$session=New-PSSession -ComputerName $fqdn -Credential $credentialForCredSSP -UseSSL -Authentication Credssp
     }
-    $session=New-PSSession -ComputerName $fqdn -Credential $credentialForCredSSP -UseSSL -Authentication Credssp
 
     Invoke-CommandWrap -Session $session -ScriptBlock $copyBlock -BlockName "Copy and Extract ISH13.0.0" -UseParameters @("internalCDFolder")
 
