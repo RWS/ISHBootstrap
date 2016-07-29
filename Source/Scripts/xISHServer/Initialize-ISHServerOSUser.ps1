@@ -1,6 +1,8 @@
 ﻿param (
     [Parameter(Mandatory=$true,ParameterSetName="Remote")]
     [string]$Computer,
+    [Parameter(Mandatory=$false,ParameterSetName="Remote")]
+    $SessionOptions=$null,
     [Parameter(Mandatory=$true,ParameterSetName="Remote")]
     [PSCredential]$CrentialForCredSSP,
     [Parameter(Mandatory=$true,ParameterSetName="Local")]
@@ -17,7 +19,14 @@ try
     $ishServerModuleName="xISHServer.$ISHServerVersion"
     if($Computer)
     {
-        $session=New-PSSession -ComputerName $Computer -Credential $CrentialForCredSSP -UseSSL -Authentication Credssp
+        if($SessionOptions)
+        {
+            $session=New-PSSession -ComputerName $Computer -Credential $CrentialForCredSSP -UseSSL -Authentication Credssp –SessionOption $SessionOptions
+        }
+        else
+        {
+            $session=New-PSSession -ComputerName $Computer -Credential $CrentialForCredSSP -UseSSL -Authentication Credssp
+        }
         Import-Module $ishServerModuleName -PSSession $session -Force
         Invoke-CommandWrap -Session $session -BlockName "Initialize Debug/Verbose preference on session" -ScriptBlock {}
     }

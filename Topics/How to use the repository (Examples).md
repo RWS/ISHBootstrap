@@ -141,8 +141,36 @@ To configure the system at this moment we need to Remote Desktop and execute loc
 The current script install the Oracle ODAC client. At this moment, I can't find a way to make it work without a restart of the server. The script takes care of this automatically.
 
 This step uses the `PrerequisitesSourcePath` for the xISHServer 3rd party dependencies. The file are copies from this folder into the remote server. The required files are explained in [About xISHServer module](About xISHServer module.md) 
-The values of `CredentialForCredSSPExpression` and `OSUserCredentialExpression` are an abstraction to the credentials for a user that can establish a session with CredSSP and for the osuser.
+The values of `CredentialForCredSSPExpression` and `OSUserCredentialExpression` are an abstraction to the credentials for a user that can establish a session with CredSSP and for the `osuser`.
 Behind the scenes the `Invoke-Expression` is used to execute the specified cmdlet. In my profile scripts I've made sure that cmdlets `New-MyCredential` and `New-InfoShareServiceUserCredential` are always available.
+
+Behind the scenes the scripts in folder `Source\Scripts\xISHServer` are executed. 
+The `Initialize-ISHServerOSUser.ps1` is the most tricky one because it needs to add the `osuser` to the local administrator group. 
+To do that the remote call needs to access the active directory and this is where the double hop issue appears. Read more on [About CredSSP authentication for PSSession](About CredSSP authentication for PSSession.md). 
+CredSSP requires secure SSL. That means that a session must be created using the Fully Qualified Domain Name of the computer because the certificate should have as Common Name (CN) the same. 
+As an example if the server is `server01` and the FQDN is `server01.x1.x2.x3` the code that imports implicitly a module looks like 
+
+```powershell
+$session=New-PSSession "server01.x.y.z" -Credential -UseSSL -Authentication CredSSP
+Import-Module $moduleName -PSSession $session -Force
+```
+
+If you are unlucky and those `x(n)`are long then you might end up with this message
+
+> Import-Module : Failed to generate proxies for remote module 'xISHServer.12'.  The specified path, file name, or both are too long. The fully qualified file name must be less than 260 characters, and the directory name must be less than 248 characters.
+
+There is not another way around this besides driving the session with the computer name.  
+Then ssl validation will fail with 
+
+> The SSL certificate contains a common name (CN) that does not match the hostname. For more information, see the about_Remote_Troubleshooting Help topic.
+
+To not use the lengthy FQDN and bypass the certificate common name validation adjust the JSON next to `CredentialForCredSSPExpression` like this
+
+```json
+  "CredentialForCredSSPExpression": "New-MyCredential",
+  "UseFQDNForCredSSPExpression": false,
+  "SessionOptionsForCredSSPExpression": "New-PSSessionOption -SkipCNCheck",
+```
 
 ## Seed the server with a Content Manager CD
 

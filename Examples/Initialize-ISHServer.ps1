@@ -13,11 +13,6 @@ if(-not $computerName)
 {
     & "$scriptsPaths\Helpers\Test-Administrator.ps1"
 }
-else
-{
-    $fqdn=[System.Net.Dns]::GetHostByName($computerName)| FL HostName | Out-String | %{ "{0}" -f $_.Split(':')[1].Trim() };
-    $credentialForCredSSP=Invoke-Expression (Get-ISHBootstrapperContextValue -ValuePath "CredentialForCredSSPExpression")
-}
 
 $osUserCredential=Invoke-Expression (Get-ISHBootstrapperContextValue -ValuePath "OSUserCredentialExpression")
 $prerequisitesSourcePath=Get-ISHBootstrapperContextValue -ValuePath "PrerequisitesSourcePath"
@@ -29,7 +24,22 @@ $ishServerVersion=($ishVersion -split "\.")[0]
 
 if($computerName)
 {
-    & $scriptsPaths\xISHServer\Initialize-ISHServerOSUser.ps1 -Computer $fqdn -ISHServerVersion $ishServerVersion -CrentialForCredSSP $credentialForCredSSP -OSUser ($osUserCredential.UserName)
+    $credentialForCredSSP=Invoke-Expression (Get-ISHBootstrapperContextValue -ValuePath "CredentialForCredSSPExpression")
+    $useFQDNWithCredSSP=Get-ISHBootstrapperContextValue -ValuePath "UseFQDNWithCredSSP" -DefaultValue $true
+    if($useFQDNWithCredSSP)
+    {
+        $fqdn=[System.Net.Dns]::GetHostByName($computerName)| FL HostName | Out-String | %{ "{0}" -f $_.Split(':')[1].Trim() };
+        & $scriptsPaths\xISHServer\Initialize-ISHServerOSUser.ps1 -Computer $fqdn -ISHServerVersion $ishServerVersion -CrentialForCredSSP $credentialForCredSSP -OSUser ($osUserCredential.UserName)
+    }
+    else
+    {
+        $sessionOptionsWithCredSSPExpression=Get-ISHBootstrapperContextValue -ValuePath "SessionOptionsWithCredSSPExpression" -DefaultValue $null
+        if($sessionOptionsWithCredSSPExpression)
+        {
+            $sessionOptionsWithCredSSP=Invoke-Expression $sessionOptionsWithCredSSPExpression
+        }
+        & $scriptsPaths\xISHServer\Initialize-ISHServerOSUser.ps1 -Computer $computerName -ISHServerVersion $ishServerVersion -CrentialForCredSSP $credentialForCredSSP -SessionOptions $sessionOptionsWithCredSSP -OSUser ($osUserCredential.UserName)
+    }
     & $scriptsPaths\xISHServer\Initialize-ISHServerOSUserRegion.ps1 -Computer $computerName -ISHServerVersion $ishServerVersion -OSUserCredential $osUserCredential
 }
 else

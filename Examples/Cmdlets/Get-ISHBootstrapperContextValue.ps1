@@ -12,7 +12,7 @@ Function Get-ISHBootstrapperContextValue
     $data = Get-Variable -Name $variableName -Scope Global -ValueOnly
 
     $value = Invoke-Expression "`$data.$ValuePath";
-    if (-not $value)
+    if ($value -eq $null)
     {
         if($PSBoundParameters.ContainsKey('DefaultValue'))
         {
