@@ -10,11 +10,7 @@
 . $PSScriptRoot\..\..\Cmdlets\Helpers\Invoke-CommandWrap.ps1
 try
 {
-    switch ($ISHServerVersion)
-    {
-        '12' {$ishServerModuleName="xISHServer.12"}
-        '13' {$ishServerModuleName="xISHServer.13"}
-    }
+    $ishServerModuleName="xISHServer.$ISHServerVersion"
     if($Computer)
     {
         $session=New-PSSession -ComputerName $Computer

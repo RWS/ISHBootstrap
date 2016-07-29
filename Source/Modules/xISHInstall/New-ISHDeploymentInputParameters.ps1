@@ -89,6 +89,7 @@ function New-ISHDeploymentInputParameters {
     
     if($Suffix -ne "")
     {
+        $node=$xml | Select-Xml -XPath "//param[@name='projectsuffix']"
         if(-not $node)
         {
             $param = $xml.CreateElement('param')

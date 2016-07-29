@@ -23,7 +23,7 @@ You can acquire the files from the given SDL ftp site or you can download them f
 
 Some of the pre-requisites require to server to restart.
 
-# Required files for xISHServer.12
+## Required files for xISHServer.12
 
 - MSXML 4.0
   - MSXML.40SP3.msi
@@ -47,7 +47,7 @@ Some of the pre-requisites require to server to restart.
   - V6-2-M9-Windows_X64_64E.exe.iss
   - AHFormatter.lic
   
-# Required files for xISHServer.13
+## Required files for xISHServer.13
 
 - MSXML 4.0
   - MSXML.40SP3.msi
@@ -79,6 +79,9 @@ Some of the pre-requisites require to server to restart.
 At this moment of time I don't want to publish the module to gallery yet. 
 If you still want to use it then you need to publish it to an internal nuget server and install it from there.
 
+# Why is this not a DSC module?
+
+Because when I started the interal code, I didn't had the time to investigate DSC.
   
   
   
