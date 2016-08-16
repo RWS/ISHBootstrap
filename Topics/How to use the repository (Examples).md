@@ -117,6 +117,8 @@ As part of this step, [ProcessExplorer](https://technet.microsoft.com/en-us/sysi
 
 This step uses the `xISHServerRepository`,`` and `ISHDeployRepository` to install the modules from the matching repository name. In this example the internal repository is specified by `asarafian` name in `PSRepository`.
 
+Note that when executing the scripts locally, the script will load the **xISHInstall** and **xISHServer** from their respected paths.
+
 ## Enable the CredSSP authentication for PSSession
 
 ```powershell
