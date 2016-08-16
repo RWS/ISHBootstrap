@@ -2,6 +2,8 @@
 
 **20160816**
 
+- New configuration scripts in examples. `Set-ISHSTSWindows.ps1` and `Set-UIFeatures.ImplicitRemoting.ps1` to enable the light weight windows authentication on top of ISHSTS. Scripts will make sure that IIS has the the module installed.
+- xISHServer has new cmdlet `Install-ISHWindowsFeatureIISWinAuth` to install the windows authentication module on IIS.
 - Added `Clean-ISH.ps1` in examples to remove all artifacts. (The CD is not removed).
 
 **20160729**

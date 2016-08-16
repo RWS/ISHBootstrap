@@ -50,6 +50,7 @@ $setUIFeaturesScirptBlock= {
         Label="Custom Event"
         Description="Show all custom events"
         EventTypesFilter=@("CUSTOM1","CUSTOM2")
+        UserRole=@("Administrator","Author")
     }
     Set-ISHUIEventMonitorTab -ISHDeployment $DeploymentName @hash
     Move-ISHUIEventMonitorTab -ISHDeployment $DeploymentName -Label $hash["Label"] -First

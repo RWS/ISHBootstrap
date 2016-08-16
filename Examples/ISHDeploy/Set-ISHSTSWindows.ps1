@@ -1,0 +1,39 @@
+param (
+    [Parameter(Mandatory=$false)]
+    [string[]]$Computer,
+    [Parameter(Mandatory=$true)]
+    [string]$DeploymentName
+)        
+
+$ishBootStrapRootPath="C:\GitHub\ISHBootstrap"
+$cmdletsPaths="$ishBootStrapRootPath\Source\Cmdlets"
+$scriptsPaths="$ishBootStrapRootPath\Source\Scripts"
+
+if(-not $Computer)
+{
+    & "$scriptsPaths\Helpers\Test-Administrator.ps1"
+}
+
+if(-not (Get-Command Invoke-CommandWrap -ErrorAction SilentlyContinue))
+{
+    . $cmdletsPaths\Helpers\Invoke-CommandWrap.ps1
+}  
+
+
+$installIISWinAuthBlock= {
+    Install-ISHWindowsFeatureIISWinAuth
+}
+$setWindowsBlock= {
+    Set-ISHSTSConfiguration -ISHDeployment $DeploymentName -AuthenticationType Windows
+}
+
+
+try
+{
+    Invoke-CommandWrap -ComputerName $Computer -ScriptBlock $installIISWinAuthBlock -BlockName "Install IIS Windows Authentication"
+    Invoke-CommandWrap -ComputerName $Computer -ScriptBlock $setWindowsBlock -BlockName "Windows Authentication $DeploymentName" -UseParameters @("DeploymentName")
+}
+finally
+{
+
+}
