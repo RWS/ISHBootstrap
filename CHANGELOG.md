@@ -1,5 +1,9 @@
 # Change log
 
+**20160816**
+
+- Added `Clean-ISH.ps1` in examples to remove all artifacts. (The CD is not removed).
+
 **20160729**
 
 - Fixes to support non-remote execution.
