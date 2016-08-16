@@ -31,6 +31,7 @@
 . $PSScriptRoot\Install-ISHToolAntennaHouse.ps1
 . $PSScriptRoot\Install-ISHToolOracleODAC.ps1
 . $PSScriptRoot\Install-ISHWindowsFeature.ps1
+. $PSScriptRoot\Install-ISHWindowsFeatureIISWinAuth.ps1
 #endregion
 
 #region Regional settings
