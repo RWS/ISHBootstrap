@@ -18,9 +18,10 @@ $osUserCredential=Invoke-Expression (Get-ISHBootstrapperContextValue -ValuePath 
 $prerequisitesSourcePath=Get-ISHBootstrapperContextValue -ValuePath "PrerequisitesSourcePath"
 $ishVersion=Get-ISHBootstrapperContextValue -ValuePath "ISHVersion"
 $ishServerVersion=($ishVersion -split "\.")[0]
+$installOracle=Get-ISHBootstrapperContextValue -ValuePath "InstallOracle" -DefaultValue $false
 
 & $scriptsPaths\xISHServer\Upload-ISHServerPrerequisites.ps1 -Computer $computerName -PrerequisitesSourcePath $prerequisitesSourcePath -ISHServerVersion $ishServerVersion
-& $scriptsPaths\xISHServer\Install-ISHServerPrerequisites.ps1 -Computer $computerName -ISHServerVersion $ishServerVersion
+& $scriptsPaths\xISHServer\Install-ISHServerPrerequisites.ps1 -Computer $computerName -ISHServerVersion $ishServerVersion -InstallOracle:$installOracle
 
 if($computerName)
 {

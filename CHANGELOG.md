@@ -2,6 +2,7 @@
 
 **20160818**
 
+- Made installation of OracleODAC an optional part of the flow.
 - Seperated **Examples** specific changes from the main changelog.  
 
 **20160816**

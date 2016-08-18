@@ -98,8 +98,6 @@ An obfuscated file looks like this
 }
 ```
 
-An explanation about the structure of the json is available on [About Example Scripts](About Example Scripts.md). 
-
 ## Initialize PowerShellGet on remote server
 
 ```powershell
@@ -140,7 +138,16 @@ To configure the system at this moment we need to Remote Desktop and execute loc
 # .\Examples\Initialize-ISHServer.ps1
 ```
 
-The current script install the Oracle ODAC client. At this moment, I can't find a way to make it work without a restart of the server. The script takes care of this automatically.
+Install the OracleODAC client is a pre-requisite only when a Content Manager deployment is configured against an Oracle database. 
+The script will not install by default the OracleODAC. 
+To force the installation add the following into the json file
+
+```json
+  "InstallOracle": true,
+```
+
+Some of the installed components require a restart on the VM. 
+The script will take care of that when the target is a remote server.
 
 This step uses the `PrerequisitesSourcePath` for the xISHServer 3rd party dependencies. The file are copies from this folder into the remote server. The required files are explained in [About xISHServer module](About xISHServer module.md) 
 The values of `CredentialForCredSSPExpression` and `OSUserCredentialExpression` are an abstraction to the credentials for a user that can establish a session with CredSSP and for the `osuser`.

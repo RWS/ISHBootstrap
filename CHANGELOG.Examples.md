@@ -2,6 +2,7 @@
 
 **20160818**
 
+- Scripts will install OracleODAC only when `InstallOracle` is defined in the json file.
 - Seperated **Examples** specific changes from the main changelog.  
 
 **20160816**
