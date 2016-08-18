@@ -3,7 +3,9 @@
     [string]$Computer=$null,
     [Parameter(Mandatory=$true)]
     [ValidateSet("12","13")]
-    [string]$ISHServerVersion
+    [string]$ISHServerVersion,
+    [Parameter(Mandatory=$false)]
+    [switch]$InstallOracle=$false
 )    
 . $PSScriptRoot\..\..\Cmdlets\Helpers\Invoke-CommandWrap.ps1
 try
@@ -28,7 +30,10 @@ try
     Install-ISHToolJavaHelp
     Install-ISHToolHtmlHelp
     Install-ISHToolAntennaHouse
-    Install-ISHToolOracleODAC
+    if($InstallOracle)
+    {
+        Install-ISHToolOracleODAC
+    }
 
     Initialize-ISHLocale
     Initialize-ISHIIS
@@ -43,7 +48,10 @@ try
     Set-ISHFirewallNETBIOS
     Set-ISHFirewallSMTP
     Set-ISHFirewallSQLServer
-    Set-ISHFirewallOracle
+    if($InstallOracle)
+    {
+        Set-ISHFirewallOracle
+    }
     Set-ISHFirewallHTTPS
     if($ISHServerVersion -eq "12")
     {
