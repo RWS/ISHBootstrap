@@ -5,7 +5,7 @@
     [string]$DeploymentName
 )
 
-$ishBootStrapRootPath="C:\GitHub\ISHBootstrap"
+$ishBootStrapRootPath=Resolve-Path "$PSScriptRoot\..\.."
 $cmdletsPaths="$ishBootStrapRootPath\Source\Cmdlets"
 $scriptsPaths="$ishBootStrapRootPath\Source\Scripts"
 

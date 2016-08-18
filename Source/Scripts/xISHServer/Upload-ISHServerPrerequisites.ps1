@@ -8,18 +8,19 @@
     [string]$ISHServerVersion
 )    
 . $PSScriptRoot\..\..\Cmdlets\Helpers\Invoke-CommandWrap.ps1
+
+if($Computer)
+{
+    . $PSScriptRoot\..\..\Cmdlets\Helpers\Add-ModuleFromRemote.ps1
+    . $PSScriptRoot\..\..\Cmdlets\Helpers\Remove-ModuleFromRemote.ps1
+}
+
 try
 {
-    $ishServerModuleName="xISHServer.$ISHServerVersion"
     if($Computer)
     {
-        $session=New-PSSession -ComputerName $Computer
-        Import-Module $ishServerModuleName -PSSession $session -Force
-        Invoke-CommandWrap -Session $session -BlockName "Initialize Debug/Verbose preference on session" -ScriptBlock {}
-    }
-    else
-    {
-        Import-Module $ishServerModuleName -Force
+        $ishServerModuleName="xISHServer.$ISHServerVersion"
+        $remote=Add-ModuleFromRemote -ComputerName $Computer -Name $ishServerModuleName
     }
 
     $filesToCopy=@(
@@ -66,10 +67,9 @@ try
 
 finally
 {
-    Get-Module $ishServerModuleName |Remove-Module    
-    if($session)
+    if($Computer)
     {
-        $session |Remove-PSSession
+        Remove-ModuleFromRemote -Remote $remote
     }
 }
 

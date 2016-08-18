@@ -9,7 +9,7 @@ param (
     [switch]$IncludeInternalClients=$false
 )        
 
-$ishBootStrapRootPath="C:\GitHub\ISHBootstrap"
+$ishBootStrapRootPath=Resolve-Path "$PSScriptRoot\..\.."
 $cmdletsPaths="$ishBootStrapRootPath\Source\Cmdlets"
 $scriptsPaths="$ishBootStrapRootPath\Source\Scripts"
 
@@ -18,21 +18,28 @@ if(-not $Computer)
     & "$scriptsPaths\Helpers\Test-Administrator.ps1"
 }
 
-if(-not (Get-Command Invoke-ImplicitRemoting -ErrorAction SilentlyContinue))
+. $cmdletsPaths\Helpers\Add-ModuleFromRemote.ps1
+. $cmdletsPaths\Helpers\Remove-ModuleFromRemote.ps1
+
+try
 {
-    . $cmdletsPaths\Helpers\Invoke-ImplicitRemoting.ps1
-}  
+    #region adfs information
+    $adfsComputerName="adfs.example.com"
+    #endegion
 
-#region adfs information
-$adfsComputerName="adfs.example.com"
-#endegion
+    #region integraion filename
+    $adfsIntegrationISHFilename="$(Get-Date -Format "yyyyMMdd").ADFSIntegrationISH.zip"
 
-#region integraion filename
-$adfsIntegrationISHFilename="$(Get-Date -Format "yyyyMMdd").ADFSIntegrationISH.zip"
+    #endregion
 
-#endregion
+    if($Computer)
+    {
+        $ishDelpoyModuleName="ISHDeploy.$ISHVersion"
+        $remote=Add-ModuleFromRemote -ComputerName $Computer -Name $ishDelpoyModuleName
+    }
+    $remoteADFS=Add-ModuleFromRemote -ComputerName $adfsComputerName -Name ADFS
 
-$getADFSInformationBlock = {
+    #region query properties from adfs
     $properties=Get-ADFSProperties
     $primaryTokenSigningCertificate=Get-AdfsCertificate -CertificateType Token-Signing|Where-Object -Property IsPrimary -EQ $true
     $endpoints=Get-AdfsEndpoint
@@ -51,17 +58,10 @@ $getADFSInformationBlock = {
     $tokenSigningCertificateThumbprint=$primaryTokenSigningCertificate.Thumbprint
     $issuercertificatevalidationmode = "None"
 
-    #promote the variables to script scope so the next block can use them.
-    Set-Variable -Name "issuerName" -Value $issuerName -Scope Script -Force
-    Set-Variable -Name "wsFederationUri" -Value $wsFederationUri -Scope Script -Force
-    Set-Variable -Name "wsTrustUri" -Value $wsTrustUri -Scope Script -Force
-    Set-Variable -Name "wsTrustMexUri" -Value $wsTrustMexUri -Scope Script -Force
-    Set-Variable -Name "bindingType" -Value $bindingType -Scope Script -Force
-    Set-Variable -Name "tokenSigningCertificateThumbprint" -Value $tokenSigningCertificateThumbprint -Scope Script -Force
-    Set-Variable -Name "issuercertificatevalidationmode" -Value $issuercertificatevalidationmode -Scope Script -Force
-}
+    #endregion
 
-$integrationBlock= {
+    #region Configure ADFS integration
+    
     # Set WS Federation integration
     Set-ISHIntegrationSTSWSFederation -ISHDeployment $DeploymentName -Endpoint $wsFederationUri
     # Set WS Trust integration
@@ -76,6 +76,9 @@ $integrationBlock= {
     # Set Token signing certificate
     Set-ISHIntegrationSTSCertificate -ISHDeployment $DeploymentName -Issuer $issuerName -Thumbprint $tokenSigningCertificateThumbprint -ValidationMode $issuercertificatevalidationmode
 
+    #endregion
+
+    #region Retrieve integration package
     Save-ISHIntegrationSTSConfigurationPackage -ISHDeployment $DeploymentName -FileName $adfsIntegrationISHFilename -ADFS
 
     $uncPath=Get-ISHPackageFolderPath -ISHDeployment $DeploymentName -UNC
@@ -105,21 +108,20 @@ $integrationBlock= {
     Write-Verbose "Expanded $tempZipPath to $expandPath"
 
     $scriptADFSIntegrationISHPath=Join-Path $expandPath "Invoke-ADFSIntegrationISH.ps1"
+    #endregion
 
+    #region Execute integration script
     Write-Verbose "Configurating rellying parties on $adfsComputerName"
     & $scriptADFSIntegrationISHPath -Computer $adfsComputerName -Action Set -Verbose
     Write-Host "Configured rellying parties on $adfsComputerName"
-}
+    #endregion
 
-
-#Install the packages
-try
-{
-    $ishDelpoyModuleName="ISHDeploy.$ishVersion"
-    Invoke-ImplicitRemoting -ScriptBlock $getADFSInformationBlock -BlockName "Get ADFS information" -ComputerName $adfsComputerName -ImportModule "ADFS"
-    Invoke-ImplicitRemoting -ScriptBlock $integrationBlock -BlockName "Integrate With ADFS for $DeploymentName" -ComputerName $Computer -ImportModule $ishDelpoyModuleName
 }
 finally
 {
-
+    if($Computer)
+    {
+        Remove-ModuleFromRemote -Remote $remote
+    }
+    Remove-ModuleFromRemote -Remote $remoteADFS
 }

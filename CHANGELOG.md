@@ -2,6 +2,7 @@
 
 **20160818**
 
+- Refactored the implicit remoting by using the new `Add-ModuleFromRemote` and `Remove-ModuleFromRemote`.
 - Made installation of OracleODAC an optional part of the flow.
 - Seperated **Examples** specific changes from the main changelog.  
 

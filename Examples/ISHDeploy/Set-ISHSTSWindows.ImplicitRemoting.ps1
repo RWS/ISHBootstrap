@@ -6,8 +6,7 @@ param (
     [Parameter(Mandatory=$true)]
     [string]$ISHVersion
 )        
-
-$ishBootStrapRootPath="C:\GitHub\ISHBootstrap"
+$ishBootStrapRootPath=Resolve-Path "$PSScriptRoot\..\.."
 $cmdletsPaths="$ishBootStrapRootPath\Source\Cmdlets"
 $scriptsPaths="$ishBootStrapRootPath\Source\Scripts"
 
@@ -15,31 +14,29 @@ if(-not $Computer)
 {
     & "$scriptsPaths\Helpers\Test-Administrator.ps1"
 }
-
-if(-not (Get-Command Invoke-ImplicitRemoting -ErrorAction SilentlyContinue))
+else
 {
-    . $cmdletsPaths\Helpers\Invoke-ImplicitRemoting.ps1
-}  
-
-$installIISWinAuthBlock= {
-    Install-ISHWindowsFeatureIISWinAuth
-}
-$setWindowsBlock= {
-    Set-ISHSTSConfiguration -ISHDeployment $DeploymentName -AuthenticationType Windows
+   . $cmdletsPaths\Helpers\Add-ModuleFromRemote.ps1
+   . $cmdletsPaths\Helpers\Remove-ModuleFromRemote.ps1
 }
 
-
-
-#Install the packages
 try
 {
-    $ishServerVersion=($ishVersion -split "\.")[0]
-    $ishServerModuleName="xISHServer.$ishServerVersion"
-    $ishDelpoyModuleName="ISHDeploy.$ishVersion"
-    Invoke-ImplicitRemoting -ScriptBlock $installIISWinAuthBlock -BlockName "Install IIS Windows Authentication" -ComputerName $Computer -ImportModule $ishServerModuleName
-    Invoke-ImplicitRemoting -ScriptBlock $setWindowsBlock -BlockName "Windows Authentication $DeploymentName" -ComputerName $Computer -ImportModule $ishDelpoyModuleName
+    if($Computer)
+    {
+        $ishServerVersion=($ISHVersion -split "\.")[0]
+        $ishServerModuleName="xISHServer.$ishServerVersion"
+        $ishDelpoyModuleName="ISHDeploy.$ISHVersion"
+        $remote=Add-ModuleFromRemote -ComputerName $Computer -Name @($ishServerModuleName,$ishDelpoyModuleName)
+    }
+
+    Install-ISHWindowsFeatureIISWinAuth
+    Set-ISHSTSConfiguration -ISHDeployment $DeploymentName -AuthenticationType Windows
 }
 finally
 {
-
+    if($Computer)
+    {
+        Remove-ModuleFromRemote -Remote $remote
+    }
 }

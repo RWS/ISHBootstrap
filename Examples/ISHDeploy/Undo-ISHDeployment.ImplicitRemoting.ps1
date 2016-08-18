@@ -6,7 +6,8 @@
     [Parameter(Mandatory=$true)]
     [string]$ISHVersion    
 )
-$ishBootStrapRootPath="C:\GitHub\ISHBootstrap"
+
+$ishBootStrapRootPath=Resolve-Path "$PSScriptRoot\..\.."
 $cmdletsPaths="$ishBootStrapRootPath\Source\Cmdlets"
 $scriptsPaths="$ishBootStrapRootPath\Source\Scripts"
 
@@ -14,22 +15,27 @@ if(-not $Computer)
 {
     & "$scriptsPaths\Helpers\Test-Administrator.ps1"
 }
-
-if(-not (Get-Command Invoke-ImplicitRemoting -ErrorAction SilentlyContinue))
+else
 {
-    . $cmdletsPaths\Helpers\Invoke-ImplicitRemoting.ps1
-}        
+   . $cmdletsPaths\Helpers\Add-ModuleFromRemote.ps1
+   . $cmdletsPaths\Helpers\Remove-ModuleFromRemote.ps1
+}
 
 try
 {
-    $undoBlock={
-        Undo-ISHDeployment -ISHDeployment $DeploymentName
-        Clear-ISHDeploymentHistory -ISHDeployment $DeploymentName
+    if($Computer)
+    {
+        $ishDelpoyModuleName="ISHDeploy.$ISHVersion"
+        $remote=Add-ModuleFromRemote -ComputerName $Computer -Name $ishDelpoyModuleName
     }
 
-    $ishDelpoyModuleName="ISHDeploy.$ISHVersion"
-    Invoke-ImplicitRemoting -ScriptBlock $undoBlock -BlockName "Undo deployment" -ComputerName $computerName -ImportModule $ishDelpoyModuleName
+    Undo-ISHDeployment -ISHDeployment $DeploymentName
+    Clear-ISHDeploymentHistory -ISHDeployment $DeploymentName
 }
 finally
 {
+    if($Computer)
+    {
+        Remove-ModuleFromRemote -Remote $remote
+    }
 }

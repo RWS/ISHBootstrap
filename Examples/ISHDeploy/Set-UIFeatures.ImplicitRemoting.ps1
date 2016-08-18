@@ -6,7 +6,7 @@
     [Parameter(Mandatory=$true)]
     [string]$ISHVersion    
 )
-$ishBootStrapRootPath="C:\GitHub\ISHBootstrap"
+$ishBootStrapRootPath=Resolve-Path "$PSScriptRoot\..\.."
 $cmdletsPaths="$ishBootStrapRootPath\Source\Cmdlets"
 $scriptsPaths="$ishBootStrapRootPath\Source\Scripts"
 
@@ -14,15 +14,19 @@ if(-not $Computer)
 {
     & "$scriptsPaths\Helpers\Test-Administrator.ps1"
 }
-
-if(-not (Get-Command Invoke-ImplicitRemoting -ErrorAction SilentlyContinue))
+else
 {
-    . $cmdletsPaths\Helpers\Invoke-ImplicitRemoting.ps1
-}        
+   . $cmdletsPaths\Helpers\Add-ModuleFromRemote.ps1
+   . $cmdletsPaths\Helpers\Remove-ModuleFromRemote.ps1
+}
 
-
-
-$setUIFeaturesScirptBlock= {
+try
+{
+    if($Computer)
+    {
+        $ishDelpoyModuleName="ISHDeploy.$ISHVersion"
+        $remote=Add-ModuleFromRemote -ComputerName $Computer -Name $ishDelpoyModuleName
+    }
 
     #region xopus information
     #XOPUS License Key
@@ -55,15 +59,12 @@ $setUIFeaturesScirptBlock= {
     Set-ISHUIEventMonitorTab -ISHDeployment $DeploymentName @hash
     Move-ISHUIEventMonitorTab -ISHDeployment $DeploymentName -Label $hash["Label"] -First
     Write-Host "Event monitor tab created"
-}
 
-
-try
-{
-    $ishDelpoyModuleName="ISHDeploy.$ISHVersion"
-    Invoke-ImplicitRemoting -ScriptBlock $setUIFeaturesScirptBlock -BlockName "Set UI Features on $DeploymentName" -ComputerName $Computer -ImportModule $ishDelpoyModuleName
 }
 finally
 {
-
+    if($Computer)
+    {
+        Remove-ModuleFromRemote -Remote $remote
+    }
 }

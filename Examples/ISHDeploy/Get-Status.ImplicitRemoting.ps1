@@ -6,7 +6,8 @@
     [Parameter(Mandatory=$true)]
     [string]$ISHVersion    
 )
-$ishBootStrapRootPath="C:\GitHub\ISHBootstrap"
+
+$ishBootStrapRootPath=Resolve-Path "$PSScriptRoot\..\.."
 $cmdletsPaths="$ishBootStrapRootPath\Source\Cmdlets"
 $scriptsPaths="$ishBootStrapRootPath\Source\Scripts"
 
@@ -14,28 +15,29 @@ if(-not $Computer)
 {
     & "$scriptsPaths\Helpers\Test-Administrator.ps1"
 }
-
-if(-not (Get-Command Invoke-ImplicitRemoting -ErrorAction SilentlyContinue))
+else
 {
-    . $cmdletsPaths\Helpers\Invoke-ImplicitRemoting.ps1
-}        
-
-
-
-$getStatusBlock= {
-    Write-Host "History"
-    Get-ISHDeploymentHistory -ISHDeployment $DeploymentName
-    Write-Host "Changed parameters"
-    Get-ISHDeploymentParameters -ISHDeployment $DeploymentName -Changed | Format-Table
+   . $cmdletsPaths\Helpers\Add-ModuleFromRemote.ps1
+   . $cmdletsPaths\Helpers\Remove-ModuleFromRemote.ps1
 }
-
 
 try
 {
-    $ishDelpoyModuleName="ISHDeploy.$ishVersion"
-    Invoke-ImplicitRemoting -ScriptBlock $getStatusBlock -BlockName "Status on $DeploymentName" -ComputerName $Computer -ImportModule $ishDelpoyModuleName
+    if($Computer)
+    {
+        $ishDelpoyModuleName="ISHDeploy.$ISHVersion"
+        $remote=Add-ModuleFromRemote -ComputerName $Computer -Name $ishDelpoyModuleName
+    }
+
+    Write-Host "History of $DeploymentName"
+    Get-ISHDeploymentHistory -ISHDeployment $DeploymentName
+    Write-Host "Changed parameters of $DeploymentName"
+    Get-ISHDeploymentParameters -ISHDeployment $DeploymentName -Changed | Format-Table
 }
 finally
 {
-
+    if($Computer)
+    {
+        Remove-ModuleFromRemote -Remote $remote
+    }
 }

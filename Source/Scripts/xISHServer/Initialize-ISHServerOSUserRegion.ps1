@@ -8,21 +8,29 @@
     [string]$ISHServerVersion
 )    
 . $PSScriptRoot\..\..\Cmdlets\Helpers\Invoke-CommandWrap.ps1
+
+if($Computer)
+{
+    . $PSScriptRoot\..\..\Cmdlets\Helpers\Add-ModuleFromRemote.ps1
+    . $PSScriptRoot\..\..\Cmdlets\Helpers\Remove-ModuleFromRemote.ps1
+}
+
 try
 {
-    $ishServerModuleName="xISHServer.$ISHServerVersion"
-    $session=New-PSSession -ComputerName $Computer -Credential $OSUserCredential
-    Import-Module $ishServerModuleName -PSSession $session -Force
-    Invoke-CommandWrap -Session $session -BlockName "Initialize Debug/Verbose preference on session" -ScriptBlock {}
+    if($Computer)
+    {
+        $ishServerModuleName="xISHServer.$ISHServerVersion"
+        $remote=Add-ModuleFromRemote -ComputerName $Computer -Name $ishServerModuleName
+    }
 
     Initialize-ISHRegional
 }
 
 finally
 {
-    if($session)
+    if($Computer)
     {
-        $session |Remove-PSSession
+        Remove-ModuleFromRemote -Remote $remote
     }
 }
 

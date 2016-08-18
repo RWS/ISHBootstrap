@@ -2,6 +2,7 @@
 
 **20160818**
 
+- Scripts using implicit remoting are refactored to leverage the `Add-ModuleFromRemote` and `Remove-ModuleFromRemote`.
 - Scripts will install OracleODAC only when `InstallOracle` is defined in the json file.
 - Seperated **Examples** specific changes from the main changelog.  
 

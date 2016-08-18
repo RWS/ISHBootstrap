@@ -14,11 +14,14 @@
     [string]$ISHServerVersion
 )    
 . $PSScriptRoot\..\..\Cmdlets\Helpers\Invoke-CommandWrap.ps1
+. $PSScriptRoot\..\..\Cmdlets\Helpers\Add-ModuleFromRemote.ps1
+. $PSScriptRoot\..\..\Cmdlets\Helpers\Remove-ModuleFromRemote.ps1
+
 try
 {
-    $ishServerModuleName="xISHServer.$ISHServerVersion"
     if($Computer)
     {
+        $ishServerModuleName="xISHServer.$ISHServerVersion"
         if($SessionOptions)
         {
             $session=New-PSSession -ComputerName $Computer -Credential $CrentialForCredSSP -UseSSL -Authentication Credssp –SessionOption $SessionOptions
@@ -27,12 +30,7 @@ try
         {
             $session=New-PSSession -ComputerName $Computer -Credential $CrentialForCredSSP -UseSSL -Authentication Credssp
         }
-        Import-Module $ishServerModuleName -PSSession $session -Force
-        Invoke-CommandWrap -Session $session -BlockName "Initialize Debug/Verbose preference on session" -ScriptBlock {}
-    }
-    else
-    {
-        Import-Module $ishServerModuleName -Force
+        $remote=Add-ModuleFromRemote -Session $session -Name $ishServerModuleName
     }
 
     Initialize-ISHUser -OSUser $OSUser
@@ -40,6 +38,10 @@ try
 
 finally
 {
+    if($Computer)
+    {
+        Remove-ModuleFromRemote -Remote $remote
+    }
     if($session)
     {
         $session |Remove-PSSession
