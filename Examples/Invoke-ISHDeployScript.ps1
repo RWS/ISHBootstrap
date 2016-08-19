@@ -35,7 +35,7 @@ try
 
     foreach($ishDeployment in $ishDeployments)
     {
-        $deploymentName="InfoShare$($ishDeployment.Suffix)"
+        $deploymentName=$ishDeployment.Name
         $scriptsToExecute=@()
         switch ($PSCmdlet.ParameterSetName)
         {

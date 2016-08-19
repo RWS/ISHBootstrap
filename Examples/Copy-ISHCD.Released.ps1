@@ -64,7 +64,7 @@ try
         & "$scriptsPaths\Helpers\Test-Administrator.ps1"
     }
 
-    Invoke-CommandWrap -ComputerName $computerName -ScriptBlock $copyBlock -BlockName "Copy and Extract ISH.$ishVersion" -UseParameters @("ftpHost","ftpIp","ftpUser","ftpPassword","ftpCDFolder","ftpCDFileName")
+    Invoke-CommandWrap -ComputerName $computerName -ScriptBlock $copyBlock -BlockName "Copy and Extract ISH.$ishVersion" -UseParameters @("ishVersion","ftpHost","ftpIp","ftpUser","ftpPassword","ftpCDFolder","ftpCDFileName")
 }
 finally
 {
