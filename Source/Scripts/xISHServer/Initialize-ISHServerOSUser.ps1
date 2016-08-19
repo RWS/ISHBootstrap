@@ -13,9 +13,15 @@
     [ValidateSet("12","13")]
     [string]$ISHServerVersion
 )    
-. $PSScriptRoot\..\..\Cmdlets\Helpers\Invoke-CommandWrap.ps1
-. $PSScriptRoot\..\..\Cmdlets\Helpers\Add-ModuleFromRemote.ps1
-. $PSScriptRoot\..\..\Cmdlets\Helpers\Remove-ModuleFromRemote.ps1
+$cmdletsPaths="$PSScriptRoot\..\..\Cmdlets"
+
+. "$cmdletsPaths\Helpers\Write-MyInvocation.ps1"
+Write-MyInvocation -Invocation $MyInvocation
+
+. "$cmdletsPaths\Helpers\Invoke-CommandWrap.ps1"
+
+. $cmdletsPaths\Helpers\Add-ModuleFromRemote.ps1
+. $cmdletsPaths\Helpers\Remove-ModuleFromRemote.ps1
 
 try
 {

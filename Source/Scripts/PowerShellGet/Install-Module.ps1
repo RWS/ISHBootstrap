@@ -11,6 +11,10 @@
 )    
 
 $cmdletsPaths="$PSScriptRoot\..\..\Cmdlets"
+
+. "$cmdletsPaths\Helpers\Write-MyInvocation.ps1"
+Write-MyInvocation -Invocation $MyInvocation
+
 . "$cmdletsPaths\Helpers\Invoke-CommandWrap.ps1"
 
 $installScriptBlock={

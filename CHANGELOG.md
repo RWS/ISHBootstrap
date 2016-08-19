@@ -1,5 +1,9 @@
 # Change log
 
+**20160819**
+
+- All scripts add a verbose line with their invocation.
+
 **20160818**
 
 - Refactored the implicit remoting by using the new `Add-ModuleFromRemote` and `Remove-ModuleFromRemote`.

@@ -1,3 +1,8 @@
+$cmdletsPaths="$PSScriptRoot\..\..\Cmdlets"
+
+. "$cmdletsPaths\Helpers\Write-MyInvocation.ps1"
+Write-MyInvocation -Invocation $MyInvocation
+
 # Get the ID and security principal of the current user account
 $myWindowsID=[System.Security.Principal.WindowsIdentity]::GetCurrent()
 $myWindowsPrincipal=new-object System.Security.Principal.WindowsPrincipal($myWindowsID)

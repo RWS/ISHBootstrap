@@ -2,7 +2,13 @@ param (
     [Parameter(Mandatory=$false)]
     [string]$Computer=$null
 )
-. $PSScriptRoot\..\..\Cmdlets\Helpers\Invoke-CommandWrap.ps1
+$cmdletsPaths="$PSScriptRoot\..\..\Cmdlets"
+
+. "$cmdletsPaths\Helpers\Write-MyInvocation.ps1"
+Write-MyInvocation -Invocation $MyInvocation
+
+. "$cmdletsPaths\Helpers\Invoke-CommandWrap.ps1"
+
 try
 {
     $block={
