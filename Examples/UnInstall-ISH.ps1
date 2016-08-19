@@ -23,20 +23,34 @@ $uninstallBlock= {
         Write-Warning "C:\ISHCD\$ishVersion does not contain a cd."
         return
     }
-    $inputParameterFiles=Get-ChildItem $rootPath -Filter "inputparameters-*.xml"
 
-    $inputParameterFiles | ForEach-Object {
-        $fileName=$_.Name
-        if ($fileName -match "inputparameters-(?<suffix>.*)\.xml")
-        {
-            $suffix=$Matches["suffix"]
-            Write-Debug "Uninstalling from $cdPath the $suffix"
-            Uninstall-ISHDeployment -CDPath $cdPath -Suffix $suffix
-            Write-Verbose "Uninstalled from $cdPath the $suffix"
+    $ishDeployModuleName="ISHDeploy.$ishVersion"
+    if(Get-Module $ishDeployModuleName -ListAvailable)
+    {
+        Get-ISHDeployment |Select-Object -ExpandProperty Name | ForEach-Object {
+            Write-Debug "Uninstalling from $cdPath the deployment $_"
+            Uninstall-ISHDeployment -CDPath $cdPath -Name $_
+            Write-Verbose "Uninstalled from $cdPath the deployment $_"
         }
-        else
-        {
-            Write-Warning "Not a valid input parameter file $fileName"
+    }
+    else
+    {
+        Write-Warning "$ishDeployModuleName is not available. Falling back into working with the files created by Install-ISH.ps1 ($rootPath\inputparameters-*.xml)"
+        $inputParameterFiles=Get-ChildItem $rootPath -Filter "inputparameters-*.xml"
+
+        $inputParameterFiles | ForEach-Object {
+            $fileName=$_.Name
+            if ($fileName -match "inputparameters-(?<name>.*)\.xml")
+            {
+                $name=$Matches["name"]
+                Write-Debug "Uninstalling from $cdPath the deployment $name"
+                Uninstall-ISHDeployment -CDPath $cdPath -Name $name
+                Write-Verbose "Uninstalled from $cdPath the deployment $name"
+            }
+            else
+            {
+                Write-Warning "Not a valid input parameter file $fileName"
+            }
         }
     }
 }

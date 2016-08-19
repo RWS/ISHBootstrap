@@ -85,7 +85,7 @@ An obfuscated file looks like this
   },
   "ISHDeployment": [
 	{
-	  "Suffix": "SQL",
+	  "Name": "InfoShare",
 	  "IsOracle": false,
 	  "ConnectionString": "",
 	  "LucenePort": 9010,
@@ -218,7 +218,7 @@ I've created a script `Invoke-ISHDeployScript.ps1` that wraps up functionality f
 ```json
 "ISHDeployment": [
 	{
-	  "Suffix": "",
+	  "Name": "InfoShare",
 	  "IsOracle": false,
 	  "ConnectionString": "",
 	  "LucenePort": 9010,
@@ -232,7 +232,6 @@ I've created a script `Invoke-ISHDeployScript.ps1` that wraps up functionality f
 ```
 
 To showcase the potential of ISHDeploy I've crafted a two scripts with a variation. 
-Each script works against a target computer and a specific deployment that is generated like this `InfoShare$Suffix`.
 
 - `Set-UIFeatures.ps1` shows a small script that 
   - Enables Content Editor and sets the license.

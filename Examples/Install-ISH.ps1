@@ -39,12 +39,12 @@ $installBlock= {
             OSPassword=$osPassword
             ConnectionString=$ishDeployment.ConnectionString
             IsOracle=$ishDeployment.IsOracle
-            Suffix=$ishDeployment.Suffix
+            Name=$ishDeployment.Name
             LucenePort=$ishDeployment.LucenePort
             UseRelativePaths=$ishDeployment.UseRelativePaths
         }
         $inputParameters=New-ISHDeploymentInputParameters @hash
-        $fileName="inputparameters-$($ishDeployment.Suffix).xml"
+        $fileName="inputparameters-$($ishDeployment.Name).xml"
         $filePath=Join-Path $rootPath $fileName
         Write-Debug "filePath=$filePath"
         $inputParameters|Out-File $filePath

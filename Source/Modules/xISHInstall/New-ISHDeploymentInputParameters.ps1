@@ -13,7 +13,8 @@ function New-ISHDeploymentInputParameters {
         [Parameter(Mandatory=$false)]
         [switch]$IsOracle=$false,
         [Parameter(Mandatory=$false)]
-        $Suffix="",
+        [ValidatePattern("(?# Name doesn't start with InfoShare)InfoShare.*")]
+        $Name="InfoShare",
         [Parameter(Mandatory=$false)]
         $RootPath="C:\InfoShare\$Version",
         [Parameter(Mandatory=$false)]
@@ -23,8 +24,11 @@ function New-ISHDeploymentInputParameters {
         [Parameter(Mandatory=$false)]
         $ServiceCertificateThumbprint=$null
     )
+    $isMatch=$Name -match "InfoShare(?<suffix>.*)"
+    $suffix=$Matches["suffix"]
+
     $computerName=$env:COMPUTERNAME.ToLower()
-    $infosharestswebappname="ISHSTS$Suffix".ToLower()
+    $infosharestswebappname="ISHSTS$suffix".ToLower()
 
     if($ServiceCertificateThumbprint -eq $null)
     {
@@ -47,7 +51,7 @@ function New-ISHDeploymentInputParameters {
     {
         $inputParameters["databasetype"]="sqlserver"
     }
-    $inputParameters["projectsuffix"]=$Suffix
+    $inputParameters["projectsuffix"]=$suffix
     $inputParameters["baseurl"]=$baseUrl
     $inputParameters["localservicehostname"]="$computerName"
     $inputParameters["apppath"]=$RootPath
@@ -59,9 +63,9 @@ function New-ISHDeploymentInputParameters {
     
     if($UseRelativePaths)
     {
-        $inputParameters["apppath"]=Join-Path $inputParameters["apppath"] "ISH$Suffix"
-        $inputParameters["datapath"]=Join-Path $inputParameters["datapath"] "ISH$Suffix"
-        $inputParameters["webpath"]=Join-Path $inputParameters["webpath"] "ISH$Suffix"
+        $inputParameters["apppath"]=Join-Path $inputParameters["apppath"] "ISH$suffix"
+        $inputParameters["datapath"]=Join-Path $inputParameters["datapath"] "ISH$suffix"
+        $inputParameters["webpath"]=Join-Path $inputParameters["webpath"] "ISH$suffix"
     }
     else
     {
@@ -70,8 +74,8 @@ function New-ISHDeploymentInputParameters {
         $inputParameters["webpath"]=Join-Path $inputParameters["webpath"] "ISH"
     }
 
-    $inputParameters["infoshareauthorwebappname"]="ISHCM$Suffix".ToLower()
-    $inputParameters["infosharewswebappname"]="ISHWS$Suffix".ToLower()
+    $inputParameters["infoshareauthorwebappname"]="ISHCM$suffix".ToLower()
+    $inputParameters["infosharewswebappname"]="ISHWS$suffix".ToLower()
     $inputParameters["infosharestswebappname"]=$infosharestswebappname
     $inputParameters["servicecertificatethumbprint"]=$ServiceCertificateThumbprint
 
@@ -87,7 +91,7 @@ function New-ISHDeploymentInputParameters {
     $inputParametersPath=Join-Path $CDPath "__InstallTool\inputparameters.xml"
     [xml]$xml=Get-Content $inputParametersPath
     
-    if($Suffix -ne "")
+    if($suffix -ne "")
     {
         $node=$xml | Select-Xml -XPath "//param[@name='projectsuffix']"
         if(-not $node)
@@ -96,7 +100,7 @@ function New-ISHDeploymentInputParameters {
             $param.SetAttribute('name','projectsuffix') |Out-Null
             
             $currentValue = $xml.CreateElement('currentvalue')
-            $currentValue.InnerText=$Suffix
+            $currentValue.InnerText=$suffix
             $param.AppendChild($currentValue) |Out-Null
 
             $defaultvalue = $xml.CreateElement('defaultvalue')

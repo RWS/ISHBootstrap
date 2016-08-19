@@ -2,6 +2,7 @@
 
 **20160819**
 
+- Cmdlets of module **xISHInstall** require a deployment name instead of a suffix.
 - All scripts add a verbose line with their invocation.
 
 **20160818**

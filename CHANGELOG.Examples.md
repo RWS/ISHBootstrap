@@ -2,6 +2,8 @@
 
 **20160819**
 
+- Script `UnInstall-ISH.ps1` first tries to use **ISHDeploy** and then falls back into looking for input parameter files droped by  `Install-ISH.ps1`.
+- Scripts are now powered by deployment names instead of suffix.
 - Scripts that seed the ISHCD have now two permutations `Copy-ISHCD.Released.ps1` and `Copy-ISHCD.NotReleased.ps1`.
   - `Copy-ISHCD.NotReleased.ps1` is for internal releases. This is for **internal** use only.
   - `Copy-ISHCD.Released.ps1` is powered by an FTP. 

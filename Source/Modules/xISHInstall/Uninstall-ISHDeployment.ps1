@@ -2,13 +2,12 @@ function Uninstall-ISHDeployment{
     param (
         [Parameter(Mandatory=$true)]
         $CDPath,
-        [Parameter(Mandatory=$true)]
-        $Suffix
+        [Parameter(Mandatory=$false)]
+        $Name="InfoShare"
     )
-    $project="InfoShare$Suffix"
     $installToolPath=Join-Path $CDPath "__InstallTool\InstallTool.exe"
     $installToolArgs=@("-Uninstall",
-        "-project",$project
+        "-project",$Name
         )
     & $installToolPath $installToolArgs
 }

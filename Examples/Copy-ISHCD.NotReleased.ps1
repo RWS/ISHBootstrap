@@ -58,7 +58,7 @@ try
 		$session=New-PSSession -ComputerName $fqdn -Credential $credentialForCredSSP -UseSSL -Authentication Credssp
     }
 
-    Invoke-CommandWrap -Session $session -ScriptBlock $copyBlock -BlockName "Copy and Extract ISH.$ishVersion" -UseParameters @("internalCDFolder")
+    Invoke-CommandWrap -Session $session -ScriptBlock $copyBlock -BlockName "Copy and Extract ISH.$ishVersion" -UseParameters @("ishVersion","internalCDFolder")
 
 }
 finally
