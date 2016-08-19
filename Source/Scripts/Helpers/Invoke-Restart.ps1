@@ -3,7 +3,13 @@ param (
     [string[]]$Computer
 ) 
     
-. "$PSScriptRoot\..\..\Cmdlets\Helpers\Invoke-CommandWrap.ps1"
+$cmdletsPaths="$PSScriptRoot\..\..\Cmdlets"
+
+. "$cmdletsPaths\Helpers\Write-MyInvocation.ps1"
+Write-MyInvocation -Invocation $MyInvocation
+
+. "$cmdletsPaths\Helpers\Invoke-CommandWrap.ps1"
+
 Write-Verbose "Restarting $Computer"
 Restart-Computer -ComputerName  $Computer -Force
 Write-Host "Initiated $Computer restart"
