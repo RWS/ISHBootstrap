@@ -8,13 +8,14 @@ $scriptsPaths="$sourcePath\Scripts"
 
 . "$PSScriptRoot\Cmdlets\Get-ISHBootstrapperContextValue.ps1"
 $computerName=Get-ISHBootstrapperContextValue -ValuePath "ComputerName" -DefaultValue $null
+$ishVersion=Get-ISHBootstrapperContextValue -ValuePath "ISHVersion"
 
 . "$cmdletsPaths\Helpers\Invoke-CommandWrap.ps1"
 
-$internalCDFolder=Get-ISHBootstrapperContextValue -ValuePath "InternalRelease.ISH1300CDFolder"
+$internalCDFolder=Get-ISHBootstrapperContextValue -ValuePath "InternalRelease.ISHCDFolder"
 
 $copyBlock= {
-    $targetPath="C:\IshCD\13.0.0"
+    $targetPath="C:\IshCD\$ishVersion"
     Write-Debug "targetPath=$targetPath"
 
     $cdObject=((Get-ChildItem $internalCDFolder |Where-Object{Test-Path $_.FullName -PathType Leaf}| Sort-Object FullName -Descending)[0])
@@ -57,7 +58,7 @@ try
 		$session=New-PSSession -ComputerName $fqdn -Credential $credentialForCredSSP -UseSSL -Authentication Credssp
     }
 
-    Invoke-CommandWrap -Session $session -ScriptBlock $copyBlock -BlockName "Copy and Extract ISH13.0.0" -UseParameters @("internalCDFolder")
+    Invoke-CommandWrap -Session $session -ScriptBlock $copyBlock -BlockName "Copy and Extract ISH.$ishVersion" -UseParameters @("internalCDFolder")
 
 }
 finally

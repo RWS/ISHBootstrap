@@ -1,5 +1,11 @@
 # Examples Change log
 
+**20160819**
+
+- Scripts that seed the ISHCD have now two permutations `Copy-ISHCD.Released.ps1` and `Copy-ISHCD.NotReleased.ps1`.
+  - `Copy-ISHCD.NotReleased.ps1` is for internal releases. This is for **internal** use only.
+  - `Copy-ISHCD.Released.ps1` is powered by an FTP. 
+
 **20160818**
 
 - Scripts using implicit remoting are refactored to leverage the `Add-ModuleFromRemote` and `Remove-ModuleFromRemote`.

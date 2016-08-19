@@ -34,15 +34,16 @@ The process depends on scripts in the examples directory. To help run these scri
 1. Install the server prerequisites using xISHServer.12
 1. Seed the server with a Content Manager CD.
 1. Install a deployment using xISHInstall.
-1. Apply code as configuration scripts using ISHDeploy.12.0.0
+1. Apply code as configuration scripts using one of the following
+  - ISHDeploy.12.0.0
+  - ISHDeploy.12.0.1
 
 
 ## Publish the modules to the internal Nuget Server repository
 
 ```powershell
-& .\Source\Modules\Publish-xISHServer.ps1 -ModuleName xISHServer.12 -Repository asarafian -APIKey asarafian -BuildNumber -TimeStamp
-& .\Source\Modules\Publish-xISHServer.ps1 -ModuleName xISHServer.13 -Repository asarafian -APIKey asarafian -BuildNumber -TimeStamp
-& .\Source\Modules\Publish-xISHInstall.ps1 -Repository asarafian -APIKey asarafian -BuildNumber -TimeStamp
+& .\Source\Modules\Publish-xISHServer.ps1 -ModuleName xISHServer.12 -Repository mymachine -APIKey mykey -BuildNumber -TimeStamp
+& .\Source\Modules\Publish-xISHInstall.ps1 -Repository mymachine -APIKey mykey -BuildNumber -TimeStamp
 ```
 
 Because the repository is internal we force a very detailed build number on the module version using `-BuildNumber` and `-TimeStamp`. 
@@ -58,19 +59,19 @@ An obfuscated file looks like this
 ```json
 {
   "ComputerName": "SERVER01",
-  "ISHVersion": "12.0.0",
+  "ISHVersion": "12.0.1",
   "EnableSecureWinRM": true,
   "CertificateAuthority" : "CertificateAuthority",
   "InstallProcessExplorer": true,
-  "xISHServerRepository": "asarafian",
-  "xISHInstallRepository": "asarafian",
+  "xISHServerRepository": "mymachine",
+  "xISHInstallRepository": "mymachine",
   "ISHDeployRepository": "PSGallery",
   "PrerequisitesSourcePath": "C:\\inetpubopen\\xISHServer",
   "CredentialForCredSSPExpression": "New-MyCredential",
   "OSUserCredentialExpression": "New-InfoShareServiceUserCredential",
   "PSRepository": [
     {
-      "Name": "asarafian",
+      "Name": "mymachine",
       "SourceLocation": "http://mymachine/MiniNuGetServer/nuget/",
       "InstallationPolicy": "Trusted"
     }
@@ -79,8 +80,8 @@ An obfuscated file looks like this
     "Host": "host"
     "User": "user",
     "Password": "password",
-    "ISH1200CDFolder": "path",
-    "ISH1200CDFileName": "filename"
+    "ISHCDFolder": "path",
+    "ISHCDFileName": "filename"
   },
   "ISHDeployment": [
 	{
@@ -184,7 +185,7 @@ To not use the lengthy FQDN and bypass the certificate common name validation ad
 ## Seed the server with a Content Manager CD
 
 ```powershell
-& .\Examples\Copy-ISH12.0.0.CD.ps1
+& .\Examples\Copy-ISHCD.Released.ps1
 ```
 
 This step uses the values in 
@@ -194,8 +195,8 @@ This step uses the values in
     "Host": "host"
     "User": "user",
     "Password": "password",
-    "ISH1200CDFolder": "path",
-    "ISH1200CDFileName": "filename"
+    "ISHCDFolder": "path",
+    "ISHCDFileName": "filename"
   }
 ```
 
@@ -217,7 +218,7 @@ I've created a script `Invoke-ISHDeployScript.ps1` that wraps up functionality f
 ```json
 "ISHDeployment": [
 	{
-	  "Suffix": "SQL",
+	  "Suffix": "",
 	  "IsOracle": false,
 	  "ConnectionString": "",
 	  "LucenePort": 9010,

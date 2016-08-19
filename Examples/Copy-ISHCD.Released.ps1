@@ -8,6 +8,7 @@ $scriptsPaths="$sourcePath\Scripts"
 
 . "$PSScriptRoot\Cmdlets\Get-ISHBootstrapperContextValue.ps1"
 $computerName=Get-ISHBootstrapperContextValue -ValuePath "ComputerName" -DefaultValue $null
+$ishVersion=Get-ISHBootstrapperContextValue -ValuePath "ISHVersion"
 
 . "$cmdletsPaths\Helpers\Invoke-CommandWrap.ps1"
 
@@ -15,11 +16,11 @@ $ftpHost=Get-ISHBootstrapperContextValue -ValuePath "FTP.Host"
 $ftpIp=Get-ISHBootstrapperContextValue -ValuePath "FTP.Ip"
 $ftpUser=Get-ISHBootstrapperContextValue -ValuePath "FTP.User"
 $ftpPassword=Get-ISHBootstrapperContextValue -ValuePath "FTP.Password"
-$ftpCDFolder=Get-ISHBootstrapperContextValue -ValuePath "FTP.ISH1200CDFolder"
-$ftpCDFileName=Get-ISHBootstrapperContextValue -ValuePath "FTP.ISH1200CDFileName"
+$ftpCDFolder=Get-ISHBootstrapperContextValue -ValuePath "FTP.ISHCDFolder"
+$ftpCDFileName=Get-ISHBootstrapperContextValue -ValuePath "FTP.ISHCDFileName"
 
 $copyBlock= {
-    $targetPath="C:\IshCD\12.0.0"
+    $targetPath="C:\IshCD\$ishVersion"
     Write-Debug "targetPath=$targetPath"
     Import-Module PSFTP -ErrorAction Stop
 
@@ -63,7 +64,7 @@ try
         & "$scriptsPaths\Helpers\Test-Administrator.ps1"
     }
 
-    Invoke-CommandWrap -ComputerName $computerName -ScriptBlock $copyBlock -BlockName "Copy and Extract ISH.12.0.0" -UseParameters @("ftpHost","ftpIp","ftpUser","ftpPassword","ftpCDFolder","ftpCDFileName")
+    Invoke-CommandWrap -ComputerName $computerName -ScriptBlock $copyBlock -BlockName "Copy and Extract ISH.$ishVersion" -UseParameters @("ftpHost","ftpIp","ftpUser","ftpPassword","ftpCDFolder","ftpCDFileName")
 }
 finally
 {
