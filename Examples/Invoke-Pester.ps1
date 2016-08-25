@@ -57,10 +57,6 @@ try
         if($Separate)
         {
             $pesterScripts| ForEach-Object {
-                if(-not (Test-Path $_))
-                {
-                    Write-Warning "$_ not found. Skipping."
-                }
                 $script.Path=$_
                 Invoke-Pester -Script $script # -PassThru -OutputFormat NUnitXml -OutputFile $outputFile
             }
@@ -90,17 +86,19 @@ try
                 Remove-Item $testContainerPath -Recurse -Force
             }
             New-Item -Path $testContainerPath -ItemType Directory |Out-Null
+            $extraFolderPathToCopy=@()
             $i=0
             $pesterScripts| ForEach-Object {
-                if(-not (Test-Path $_))
-                {
-                    Write-Warning "$_ not found. Skipping."
-                }
+                $sourceFolderPath=Split-Path -Path $_ -Parent
+                $extraFolderPathToCopy+=Get-ChildItem -Path $sourceFolderPath -Directory |Select-Object -ExpandProperty FullName
+
                 $sourceFileName=Split-Path -Path $_ -Leaf
                 $prefix=$i.ToString("000")
                 $targetPath=Join-Path $testContainerPath "$prefix.$sourceFileName"
                 Copy-Item -Path $_ -Destination $targetPath
             }
+            $extraFolderPathToCopy=$extraFolderPathToCopy|Select-Object -Unique
+            Copy-Item -Path $extraFolderPathToCopy -Destination $testContainerPath -Recurse
             $script.Path=$testContainerPath
             Invoke-Pester -Script $script # -PassThru -OutputFormat NUnitXml -OutputFile $outputFile
         }
@@ -122,7 +120,14 @@ try
         $pester | ForEach-Object {
             $scriptFileName=$_
             $scriptPath=Join-Path $folderPath $scriptFileName
-            $scriptsToExecute+=$scriptPath
+            if(Test-Path $scriptPath)
+            {
+                $scriptsToExecute+=$scriptPath
+            }
+            else
+            {
+                Write-Warning "$scriptPath not found. Skipping."
+            }
         }
         InvokePester $null $scriptsToExecute
     }
@@ -141,7 +146,14 @@ try
             $ishDeployment.Pester | ForEach-Object {
                 $scriptFileName=$_
                 $scriptPath=Join-Path $folderPath $scriptFileName
-                $scriptsToExecute+=$scriptPath
+                if(Test-Path $scriptPath)
+                {
+                    $scriptsToExecute+=$scriptPath
+                }
+                else
+                {
+                    Write-Warning "$scriptPath not found. Skipping."
+                }
             }
             InvokePester $deploymentName $scriptsToExecute
         }
