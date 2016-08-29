@@ -26,9 +26,9 @@ Function Add-ModuleFromRemote {
         Write-Debug "Targetting remote session $($Session.ComputerName)"
         Write-Verbose "[$BlockName] Begin on $($Session.ComputerName)"
         $Name | ForEach-Object { 
-            Write-Verbose "Import module $_ from $($Session.ComputerName)"
+            Write-Debug "Import module $_ from $($Session.ComputerName)"
             Import-Module -Name $_ -PSSession $Session -Force
-            Write-Host "Imported module $_ from $($Session.ComputerName)"
+            Write-Verbose "Imported module $_ from $($Session.ComputerName)"
         }
     }
 
