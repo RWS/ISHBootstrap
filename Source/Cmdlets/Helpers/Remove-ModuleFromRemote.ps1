@@ -8,8 +8,9 @@ Function Remove-ModuleFromRemote {
     if($Remote)
     {
         $Remote.Module | ForEach-Object { 
+            Write-Debug "Remove remote module $_"
             Get-Module -Name $_| Remove-Module
-            Write-Host "Removed remote module $_"
+            Write-Verbose "Removed remote module $_"
         }
         if($Remote.Session)
         {
