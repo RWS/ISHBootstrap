@@ -1,5 +1,9 @@
 # Examples Change log
 
+**20160826**
+
+- `Load-ISHBootstrapperContext.ps1` can load a context from a variable with a pre-loaded json.
+
 **20160825**
 
 - `Invoke-ISHDeployScript.ps1` and `Invoke-Pester.ps1` will skip script references that do not exist. Temporary commenting mechanism.
