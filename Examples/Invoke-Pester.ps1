@@ -14,8 +14,6 @@ $sourcePath=Resolve-Path "$PSScriptRoot\..\Source"
 $cmdletsPaths="$sourcePath\Cmdlets"
 $scriptsPaths="$sourcePath\Scripts"
 
-
-
 try
 {
 
@@ -36,7 +34,7 @@ try
     $ishDeployments=Get-ISHBootstrapperContextValue -ValuePath "ISHDeployment"
     $ishVersion=Get-ISHBootstrapperContextValue -ValuePath "ISHVersion"
     $folderPath=Get-ISHBootstrapperContextValue -ValuePath "FolderPath"
-
+    $pesterResult=@{}
     function InvokePester ([string]$deploymentName, [string[]]$pesterScripts)
     {
         $parameters=@{
@@ -56,9 +54,10 @@ try
 
         if($Separate)
         {
+            $pesterResult=@()
             $pesterScripts| ForEach-Object {
                 $script.Path=$_
-                Invoke-Pester -Script $script # -PassThru -OutputFormat NUnitXml -OutputFile $outputFile
+                $pesterResult+=Invoke-Pester -Script $script -PassThru # -OutputFormat NUnitXml -OutputFile $outputFile
             }
         }
         else
@@ -100,14 +99,14 @@ try
             $extraFolderPathToCopy=$extraFolderPathToCopy|Select-Object -Unique
             Copy-Item -Path $extraFolderPathToCopy -Destination $testContainerPath -Recurse
             $script.Path=$testContainerPath
-            Invoke-Pester -Script $script # -PassThru -OutputFormat NUnitXml -OutputFile $outputFile
+            $pesterResult=Invoke-Pester -Script $script -PassThru #-OutputFormat NUnitXml -OutputFile $outputFile
         }
 
-
+        return $pesterResult
     }
 
 
-
+    $pesterResult=@{}
     if($Server)
     {
         $scriptsToExecute=@()
@@ -129,7 +128,7 @@ try
                 Write-Warning "$scriptPath not found. Skipping."
             }
         }
-        InvokePester $null $scriptsToExecute
+        $pesterResult["Server"]=InvokePester $null $scriptsToExecute
     }
 
     if($Deployment)
@@ -155,10 +154,15 @@ try
                     Write-Warning "$scriptPath not found. Skipping."
                 }
             }
-            InvokePester $deploymentName $scriptsToExecute
+            $pesterResult[$deploymentName]=InvokePester $deploymentName $scriptsToExecute
         }
     }
-
+    $pesterReport=@()
+    foreach($key in $pesterResult.Keys)
+    {
+        $pesterReport+=$pesterResult[$key]|Select-Object @{Name="Name";Expression={$key}},TotalCount,PassedCount,FailedCount,SkippedCount,PendingCount,Time
+    }
+    $pesterReport |Format-Table Name,PassedCount,FailedCount,PendingCount,SkippedCount,TotalCount
 }
 finally
 {
