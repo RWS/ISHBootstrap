@@ -37,7 +37,7 @@ The process depends on scripts in the examples directory. To help run these scri
 1. Apply code as configuration scripts using one of the following
   - ISHDeploy.12.0.0
   - ISHDeploy.12.0.1
-
+1. Run Pester tests
 
 ## Publish the modules to the internal Nuget Server repository
 
@@ -83,6 +83,9 @@ An obfuscated file looks like this
     "ISHCDFolder": "path",
     "ISHCDFileName": "filename"
   },
+  "Pester": [
+	"Pester\\Module.Tests.ps1"
+  ],
   "ISHDeployment": [
 	{
 	  "Name": "InfoShare",
@@ -93,6 +96,9 @@ An obfuscated file looks like this
 	  "Scripts": [
 		"ISHDeploy\\Set-UIFeatures.ps1",
 		"ISHDeploy\\Set-ADFSIntegration.ps1"
+	  ],
+	  "Pester": [
+		"Pester\\Basic.Tests.ps1",
 	  ]
 	}
   ]
@@ -293,6 +299,72 @@ You can any of the above options for `Invoke-ISHDeployScript.ps1` with the `-Use
 & .\Examples\Invoke-ISHDeployScript.ps1 -Status -UseImplicitRemoting
 # Undo
 & .\Examples\Invoke-ISHDeployScript.ps1 -Undo -UseImplicitRemoting
+```
+
+# Verify deployments
+
+`Examples\Invoke-Pester.ps1` can run two different types of tests:
+
+- Deployment independent tests. Use `& .\Examples\Invoke-Pester.ps1 -Server`
+- Deployment specific tests. Use `& .\Examples\Invoke-Pester.ps1 -Deployment`
+
+## Deployment independent tests
+
+Declare the test script section in the JSON on the rool level with key `Pester`
+
+```json
+{
+  "Pester": [
+	"Pester\\Module.Tests.ps1"
+  ]
+}
+```
+
+Each test script must accept the following parameters
+```powershell
+param (
+    [Parameter(Mandatory=$false)]
+    $Session,
+    [Parameter(Mandatory=$true)]
+    [string]$ISHVersion
+)        
+```
+
+## Deployment specific tests
+
+Declare the test script section in the JSON within a deployment with key `Pester`
+
+```json
+{
+	"ISHDeployment": [
+	{
+	  "Name": "InfoShare",
+	  "IsOracle": false,
+	  "ConnectionString": "",
+	  "LucenePort": 9010,
+	  "UseRelativePaths": false,
+	  "Scripts": [
+		"ISHDeploy\\Set-UIFeatures.ps1",
+		"ISHDeploy\\Set-ADFSIntegration.ps1"
+	  ],
+	  "Pester": [
+		"Pester\\Basic.Tests.ps1",
+	  ]
+	}
+  ]
+}  
+```
+
+Each test script must accept the following parameters
+```powershell
+param (
+    [Parameter(Mandatory=$false)]
+    $Session,
+    [Parameter(Mandatory=$true)]
+    [string]$DeploymentName,
+    [Parameter(Mandatory=$true)]
+    [string]$ISHVersion
+)        
 ```
 
 # Final remarks

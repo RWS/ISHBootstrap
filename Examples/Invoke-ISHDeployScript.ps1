@@ -50,7 +50,14 @@ try
                     $scriptFileName=$_
                     $folderPath=Get-ISHBootstrapperContextValue -ValuePath "FolderPath"
                     $scriptPath=Join-Path $folderPath $scriptFileName
-                    $scriptsToExecute+=$scriptPath
+                    if(Test-Path $scriptPath)
+                    {
+                        $scriptsToExecute+=$scriptPath
+                    }
+                    else
+                    {
+                        Write-Warning "$scriptPath not found. Skipping."
+                    }
                 }            
             }
             'Status' {

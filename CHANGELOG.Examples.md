@@ -1,5 +1,10 @@
 # Examples Change log
 
+**20160825**
+
+- `Invoke-ISHDeployScript.ps1` and `Invoke-Pester.ps1` will skip script references that do not exist. Temporary commenting mechanism.
+- New `Invoke-Pester.ps1` to execute pester tests.
+
 **20160819**
 
 - Script `UnInstall-ISH.ps1` first tries to use **ISHDeploy** and then falls back into looking for input parameter files droped by  `Install-ISH.ps1`.
