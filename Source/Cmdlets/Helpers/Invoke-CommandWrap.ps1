@@ -110,6 +110,12 @@ Function Invoke-CommandWrap {
     if($Session -or $ComputerName)
     {
         $scriptSegments=@()
+        $normalizedScriptBlock=$ScriptBlock
+        if($ScriptBlock.Ast.ParamBlock)
+        {
+            $scriptSegments +=$ScriptBlock.Ast.ParamBlock
+            $normalizedScriptBlock=$ExecutionContext.InvokeCommand.NewScriptBlock($ScriptBlock.ToString().Replace($ScriptBlock.Ast.ParamBlock.ToString(),""))
+        }
         $scriptSegments += {
             if($PSSenderInfo) {
                 $DebugPreference=$Using:DebugPreference
@@ -128,8 +134,7 @@ Function Invoke-CommandWrap {
 
             $scriptSegments+=$ExecutionContext.InvokeCommand.NewScriptBlock($lines -join ([System.Environment]::NewLine))
         }
-
-        $scriptSegments+=$ScriptBlock
+        $scriptSegments+=$normalizedScriptBlock
 
         $finalScript=""
         $scriptSegments|ForEach-Object {$finalScript+=$_.ToString()+[System.Environment]::NewLine}
