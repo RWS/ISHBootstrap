@@ -1,5 +1,9 @@
 # Change log
 
+**20160830**
+
+- 'Invoke-CommandWrap` fix for script blocks with param.
+
 **20160819**
 
 - Cmdlets of module **xISHInstall** require a deployment name instead of a suffix.
