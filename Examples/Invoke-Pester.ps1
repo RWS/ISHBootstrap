@@ -95,6 +95,7 @@ try
                 $prefix=$i.ToString("000")
                 $targetPath=Join-Path $testContainerPath "$prefix.$sourceFileName"
                 Copy-Item -Path $_ -Destination $targetPath
+                $i++
             }
             $extraFolderPathToCopy=$extraFolderPathToCopy|Select-Object -Unique
             Copy-Item -Path $extraFolderPathToCopy -Destination $testContainerPath -Recurse
