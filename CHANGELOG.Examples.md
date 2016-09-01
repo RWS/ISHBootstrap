@@ -1,5 +1,9 @@
 # Examples Change log
 
+**20160901**
+
+- Code as configuration scripts output a header/footer to improve console readability.
+
 **20160826**
 
 - `Load-ISHBootstrapperContext.ps1` can load a context from a variable with a pre-loaded json.

@@ -6,6 +6,8 @@ param (
     [Parameter(Mandatory=$false)]
     [switch]$IncludeInternalClients=$false
 )        
+. $PSScriptRoot\Cmdlets\Write-Separator.ps1
+Write-Separator -Invocation $MyInvocation -Header
 
 $ishBootStrapRootPath=Resolve-Path "$PSScriptRoot\..\.."
 $cmdletsPaths="$ishBootStrapRootPath\Source\Cmdlets"
@@ -130,3 +132,5 @@ finally
 {
 
 }
+
+Write-Separator -Invocation $MyInvocation -Footer

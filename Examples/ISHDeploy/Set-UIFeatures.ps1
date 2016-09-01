@@ -4,6 +4,8 @@
     [Parameter(Mandatory=$true)]
     [string]$DeploymentName
 )
+. $PSScriptRoot\Cmdlets\Write-Separator.ps1
+Write-Separator -Invocation $MyInvocation -Header
 
 $ishBootStrapRootPath=Resolve-Path "$PSScriptRoot\..\.."
 $cmdletsPaths="$ishBootStrapRootPath\Source\Cmdlets"
@@ -63,3 +65,5 @@ finally
 {
 
 }
+
+Write-Separator -Invocation $MyInvocation -Footer

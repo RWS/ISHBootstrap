@@ -6,6 +6,8 @@
     [Parameter(Mandatory=$true)]
     [string]$ISHVersion    
 )
+. $PSScriptRoot\Cmdlets\Write-Separator.ps1
+Write-Separator -Invocation $MyInvocation -Header
 
 $ishBootStrapRootPath=Resolve-Path "$PSScriptRoot\..\.."
 $cmdletsPaths="$ishBootStrapRootPath\Source\Cmdlets"
@@ -41,3 +43,5 @@ finally
         Remove-ModuleFromRemote -Remote $remote
     }
 }
+
+Write-Separator -Invocation $MyInvocation -Footer
