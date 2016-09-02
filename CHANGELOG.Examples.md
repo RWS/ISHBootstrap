@@ -1,5 +1,9 @@
 # Examples Change log
 
+**20160902**
+
+- `Invoke-Pester.ps1` will output also the test result file path. File format is by default `NUnitXml` but it can be changed.
+
 **20160901**
 
 - Code as configuration scripts output a header/footer to improve console readability.
