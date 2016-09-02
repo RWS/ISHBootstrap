@@ -4,7 +4,10 @@ param(
     [Parameter(Mandatory=$false)]
     [switch]$Deployment=$false,
     [Parameter(Mandatory=$false)]
-    [switch]$Separate=$false
+    [switch]$Separate=$false,
+    [Parameter(Mandatory=$false)]
+    [ValidateSet("LegacyNUnitXml","NUnitXml")]
+    [string]$OutputFormat="NUnitXml"
 )
 if ($PSBoundParameters['Debug']) {
     $DebugPreference = 'Continue'
@@ -13,7 +16,6 @@ if ($PSBoundParameters['Debug']) {
 $sourcePath=Resolve-Path "$PSScriptRoot\..\Source"
 $cmdletsPaths="$sourcePath\Cmdlets"
 $scriptsPaths="$sourcePath\Scripts"
-
 try
 {
 
@@ -35,6 +37,17 @@ try
     $ishVersion=Get-ISHBootstrapperContextValue -ValuePath "ISHVersion"
     $folderPath=Get-ISHBootstrapperContextValue -ValuePath "FolderPath"
     $pesterResult=@{}
+
+    $outputPath=Join-Path $env:TEMP "ISHBootstrap"
+    if($computerName)
+    {
+        $outputPath=Join-path $outputPath $computerName
+    }
+    else
+    {
+        $outputPath=Join-path $outputPath $env:COMPUTERNAME
+    }
+
     function InvokePester ([string]$deploymentName, [string[]]$pesterScripts)
     {
         $parameters=@{
@@ -52,34 +65,30 @@ try
             Parameters = $parameters
         }
 
+        $pesterResult=@()
         if($Separate)
         {
-            $pesterResult=@()
             $pesterScripts| ForEach-Object {
                 $script.Path=$_
-                $pesterResult+=Invoke-Pester -Script $script -PassThru # -OutputFormat NUnitXml -OutputFile $outputFile
+                $pesterHash=@{
+                    Script=$script
+                    PassThru=$true
+                }
+                $pesterResult+=Invoke-Pester @pesterHash
             }
         }
         else
         {
-            $path=Join-Path $env:TEMP "ISHBootstrap"
-            if($computerName)
-            {
-                $path=Join-path $path $computerName
-            }
-            else
-            {
-                $path=Join-path $path $env:COMPUTERNAME
-            }
+            $testContainerPath=$outputPath
             if($DeploymentName)
             {
-                $path=Join-path $path $DeploymentName
+                $testContainerPath=Join-path $testContainerPath $DeploymentName
             }
             else
             {
-                $path=Join-path $path "Server"
+                $testContainerPath=Join-path $testContainerPath "Server"
             }
-            $testContainerPath=Join-Path $path (Get-Date -Format "yyyyMMddhhmmss")
+            $testContainerPath=Join-Path $testContainerPath (Get-Date -Format "yyyyMMdd.hhmmss")
             if(Test-Path $testContainerPath)
             {
                 Remove-Item $testContainerPath -Recurse -Force
@@ -100,12 +109,37 @@ try
             $extraFolderPathToCopy=$extraFolderPathToCopy|Select-Object -Unique
             Copy-Item -Path $extraFolderPathToCopy -Destination $testContainerPath -Recurse
             $script.Path=$testContainerPath
-            $pesterResult=Invoke-Pester -Script $script -PassThru #-OutputFormat NUnitXml -OutputFile $outputFile
+            $pesterHash=@{
+                Script=$script
+                PassThru=$true
+                OutputFormat=$OutputFormat
+            }
+            $outputFileNameSegments=@()
+            $outputFileNameSegments+=Get-Date -Format "yyyyMMdd.hhmmsss"
+            if($DeploymentName)
+            {
+                $outputFileNameSegments+=$deploymentName
+                #$pesterHash.TestName=$deploymentName
+            }
+            else
+            {
+                $outputFileNameSegments+="Server"
+                #$pesterHash.TestName="Server"
+            }
+            $outputFileNameSegments+="TestResults"
+            $outputFileNameSegments+="xml"
+            $outputFilePath=Join-Path $outputPath ($outputFileNameSegments -join ".")
+            
+            $pesterHash.OutputFile=$outputFilePath
+
+            $result=Invoke-Pester @pesterHash
+            $result | Add-Member -Name "TestResultPath" -Value $outputFilePath -MemberType NoteProperty
+            $pesterResult+=$result
+            Write-Verbose "$OutputFormat test result available in $outputFilePath"
         }
 
         return $pesterResult
     }
-
 
     $pesterResult=@{}
     if($Server)
@@ -158,12 +192,10 @@ try
             $pesterResult[$deploymentName]=InvokePester $deploymentName $scriptsToExecute
         }
     }
-    $pesterReport=@()
     foreach($key in $pesterResult.Keys)
     {
-        $pesterReport+=$pesterResult[$key]|Select-Object @{Name="Name";Expression={$key}},TotalCount,PassedCount,FailedCount,SkippedCount,PendingCount,Time
+        $pesterResult[$key]|Select-Object @{Name="Name";Expression={$key}},TotalCount,PassedCount,FailedCount,SkippedCount,PendingCount,Time,TestResultPath
     }
-    $pesterReport |Format-Table Name,PassedCount,FailedCount,PendingCount,SkippedCount,TotalCount
 }
 finally
 {
