@@ -26,7 +26,8 @@ try
     if($Computer)
     {
         $ishServerModuleName="xISHServer.$ISHServerVersion"
-        $remote=Add-ModuleFromRemote -ComputerName $Computer -Name $ishServerModuleName
+        $session=New-PSSession -ComputerName $Computer -Credential $OSUserCredential
+        $remote=Add-ModuleFromRemote -Session $session -Name $ishServerModuleName
     }
 
     Initialize-ISHRegional
@@ -37,6 +38,7 @@ finally
     if($Computer)
     {
         Remove-ModuleFromRemote -Remote $remote
+        $session|Remove-PSSession
     }
 }
 
