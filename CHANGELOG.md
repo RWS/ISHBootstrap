@@ -1,5 +1,9 @@
 # Change log
 
+**20160905**
+
+- 'Initialize-ISHServerOSUserRegion.ps1` fix to force the `osuser`'s profile to be initialized.
+
 **20160830**
 
 - 'Invoke-CommandWrap` fix for script blocks with param.
