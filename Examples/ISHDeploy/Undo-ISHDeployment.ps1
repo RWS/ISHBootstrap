@@ -4,12 +4,12 @@
     [Parameter(Mandatory=$true)]
     [string]$DeploymentName
 )
-. $PSScriptRoot\Cmdlets\Write-Separator.ps1
-Write-Separator -Invocation $MyInvocation -Header
-
 $ishBootStrapRootPath=Resolve-Path "$PSScriptRoot\..\.."
 $cmdletsPaths="$ishBootStrapRootPath\Source\Cmdlets"
 $scriptsPaths="$ishBootStrapRootPath\Source\Scripts"
+
+. $ishBootStrapRootPath\Examples\ISHDeploy\Cmdlets\Write-Separator.ps1
+Write-Separator -Invocation $MyInvocation -Header -Name "Configure"
 
 if(-not $Computer)
 {
@@ -34,4 +34,4 @@ finally
 {
 }
 
-Write-Separator -Invocation $MyInvocation -Footer
+Write-Separator -Invocation $MyInvocation -Footer -Name "Configure"

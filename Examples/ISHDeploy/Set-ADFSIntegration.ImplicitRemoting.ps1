@@ -8,12 +8,12 @@ param (
     [Parameter(Mandatory=$false)]
     [switch]$IncludeInternalClients=$false
 )        
-. $PSScriptRoot\Cmdlets\Write-Separator.ps1
-Write-Separator -Invocation $MyInvocation -Header
-
 $ishBootStrapRootPath=Resolve-Path "$PSScriptRoot\..\.."
 $cmdletsPaths="$ishBootStrapRootPath\Source\Cmdlets"
 $scriptsPaths="$ishBootStrapRootPath\Source\Scripts"
+
+. $ishBootStrapRootPath\Examples\ISHDeploy\Cmdlets\Write-Separator.ps1
+Write-Separator -Invocation $MyInvocation -Header -Name "Configure"
 
 if(-not $Computer)
 {
@@ -128,4 +128,4 @@ finally
     Remove-ModuleFromRemote -Remote $remoteADFS
 }
 
-Write-Separator -Invocation $MyInvocation -Footer
+Write-Separator -Invocation $MyInvocation -Footer -Name "Configure"

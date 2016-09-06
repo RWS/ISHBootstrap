@@ -5,7 +5,9 @@ Function Write-Separator {
         [Parameter(Mandatory=$true,ParameterSetName="Header")]
         [switch]$Header,
         [Parameter(Mandatory=$true,ParameterSetName="Footer")]
-        [switch]$Footer
+        [switch]$Footer,
+        [Parameter(Mandatory=$true)]
+        [string]$Name
     )
     $segments=@()
     if($Header)
@@ -16,10 +18,14 @@ Function Write-Separator {
     {
         $segments+="End"
     }
-    $segments+="Script"
+    $segments+=$Name
     if($Invocation.BoundParameters.DeploymentName)
     {
         $segments+="/"+$($Invocation.BoundParameters.DeploymentName)
+    }
+    if($Invocation.BoundParameters.Session)
+    {
+        $segments+="@"+$($Invocation.BoundParameters.Session.ComputerName)
     }
     if($Invocation.BoundParameters.Computer)
     {

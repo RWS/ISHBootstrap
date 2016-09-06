@@ -5,9 +5,7 @@ Function Write-Separator {
         [Parameter(Mandatory=$true,ParameterSetName="Header")]
         [switch]$Header,
         [Parameter(Mandatory=$true,ParameterSetName="Footer")]
-        [switch]$Footer,
-        [Parameter(Mandatory=$false)]
-        [string]$Name="Script"
+        [switch]$Footer
     )
     $segments=@()
     if($Header)
@@ -18,15 +16,7 @@ Function Write-Separator {
     {
         $segments+="End"
     }
-    $segments+=$Name
-    if($Invocation.BoundParameters.DeploymentName)
-    {
-        $segments+="/"+$($Invocation.BoundParameters.DeploymentName)
-    }
-    if($Invocation.BoundParameters.Session)
-    {
-        $segments+="@"+$($Invocation.BoundParameters.Session.ComputerName)
-    }
+    $segments+="Script"
     $line="["+($segments -join ' ')+"]"+" "+$Invocation.MyCommand.Definition
     Write-Host $line -ForegroundColor White -BackgroundColor Black
     if($Footer)
