@@ -1,7 +1,7 @@
 $cmdletsPaths="$PSScriptRoot\..\..\Cmdlets"
 
-. "$cmdletsPaths\Helpers\Write-MyInvocation.ps1"
-Write-MyInvocation -Invocation $MyInvocation
+. "$cmdletsPaths\Helpers\Write-Separator.ps1"
+Write-Separator -Invocation $MyInvocation -Header
 
 # Get the ID and security principal of the current user account
 $myWindowsID=[System.Security.Principal.WindowsIdentity]::GetCurrent()
@@ -15,3 +15,5 @@ if (-not $myWindowsPrincipal.IsInRole($adminRole))
 {
     Write-Error "The current Windows PowerShell session is not running as Administrator. Start Windows PowerShell by  using the Run as Administrator option, and then try running the script again." -RecommendedAction "Start Windows PowerShell by  using the Run as Administrator option, and then try running the script again." -ErrorAction Stop
 }
+
+Write-Separator -Invocation $MyInvocation -Footer
