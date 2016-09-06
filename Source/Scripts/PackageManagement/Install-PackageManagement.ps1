@@ -7,8 +7,8 @@
 
 $cmdletsPaths="$PSScriptRoot\..\..\Cmdlets"
 
-. "$cmdletsPaths\Helpers\Write-MyInvocation.ps1"
-Write-MyInvocation -Invocation $MyInvocation
+. "$cmdletsPaths\Helpers\Write-Separator.ps1"
+Write-Separator -Invocation $MyInvocation -Header
 
 . "$cmdletsPaths\Helpers\Invoke-CommandWrap.ps1"
 
@@ -56,5 +56,4 @@ catch
     Write-Error $_
 }
 
-
-
+Write-Separator -Invocation $MyInvocation -Footer

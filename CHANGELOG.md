@@ -3,6 +3,7 @@
 **20160905**
 
 - 'Initialize-ISHServerOSUserRegion.ps1` fix to force the `osuser`'s profile to be initialized.
+- Each script emits header and footer. (`Write-Separator.ps1`)
 
 **20160830**
 
