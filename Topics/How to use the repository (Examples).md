@@ -60,7 +60,6 @@ An obfuscated file looks like this
 {
   "ComputerName": "SERVER01",
   "ISHVersion": "12.0.1",
-  "EnableSecureWinRM": true,
   "CertificateAuthority" : "CertificateAuthority",
   "InstallProcessExplorer": true,
   "xISHServerRepository": "mymachine",
@@ -130,12 +129,10 @@ Note that when executing the scripts locally, the script will load the **xISHIns
 & .\Examples\Initialize-ServerForRemote.ps1
 ```
 
-This step uses the `EnableSecureWinRM` and when set to `true` at the end of this step there is a prompt that looks like this
-
-> Login to  and execute locally C:\Users\username\Documents\WindowsPowerShell\Initialize-Remote.ps1
-
 The required certificate for the Secure WinRM is issued by the domain certificate authority, effectively making it a double hop. More about the issue [PowerShell Remoting Caveats](https://sarafian.github.io/post/powershell/powershell-remoting-caveats/). 
 To configure the system at this moment we need to Remote Desktop and execute locally. I understand that there are alternatives but I'm not a hard core ops engineer and my knowledge about the Windows operating system stops beyond this point.
+
+The most promissing alternative is [PowerShell Remoting Kerberos Double Hop Solved Securely](https://blogs.technet.microsoft.com/ashleymcglone/2016/08/30/powershell-remoting-kerberos-double-hop-solved-securely/) that allows central configuration from the domain controller.
 
 **Important to notice** is that this steps creates a web server certificate that is used later on the HTTPS binding on IIS. If you skip this step then the certificate must be issued.
 

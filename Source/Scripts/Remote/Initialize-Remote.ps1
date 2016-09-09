@@ -1,10 +1,22 @@
 param(
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
-    [string]$CertificateAuthority
+    [string]$CertificateAuthority,
+    [Parameter(Mandatory=$false)]
+    [string]$OrganizationalUnit=$null,
+    [Parameter(Mandatory=$false)]
+    [string]$Organization=$null,
+    [Parameter(Mandatory=$false)]
+    [string]$Locality=$null,
+    [Parameter(Mandatory=$false)]
+    [string]$State=$null,
+    [Parameter(Mandatory=$false)]
+    [string]$Country=$null
 )
 Write-Verbose "Installing WinRM-IIS-Ext"
-Add-WindowsFeature WinRM-IIS-Ext | Out-Null
+# Add-WindowsFeature WinRM-IIS-Ext | Out-Null breaks on some servers
+# Instead this seems to work
+Get-WindowsFeature |Where-Object -Property Name -EQ "WinRM-IIS-Ext"|Add-WindowsFeature
 Write-Host "WinRM-IIS-Ext feature is ok"
 
 Write-Verbose "Enabling WSManCredSSP role server"
@@ -17,7 +29,31 @@ $certificate=Get-ChildItem "Cert:\LocalMachine\My" |Where-Object {$_.Subject -ma
 if(-not $certificate)
 {
     Write-Verbose "Requesting Web server certificate."
-    New-DomainSignedCertificate -Hostname $hostname -CertificateAuthority $CertificateAuthority | Out-Null
+    $newDomainSignedCertificateHash=@{
+        Hostname=$hostname
+        CertificateAuthority=$CertificateAuthority
+    }
+    if($OrganizationalUnit)
+    {
+        $newDomainSignedCertificateHash.OrganizationalUnit=$OrganizationalUnit
+    }
+    if($Organization)
+    {
+        $newDomainSignedCertificateHash.Organization=$Organization
+    }
+    if($Locality)
+    {
+        $newDomainSignedCertificateHash.Locality=$Locality
+    }
+    if($State)
+    {
+        $newDomainSignedCertificateHash.State=$State
+    }
+    if($Country)
+    {
+        $newDomainSignedCertificateHash.Country=$Country
+    }
+    New-DomainSignedCertificate @newDomainSignedCertificateHash | Out-Null
     $certificate=Get-ChildItem "Cert:\LocalMachine\My" |Where-Object {$_.Subject -match $hostname -and (Get-CertificateTemplate $_) -eq "WebServer"}
     Write-Host "Installed new certificate with friendly name $($certificate.FriendlyName)"
 }
