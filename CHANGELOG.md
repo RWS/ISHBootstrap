@@ -1,5 +1,9 @@
 # Change log
 
+**20160908**
+
+- Minor fixes and added new parameters for `Initialize-Remote.ps1`.
+
 **20160905**
 
 - 'Initialize-ISHServerOSUserRegion.ps1` fix to force the `osuser`'s profile to be initialized.
