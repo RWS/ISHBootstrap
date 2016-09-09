@@ -86,7 +86,6 @@ function New-ISHDeploymentInputParameters {
     $inputParameters["issuerwstrustmexurl"]="$baseurl/$infosharestswebappname/issue/wstrust/mex"
     $inputParameters["issuerwstrustendpointurl"]="$baseurl/$infosharestswebappname/issue/wstrust/mixed/$ishSTSType"
     $inputParameters["issuercertificatethumbprint"]=$inputParameters["servicecertificatethumbprint"]
-    $inputParameters["issuercertificatevalidationmode"]="ChainTrust"
 
     $inputParametersPath=Join-Path $CDPath "__InstallTool\inputparameters.xml"
     [xml]$xml=Get-Content $inputParametersPath
