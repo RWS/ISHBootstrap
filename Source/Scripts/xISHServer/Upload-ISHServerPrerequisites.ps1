@@ -1,6 +1,8 @@
 ﻿param (
     [Parameter(Mandatory=$false)]
     [string]$Computer=$null,
+    [Parameter(Mandatory=$false)]
+    [pscredential]$Credential=$null,
     [Parameter(Mandatory=$true)]
     [string]$PrerequisitesSourcePath,
     [Parameter(Mandatory=$true)]
@@ -25,7 +27,7 @@ try
     if($Computer)
     {
         $ishServerModuleName="xISHServer.$ISHServerVersion"
-        $remote=Add-ModuleFromRemote -ComputerName $Computer -Name $ishServerModuleName
+        $remote=Add-ModuleFromRemote -ComputerName $Computer -Credential $Credential -Name $ishServerModuleName
     }
 
     $filesToCopy=@(
@@ -58,14 +60,28 @@ try
     
     if($Computer)
     {
-        $targetPath=Get-ISHServerFolderPath -UNC
+        if($PSVersionTable.PSVersion.Major -ge 5)
+        {
+            $targetPath=Get-ISHServerFolderPath
+        }
+        else
+        {
+            $targetPath=Get-ISHServerFolderPath -UNC
+        }
     }    
     else
     {
         $targetPath=Get-ISHServerFolderPath
     }
     Write-Debug "targetPath=$targetPath"
-    Copy-Item -Path $filePathToCopy -Destination $targetPath -Force
+    if($PSVersionTable.PSVersion.Major -ge 5)
+    {
+        Copy-Item -Path $filePathToCopy -Destination $targetPath -Force -ToSession $remote.Session
+    }
+    else
+    {
+        Copy-Item -Path $filePathToCopy -Destination $targetPath -Force
+    }
 
     Write-Verbose "Uploaded files to $targetPath"
 }

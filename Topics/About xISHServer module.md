@@ -1,6 +1,11 @@
 # About xISHServer module
 
-The **xISHServer** PowerShell module provides the necessary cmdlets to prepare a default **Windows Server 2012 R2** for a SDL Knowledge Center Content Manager deployment
+The **xISHServer** PowerShell module provides the necessary cmdlets to bootstrap a SDL Knowledge Center Content Manager deployment for the following operating systems:
+
+- Windows Server 2012 R2
+- Windows Server 2016
+- Windows 10 Pro
+- Windows 8.1 Pro (Not validated but allowed)
 
 The module appears with the following names 
 

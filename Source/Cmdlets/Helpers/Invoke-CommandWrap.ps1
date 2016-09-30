@@ -12,6 +12,8 @@
         Arguments for the script block.
     .PARAMETER  Computer
         Target computer
+    .PARAMETER  Credential
+        Target Credential
     .PARAMETER  Session
         Target session
     .PARAMETER  UseParameters
@@ -94,9 +96,11 @@ Function Invoke-CommandWrap {
         $BlockName,
         [Parameter(Mandatory=$false)]
         $ArgumentList=$null,
-        [Parameter(Mandatory=$false)]
-        $ComputerName=$null,
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory=$true,ParameterSetName="Computer")]
+        $ComputerName,
+        [Parameter(Mandatory=$false,ParameterSetName="Computer")]
+        [pscredential]$Credential=$null,
+        [Parameter(Mandatory=$true,ParameterSetName="Session")]
         $Session=$null,
         [Parameter(Mandatory=$false)]
         [string[]]$UseParameters=$null
@@ -159,7 +163,14 @@ Function Invoke-CommandWrap {
     {
         Write-Debug "Targetting remote computer $ComputerName"
         Write-Verbose "[$BlockName] Begin on $ComputerName"
-        Invoke-Command -ComputerName $ComputerName -ScriptBlock $ScriptBlock -ArgumentList $ArgumentList
+        if($Credential)
+        {
+            Invoke-Command -ComputerName $ComputerName -Credential $Credential -ScriptBlock $ScriptBlock -ArgumentList $ArgumentList
+        }
+        else
+        {
+            Invoke-Command -ComputerName $ComputerName -ScriptBlock $ScriptBlock -ArgumentList $ArgumentList
+        }
         Write-Host "[$BlockName] Finish on $ComputerName"
         return
     }

@@ -1,6 +1,8 @@
 ﻿param (
     [Parameter(Mandatory=$false)]
     [string[]]$Computer,
+    [Parameter(Mandatory=$false)]
+    [pscredential]$Credential=$null,
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
     [string]$Name,
@@ -43,7 +45,7 @@ $registerPSRepositoryBlock = {
 
 try
 {
-    Invoke-CommandWrap -ComputerName $Computer -ScriptBlock $registerPSRepositoryBlock -BlockName "Register Repository $Name" -UseParameters @("Name","SourceLocation","PublishLocation","InstallationPolicy")
+    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $registerPSRepositoryBlock -BlockName "Register Repository $Name" -UseParameters @("Name","SourceLocation","PublishLocation","InstallationPolicy")
 }
 catch
 {

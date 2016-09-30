@@ -1,6 +1,8 @@
 ﻿param (
     [Parameter(Mandatory=$false)]
-    [string[]]$Computer
+    [string[]]$Computer,
+    [Parameter(Mandatory=$false)]
+    [pscredential]$Credential=$null
 )        
 
 $cmdletsPaths="$PSScriptRoot\..\..\Cmdlets"
@@ -19,7 +21,7 @@ $installProviderScriptBlock={
 #Install the packages
 try
 {
-    Invoke-CommandWrap -ComputerName $Computer -ScriptBlock $installProviderScriptBlock -BlockName "Nuget package provider"
+    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $installProviderScriptBlock -BlockName "Nuget package provider"
 }
 catch
 {

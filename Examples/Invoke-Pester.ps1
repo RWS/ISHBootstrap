@@ -21,6 +21,7 @@ try
 
     . "$PSScriptRoot\Cmdlets\Get-ISHBootstrapperContextValue.ps1"
     $computerName=Get-ISHBootstrapperContextValue -ValuePath "ComputerName" -DefaultValue $null
+    $credential=Get-ISHBootstrapperContextValue -ValuePath "CredentialExpression" -Invoke
 
     . "$cmdletsPaths\Helpers\Invoke-CommandWrap.ps1"
     if(-not $computerName)
@@ -29,7 +30,14 @@ try
     }
     else
     {
-        $session=New-PSSession $computerName
+        if($credential)
+        {
+            $session=New-PSSession $computerName -Credential $credential
+        }
+        else
+        {
+            $session=New-PSSession $computerName
+        }
         Invoke-CommandWrap -Session $session -BlockName "Initialize Debug/Verbose preference on $($Session.ComputerName)" -ScriptBlock {}
     }
 

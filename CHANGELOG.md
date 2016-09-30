@@ -1,5 +1,23 @@
 # Change log
 
+**20160930**
+
+- Major code refactoring. **Before** this all code expected to access and execute remote code without specifying crendetial. This worked for domain credentials. 
+  - Impoved the `Add-ModuleFromRemote.ps1` to accept a `-Credential` parameter. 
+  - Impoved the `Invoke-CommandWrap.ps1` to accept a `-Credential` parameter. 
+  - All scripts accept a `-Credential` parameter.
+- `Install-Module.ps1` accepts parameter `-AllowClobber` to address an issue with Windows Server 2016 and PowerShell moduble **Carbon**
+- `xISHServer` is now smarter:
+  - `Get-ISHOSInfo` breaks down the information from the caption of the operating system
+  - `Get-ISHNETInfo` returns .NET available .NET versions.
+  - `Get-ISHNETInfo` returns .NET available .NET versions.
+  - `Test-ISHServerCompliance` checks if the target operating system is supported by this bootstrapper.
+    - Windows Server 2016
+    - Windows Server 2012 R2
+    - Windows Server 10
+    - Windows Server 8.1 not tested though
+- Script `Test-SupportedServer.ps1` checks if the target operating system is supported by this bootstrapper.
+
 **20160908**
 
 - Minor fixes and added new parameters for `Initialize-Remote.ps1`.

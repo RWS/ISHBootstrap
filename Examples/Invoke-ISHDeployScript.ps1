@@ -22,6 +22,7 @@ try
 
     . "$PSScriptRoot\Cmdlets\Get-ISHBootstrapperContextValue.ps1"
     $computerName=Get-ISHBootstrapperContextValue -ValuePath "ComputerName" -DefaultValue $null
+    $credential=Get-ISHBootstrapperContextValue -ValuePath "CredentialExpression" -Invoke
 
     if(-not $computerName)
     {
@@ -78,11 +79,11 @@ try
 
             if($UseISHDeployImplicit)
             {
-                & $scriptPath -Computer $computerName -DeploymentName $deploymentName -ISHVersion $ishVersion
+                & $scriptPath -Computer $computerName -Credential $credential -DeploymentName $deploymentName -ISHVersion $ishVersion
             }
             else
             {
-                & $scriptPath -Computer $computerName -DeploymentName $deploymentName
+                & $scriptPath -Computer $computerName -Credential $credential -DeploymentName $deploymentName
             }
             Write-Verbose "Executing $scriptPath -Computer $computerName -DeploymentName $deploymentName"
         }

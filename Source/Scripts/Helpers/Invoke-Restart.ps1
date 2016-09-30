@@ -1,6 +1,8 @@
 param (
     [Parameter(Mandatory=$true)]
-    [string[]]$Computer
+    [string[]]$Computer,
+    [Parameter(Mandatory=$false)]
+    [pscredential]$Credential=$null
 ) 
     
 $cmdletsPaths="$PSScriptRoot\..\..\Cmdlets"
@@ -11,7 +13,14 @@ Write-Separator -Invocation $MyInvocation -Header
 . "$cmdletsPaths\Helpers\Invoke-CommandWrap.ps1"
 
 Write-Verbose "Restarting $Computer"
-Restart-Computer -ComputerName  $Computer -Force
+if($Credential)
+{
+    Restart-Computer -ComputerName  $Computer -Credential $Credential -Force
+}
+else
+{
+    Restart-Computer -ComputerName  $Computer -Force
+}
 Write-Host "Initiated $Computer restart"
 
 $testBlock = {

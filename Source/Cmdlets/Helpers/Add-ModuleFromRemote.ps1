@@ -4,6 +4,8 @@ Function Add-ModuleFromRemote {
     param (
         [Parameter(Mandatory=$true,ParameterSetName="Computer")]
         $ComputerName,
+        [Parameter(Mandatory=$false,ParameterSetName="Computer")]
+        [pscredential]$Credential=$null,
         [Parameter(Mandatory=$true,ParameterSetName="Session")]
         $Session,
         [Parameter(Mandatory=$true)]
@@ -18,7 +20,14 @@ Function Add-ModuleFromRemote {
         }
         if($ComputerName)
         {
-            $Session=New-PSSession -ComputerName $ComputerName
+            if($Credential)
+            {
+                $Session=New-PSSession -ComputerName $ComputerName -Credential $credential
+            }
+            else
+            {
+                $Session=New-PSSession -ComputerName $ComputerName
+            }
             $undoHash.Session=$Session
             Invoke-CommandWrap -Session $session -BlockName "Initialize Debug/Verbose preference on $($Session.ComputerName)" -ScriptBlock {}
         }

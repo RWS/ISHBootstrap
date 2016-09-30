@@ -1,6 +1,8 @@
 param (
     [Parameter(Mandatory=$true)]
-    [string[]]$Computer
+    [string[]]$Computer,
+    [Parameter(Mandatory=$false)]
+    [pscredential]$Credential=$null
 ) 
 
 $cmdletsPaths="$PSScriptRoot\..\..\Cmdlets"
@@ -15,5 +17,5 @@ $killRemoteSessionsScriptBlock={
     & taskkill /im:wsmprovhost.exe /f |Out-Null
 }
 
-Invoke-CommandWrap -ComputerName $Computer -ScriptBlock $killRemoteSessionsScriptBlock -BlockName "Kill remote sessions"
+Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $killRemoteSessionsScriptBlock -BlockName "Kill remote sessions"
 Write-Separator -Invocation $MyInvocation -Footer

@@ -5,9 +5,7 @@
     [pscredential]$Credential=$null,
     [Parameter(Mandatory=$true)]
     [ValidateSet("12","13")]
-    [string]$ISHServerVersion,
-    [Parameter(Mandatory=$false)]
-    [switch]$InstallOracle=$false
+    [string]$ISHServerVersion
 )    
 $cmdletsPaths="$PSScriptRoot\..\..\Cmdlets"
 
@@ -30,41 +28,12 @@ try
         $remote=Add-ModuleFromRemote -ComputerName $Computer -Credential $Credential -Name $ishServerModuleName
     }
 
-    Install-ISHWindowsFeature
-    Install-ISHToolDotNET
-    Install-ISHToolVisualCPP
-    Install-ISHToolMSXML4
-    Install-ISHToolJAVA
-    Install-ISHToolJavaHelp
-    Install-ISHToolHtmlHelp
-    Install-ISHToolAntennaHouse
-    if($InstallOracle)
+    $isSupported=Test-ISHServerCompliance
+    if(-not $isSupported)
     {
-        Install-ISHToolOracleODAC
+        throw "Not a compatible operating system"
     }
-
-    Initialize-ISHLocale
-    Initialize-ISHIIS
-    Initialize-ISHRegionalDefault
-
-    if($ISHServerVersion -eq "12")
-    {
-        Initialize-ISHMSDTCTransactionTimeout
-        Initialize-ISHMSDTCSettings
-    }
-
-    Set-ISHFirewallNETBIOS
-    Set-ISHFirewallSMTP
-    Set-ISHFirewallSQLServer
-    if($InstallOracle)
-    {
-        Set-ISHFirewallOracle
-    }
-    Set-ISHFirewallHTTPS
-    if($ISHServerVersion -eq "12")
-    {
-        Set-ISHFirewallMSDTC
-    }
+    $isSupported
 }
 
 finally

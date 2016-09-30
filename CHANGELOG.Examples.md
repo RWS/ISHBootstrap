@@ -1,5 +1,14 @@
 # Examples Change log
 
+**20160930**
+
+To align with the major changes in Source:
+
+- Added new supported property in JSON `CredentialExpression` that drives authorization for all remote calls.
+- `Initialize-ISHServer.ps1` checks if the target operating system is supported by this bootstrapper.
+
+
+
 **20160908**
 
 - New json parameter supported for `Initialize-Remote.ps1`.

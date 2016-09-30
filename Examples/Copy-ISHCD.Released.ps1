@@ -8,6 +8,7 @@ $scriptsPaths="$sourcePath\Scripts"
 
 . "$PSScriptRoot\Cmdlets\Get-ISHBootstrapperContextValue.ps1"
 $computerName=Get-ISHBootstrapperContextValue -ValuePath "ComputerName" -DefaultValue $null
+$credential=Get-ISHBootstrapperContextValue -ValuePath "CredentialExpression" -Invoke
 $ishVersion=Get-ISHBootstrapperContextValue -ValuePath "ISHVersion"
 
 . "$cmdletsPaths\Helpers\Invoke-CommandWrap.ps1"
@@ -64,7 +65,7 @@ try
         & "$scriptsPaths\Helpers\Test-Administrator.ps1"
     }
 
-    Invoke-CommandWrap -ComputerName $computerName -ScriptBlock $copyBlock -BlockName "Copy and Extract ISH.$ishVersion" -UseParameters @("ishVersion","ftpHost","ftpIp","ftpUser","ftpPassword","ftpCDFolder","ftpCDFileName")
+    Invoke-CommandWrap -ComputerName $computerName -Credential $credential -ScriptBlock $copyBlock -BlockName "Copy and Extract ISH.$ishVersion" -UseParameters @("ishVersion","ftpHost","ftpIp","ftpUser","ftpPassword","ftpCDFolder","ftpCDFileName")
 }
 finally
 {

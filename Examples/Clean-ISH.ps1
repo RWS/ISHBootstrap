@@ -8,6 +8,7 @@ $scriptsPaths="$sourcePath\Scripts"
 
 . "$PSScriptRoot\Cmdlets\Get-ISHBootstrapperContextValue.ps1"
 $computerName=Get-ISHBootstrapperContextValue -ValuePath "ComputerName" -DefaultValue $null
+$credential=Get-ISHBootstrapperContextValue -ValuePath "CredentialExpression" -Invoke
 $ishVersion=Get-ISHBootstrapperContextValue -ValuePath "ISHVersion"
 $ishServerVersion=($ishVersion -split "\.")[0]
 
@@ -55,7 +56,7 @@ try
     {
         & "$scriptsPaths\Helpers\Test-Administrator.ps1"
     }
-    Invoke-CommandWrap -ComputerName $computerName -ScriptBlock $cleanBlock -BlockName "Clean ISH" -UseParameters @("ishVersion","ishServerVersion")
+    Invoke-CommandWrap -ComputerName $computerName -Credential $credential -ScriptBlock $cleanBlock -BlockName "Clean ISH" -UseParameters @("ishVersion","ishServerVersion")
 
 }
 finally

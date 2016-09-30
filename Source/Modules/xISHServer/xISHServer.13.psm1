@@ -1,5 +1,8 @@
 #requires -runasadministrator
 
+. $PSScriptRoot\Get-ISHOSInfo.ps1
+. $PSScriptRoot\Get-ISHNETInfo.ps1
+. $PSScriptRoot\Test-ISHServerCompliance.ps1
 . $PSScriptRoot\Get-ISHServerFolderPath.ps1
 
 #region Ports

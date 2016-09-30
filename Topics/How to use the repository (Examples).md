@@ -1,11 +1,12 @@
 # How to use the repository (Examples)
 
-Starting from a clean **Windows Server 2012 R2** installation this how you end up with a [SDL Knowledge Center 2016](sdl.com/xml) Content Manager 12.0.0 Deployment.
+Starting from a clean server operating system this how you end up with a [SDL Knowledge Center 2016](sdl.com/xml) Content Manager 12.0.1 Deployment.
 
 # Acknowledgements
 
-- The target computer name is `SERVER01` and is initialized with **Windows Server 2012 R2** and is already joined in a active directory domain.
-- We'll use a domain certificate server to issue certificates. This is similar to the *Create Domain Certificate...* in **Internet Information Services (IIS) Manager**.
+- The target computer name is `SERVER01` and is initialized with **Windows Server 2012 R2** or **Windows Server 2016**. There are two variantions supported:
+  - Server is joined into a domain. We'll use a domain certificate server to issue certificates. This is similar to the *Create Domain Certificate...* in **Internet Information Services (IIS) Manager**.
+  - Server is not in a domain. Web Server certificate must be available in the store as a pre-requisite. 
 - **osuser** and **ospassword** are the credentials used in the **Content Manager** installation input parameters to specify which user runs the services. The osuser must be member of the local administrator group.
 - Dependency to PowerShell modules on gallery
   - [CertificatePS](http://www.powershellgallery.com/packages/CertificatePS/). This is used to help with certificate templates. Read more about this [here](https://github.com/Sarafian/CertificatePS)
@@ -59,6 +60,7 @@ An obfuscated file looks like this
 ```json
 {
   "ComputerName": "SERVER01",
+  "CredentialExpression": "New-MyCredential",
   "ISHVersion": "12.0.1",
   "CertificateAuthority" : "CertificateAuthority",
   "InstallProcessExplorer": true,
@@ -66,7 +68,6 @@ An obfuscated file looks like this
   "xISHInstallRepository": "mymachine",
   "ISHDeployRepository": "PSGallery",
   "PrerequisitesSourcePath": "C:\\inetpubopen\\xISHServer",
-  "CredentialForCredSSPExpression": "New-MyCredential",
   "OSUserCredentialExpression": "New-InfoShareServiceUserCredential",
   "PSRepository": [
     {
@@ -180,7 +181,7 @@ Then ssl validation will fail with
 To not use the lengthy FQDN and bypass the certificate common name validation adjust the JSON next to `CredentialForCredSSPExpression` like this
 
 ```json
-  "CredentialForCredSSPExpression": "New-MyCredential",
+  "CredentialExpression": "New-MyCredential",
   "UseFQDNForCredSSPExpression": false,
   "SessionOptionsForCredSSPExpression": "New-PSSessionOption -SkipCNCheck",
 ```
