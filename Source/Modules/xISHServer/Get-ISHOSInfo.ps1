@@ -8,6 +8,7 @@ function Get-ISHOSInfo
         Version=$Matches["Version"]
         Type=$Matches["Type"]
         Caption=$caption
+        IsCore=-not (Test-Path "C:\Windows\explorer.exe")
     }
     New-Object -TypeName psobject -Property $hash    
 }

@@ -5,7 +5,7 @@ function Install-ISHToolDotNET
     $osInfo=Get-ISHOSInfo
     if($osInfo.Version -eq "2016")
     {
-        Write-Warning "Assuming .NET 4.6.2 is installed on $($osInfo.Caption)"
+        Write-Verbose "Assuming .NET 4.6.2 is installed on $($osInfo.Caption)"
     }
     else
     {

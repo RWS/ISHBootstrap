@@ -6,6 +6,7 @@
 . $PSScriptRoot\Test-ISHServerCompliance.ps1
 . $PSScriptRoot\Get-ISHServerFolderPath.ps1
 . $PSScriptRoot\Grant-ISHUserLogOnAsService.ps1
+. $PSScriptRoot\Get-ISHCOMPlus.ps1
 #endregion
 
 #region Ports
@@ -36,6 +37,7 @@
 . $PSScriptRoot\Install-ISHToolOracleODAC.ps1
 . $PSScriptRoot\Install-ISHWindowsFeature.ps1
 . $PSScriptRoot\Install-ISHWindowsFeatureIISWinAuth.ps1
+. $PSScriptRoot\Install-ISHVisualBasicRuntime.ps1
 #endregion
 
 #region Regional settings

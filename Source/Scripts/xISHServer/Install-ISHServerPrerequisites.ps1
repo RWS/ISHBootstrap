@@ -29,8 +29,13 @@ try
         $ishServerModuleName="xISHServer.$ISHServerVersion"
         $remote=Add-ModuleFromRemote -ComputerName $Computer -Credential $Credential -Name $ishServerModuleName
     }
+    $osInfo=Get-ISHOSInfo
 
     Install-ISHWindowsFeature
+    if($osInfo.IsCore)
+    {
+        Install-ISHVisualBasicRuntime
+    }
     Install-ISHToolDotNET
     Install-ISHToolVisualCPP
     Install-ISHToolMSXML4

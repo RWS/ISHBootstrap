@@ -6,17 +6,18 @@
   - Impoved the `Add-ModuleFromRemote.ps1` to accept a `-Credential` parameter. 
   - Impoved the `Invoke-CommandWrap.ps1` to accept a `-Credential` parameter. 
   - All scripts accept a `-Credential` parameter.
-- `Install-Module.ps1` accepts parameter `-AllowClobber` to address an issue with Windows Server 2016 and PowerShell moduble **Carbon**
-- `xISHServer` is now smarter:
-  - `Get-ISHOSInfo` breaks down the information from the caption of the operating system
+- **xISHServer** is now smarter:
+  - `Get-ISHOSInfo` breaks down the information from the caption of the operating system.
   - `Get-ISHNETInfo` returns .NET available .NET versions.
   - `Get-ISHNETInfo` returns .NET available .NET versions.
+  - `Get-ISHCOMPlus` returns COM+ applications and their state.
   - `Test-ISHServerCompliance` checks if the target operating system is supported by this bootstrapper.
-    - Windows Server 2016
-    - Windows Server 2012 R2
-    - Windows Server 10
-    - Windows Server 8.1 not tested though
-  - Removed dependency to powershell module [Carbon](https://www.powershellgallery.com/packages/Carbon/2.3.0) by introducing altetnatives
+    - Windows Server 2016.
+    - Windows Server 2012 R2.
+    - Windows Server 10.
+    - Windows Server 8.1 **not tested though**.
+  - `Install-ISHVisualBasicRuntime` installs the Visual Basic Runtime SP6. Requires file `vbrun60sp6.exe`. Get it from [Service Pack 6 for Visual Basic 6.0: Run-Time Redistribution Pack (vbrun60sp6.exe)](https://www.microsoft.com/en-us/download/details.aspx?id=24417) and then extract. **Use only** with Windows Server 2016 core variant. **This is a workaround**. [More information](https://social.technet.microsoft.com/Forums/windowsserver/en-US/9b0f8911-07f4-420f-9e48-d31915f91528/msvbvm60dll-missing-in-core?forum=winservercore).    
+  - Removed dependency to powershell module [Carbon](https://www.powershellgallery.com/packages/Carbon/2.3.0) by introducing altetnatives.
     - Grant logon as privilege for a user. Added new `Grant-ISHUserLogOnAsService`.
     - Add user to local users group. Use `Add-LocalGroupMember` available on Windows PowerShell v.5.
 - Script `Test-SupportedServer.ps1` checks if the target operating system is supported by this bootstrapper.

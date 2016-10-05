@@ -51,7 +51,9 @@ Some of the pre-requisites require to server to restart.
   - V6-2-M9-Windows_X64_64E.exe
   - V6-2-M9-Windows_X64_64E.exe.iss
   - AHFormatter.lic
-  
+- Visual Basic Runtime (required only for core variants)
+  - vbrun60sp6.exe. Get it from [Service Pack 6 for Visual Basic 6.0: Run-Time Redistribution Pack (vbrun60sp6.exe)](https://www.microsoft.com/en-us/download/details.aspx?id=24417) and then extract.
+
 ## Required files for xISHServer.13
 
 - MSXML 4.0
@@ -64,9 +66,8 @@ Some of the pre-requisites require to server to restart.
 - Html Help  
   - htmlhelp.zip
 - Microsoft .NET 4.6.1
-  - NETFramework2015_4.6.1.xxxxx_(NDP461-KB3102436-x86-x64-AllOS-ENU).exe  
+  - NETFramework2015_4.6.1.xxxxx_(NDP461-KB3102436-x86-x64-AllOS-ENU).exe. (required only for pre Windows Server 2016 installations).
 - Microsoft VisualC++ 4.6
-  - NETFramework2013_4.5_MicrosoftVisualC++Redistributable_(vcredist_x64).exe
   - NETFramework2015_4.6_MicrosoftVisualC++Redistributable_(vc_redist.x64).exe
 - Oracle ODAC 
   - ODTwithODAC121012.rsp
@@ -78,6 +79,8 @@ Some of the pre-requisites require to server to restart.
   - V6-2-M9-Windows_X64_64E.exe
   - V6-2-M9-Windows_X64_64E.exe.iss
   - AHFormatter.lic
+- Visual Basic Runtime (required only for core variants)
+  - vbrun60sp6.exe. Get it from [Service Pack 6 for Visual Basic 6.0: Run-Time Redistribution Pack (vbrun60sp6.exe)](https://www.microsoft.com/en-us/download/details.aspx?id=24417) and then extract.
   
 # Why is the module not on PowerShell gallery
 

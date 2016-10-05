@@ -9,9 +9,7 @@
     [string]$Repository,
     [Parameter(Mandatory=$false)]
     [ValidateSet("AllUsers","CurrentUser")]
-    [string]$Scope="AllUsers",
-    [Parameter(Mandatory=$false)]
-    [switch]$AllowClobber=$false
+    [string]$Scope="AllUsers"
 )    
 
 $cmdletsPaths="$PSScriptRoot\..\..\Cmdlets"
@@ -42,14 +40,7 @@ $installScriptBlock={
         }
         Write-Verbose "Found module $name with version $($latestModule.Version)"
 
-        if($AllowClobber)
-        {
-            $latestModule|Install-Module -Scope $Scope -AllowClobber -Force|Out-Null
-        }
-        else
-        {
-            $latestModule|Install-Module -Scope $Scope -Force|Out-Null
-        }
+        $latestModule|Install-Module -Scope $Scope -Force|Out-Null
    
         Write-Host "Installed module $name with version $($latestModule.Version)"
     }
@@ -58,7 +49,7 @@ $installScriptBlock={
 #Install the packages
 try
 {
-    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $installScriptBlock -BlockName "Install Modules $ModuleName" -UseParameters @("ModuleName","Repository","Scope","AllowClobber")
+    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $installScriptBlock -BlockName "Install Modules $ModuleName" -UseParameters @("ModuleName","Repository","Scope")
 }
 catch
 {
