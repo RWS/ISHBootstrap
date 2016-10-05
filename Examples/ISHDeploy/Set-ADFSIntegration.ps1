@@ -1,6 +1,8 @@
 param (
     [Parameter(Mandatory=$false)]
     [string[]]$Computer,
+    [Parameter(Mandatory=$false)]
+    [pscredential]$Credential=$null,
     [Parameter(Mandatory=$true)]
     [string]$DeploymentName,
     [Parameter(Mandatory=$false)]
@@ -78,7 +80,7 @@ $integrationBlock= {
 
 try
 {
-    $adfsInformation=Invoke-CommandWrap -ComputerName $adfsComputerName -ScriptBlock $getADFSInformationBlock -BlockName "Get ADFS information"
+    $adfsInformation=Invoke-CommandWrap -ComputerName $adfsComputerName -Credential $Credential -ScriptBlock $getADFSInformationBlock -BlockName "Get ADFS information"
     $primaryTokenSigningCertificate=$adfsInformation.TokenSigningCertificate|Where-Object -Property IsPrimary -EQ $true
 
     #Issuer name
@@ -95,7 +97,7 @@ try
     $tokenSigningCertificateThumbprint=$primaryTokenSigningCertificate.Thumbprint
     $issuercertificatevalidationmode = "None"
 
-    $uncPath=Invoke-CommandWrap -ComputerName $Computer -ScriptBlock $integrationBlock -BlockName "Integrate With ADFS for $DeploymentName" -UseParameters @("DeploymentName","issuerName","wsFederationUri","wsTrustUri","wsTrustMexUri","bindingType","tokenSigningCertificateThumbprint","issuercertificatevalidationmode","includeInternalClients","adfsIntegrationISHFilename")
+    $uncPath=Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $integrationBlock -BlockName "Integrate With ADFS for $DeploymentName" -UseParameters @("DeploymentName","issuerName","wsFederationUri","wsTrustUri","wsTrustMexUri","bindingType","tokenSigningCertificateThumbprint","issuercertificatevalidationmode","includeInternalClients","adfsIntegrationISHFilename")
 
     $sourceUncZipPath=Join-Path $uncPath $adfsIntegrationISHFilename
     $tempZipPath=Join-Path $env:TEMP $adfsIntegrationISHFilename

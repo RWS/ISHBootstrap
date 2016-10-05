@@ -1,6 +1,8 @@
 param (
     [Parameter(Mandatory=$false)]
     [string[]]$Computer,
+    [Parameter(Mandatory=$false)]
+    [pscredential]$Credential=$null,
     [Parameter(Mandatory=$true)]
     [string]$DeploymentName,
     [Parameter(Mandatory=$true)]
@@ -30,7 +32,7 @@ try
         $ishServerVersion=($ISHVersion -split "\.")[0]
         $ishServerModuleName="xISHServer.$ishServerVersion"
         $ishDelpoyModuleName="ISHDeploy.$ISHVersion"
-        $remote=Add-ModuleFromRemote -ComputerName $Computer -Name @($ishServerModuleName,$ishDelpoyModuleName)
+        $remote=Add-ModuleFromRemote -ComputerName $Computer -Credential $Credential -Name @($ishServerModuleName,$ishDelpoyModuleName)
     }
 
     Install-ISHWindowsFeatureIISWinAuth

@@ -1,6 +1,8 @@
 ﻿param (
     [Parameter(Mandatory=$false)]
     [string]$Computer,
+    [Parameter(Mandatory=$false)]
+    [pscredential]$Credential=$null,
     [Parameter(Mandatory=$true)]
     [string]$DeploymentName
 )
@@ -28,7 +30,7 @@ try
         Undo-ISHDeployment -ISHDeployment $DeploymentName
         Clear-ISHDeploymentHistory -ISHDeployment $DeploymentName
     }
-    Invoke-CommandWrap -ComputerName $Computer -ScriptBlock $undoBlock -BlockName "Undo deployment $deploymentName" -UseParameters @("DeploymentName")
+    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $undoBlock -BlockName "Undo deployment $deploymentName" -UseParameters @("DeploymentName")
 }
 finally
 {

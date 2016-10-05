@@ -31,7 +31,7 @@ $copyBlock= {
         $ftpHost=$ftpIp
     }
 
-    $sdlCredentials=New-Credential -UserName $ftpUser -Password $ftpPassword
+    $sdlCredentials=New-Object System.Management.Automation.PSCredential($ftpUser,(ConvertTo-SecureString $ftpPassword -AsPlainText -Force))
     Set-FTPConnection -Server $ftpHost -Credentials $sdlCredentials -UseBinary -KeepAlive -UsePassive | Out-Null
     $ftpUrl="$ftpCDFolder$ftpCDFileName"
     $localPath=$env:TEMP

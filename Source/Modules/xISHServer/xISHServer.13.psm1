@@ -1,9 +1,12 @@
 #requires -runasadministrator
 
+#region Helpers
 . $PSScriptRoot\Get-ISHOSInfo.ps1
 . $PSScriptRoot\Get-ISHNETInfo.ps1
 . $PSScriptRoot\Test-ISHServerCompliance.ps1
 . $PSScriptRoot\Get-ISHServerFolderPath.ps1
+. $PSScriptRoot\Grant-ISHUserLogOnAsService.ps1
+#endregion
 
 #region Ports
 . $PSScriptRoot\Set-ISHFirewallHTTPS.ps1

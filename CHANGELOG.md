@@ -16,6 +16,9 @@
     - Windows Server 2012 R2
     - Windows Server 10
     - Windows Server 8.1 not tested though
+  - Removed dependency to powershell module [Carbon](https://www.powershellgallery.com/packages/Carbon/2.3.0) by introducing altetnatives
+    - Grant logon as privilege for a user. Added new `Grant-ISHUserLogOnAsService`.
+    - Add user to local users group. Use `Add-LocalGroupMember` available on Windows PowerShell v.5.
 - Script `Test-SupportedServer.ps1` checks if the target operating system is supported by this bootstrapper.
 
 **20160908**

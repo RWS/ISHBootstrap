@@ -18,12 +18,13 @@ $ishDeployments=Get-ISHBootstrapperContextValue -ValuePath "ISHDeployment"
 $osUserNetworkCredential=(Get-ISHBootstrapperContextValue -ValuePath "OSUserCredentialExpression" -Invoke).GetNetworkCredential()
 if($osUserNetworkCredential.Domain -and ($osUserNetworkCredential.Domain -ne ""))
 {
-    $osUser=$osUserNetworkCredential.Domain+"\"+$osUserNetworkCredential.UserName
+    $osUser=$osUserNetworkCredential.Domain
 }
 else
 {
-    $osUser=$osUserNetworkCredential.UserName
+    $osUser="."
 }
+$osUser+="\"+$osUserNetworkCredential.UserName
 $osPassword=$osUserNetworkCredential.Password
 
 $installBlock= {

@@ -13,14 +13,8 @@ Write-Separator -Invocation $MyInvocation -Header
 . "$cmdletsPaths\Helpers\Invoke-CommandWrap.ps1"
 
 Write-Verbose "Restarting $Computer"
-if($Credential)
-{
-    Restart-Computer -ComputerName  $Computer -Credential $Credential -Force
-}
-else
-{
-    Restart-Computer -ComputerName  $Computer -Force
-}
+Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock {Restart-Computer -Force} -BlockName "Restarting" -ErrorAction SilentlyContinue
+
 Write-Host "Initiated $Computer restart"
 
 $testBlock = {
@@ -36,6 +30,7 @@ do {
     Write-Verbose "Testing $Computer"
 
     $areAlive=$true
+<#
     Write-Debug "Invoking Test-Connection for $Computer"
     Test-Connection $Computer -Quiet | ForEach-Object {
         if(-not $_)
@@ -48,10 +43,11 @@ do {
         Write-Warning "Failed Test-Connection for $Computer"
         continue
     }
+#>
     try
     {
         Write-Debug "Invoking powershell remote for $Computer"
-        Invoke-Command -ComputerName $Computer -ScriptBlock $testBlock -ErrorVariable $errorVariable -ErrorAction Stop
+        Invoke-Command -ComputerName $Computer -Credential $Credential -ScriptBlock $testBlock -ErrorVariable $errorVariable -ErrorAction Stop
     }
     catch
     {

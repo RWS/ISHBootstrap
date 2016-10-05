@@ -28,7 +28,6 @@ try
     $ishDeployRepository=Get-ISHBootstrapperContextValue -ValuePath "ISHDeployRepository"
     $ishDeployModuleName="ISHDeploy.$ishVersion"
 
-    & $scriptsPaths\PowerShellGet\Install-Module.ps1 -Computer $computerName -Credential $credential -ModuleName "Carbon" -Repository PSGallery -AllowClobber
     & $scriptsPaths\PowerShellGet\Install-Module.ps1 -Computer $computerName -Credential $credential -ModuleName @("CertificatePS","PSFTP") -Repository PSGallery
     & $scriptsPaths\PowerShellGet\Install-Module.ps1 -Computer $computerName -Credential $credential -ModuleName $ishDeployModuleName -Repository $ishDeployRepository
 

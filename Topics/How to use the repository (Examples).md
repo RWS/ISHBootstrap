@@ -10,7 +10,6 @@ Starting from a clean server operating system this how you end up with a [SDL Kn
 - **osuser** and **ospassword** are the credentials used in the **Content Manager** installation input parameters to specify which user runs the services. The osuser must be member of the local administrator group.
 - Dependency to PowerShell modules on gallery
   - [CertificatePS](http://www.powershellgallery.com/packages/CertificatePS/). This is used to help with certificate templates. Read more about this [here](https://github.com/Sarafian/CertificatePS)
-  - [Carbon](http://www.powershellgallery.com/packages/Carbon/). This is used to add the osuser to the local administrator group.
   - [PSFTP](http://www.powershellgallery.com/packages/PSFTP/). This is used to download files from an ftp server
   - [ISHDeploy.12.0.0](http://www.powershellgallery.com/packages/ISHDeploy.12.0.0/). This is used to download files from an ftp server
 - Dependency to PowerShell modules in this repository. The following modules must be published to an internal NuGet server. The target server

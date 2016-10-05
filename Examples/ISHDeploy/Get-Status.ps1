@@ -1,6 +1,8 @@
 ﻿param (
     [Parameter(Mandatory=$false)]
     [string]$Computer,
+    [Parameter(Mandatory=$false)]
+    [pscredential]$Credential=$null,
     [Parameter(Mandatory=$true)]
     [string]$DeploymentName
 )
@@ -33,7 +35,7 @@ $getStatusBlock= {
 #Install the packages
 try
 {
-    Invoke-CommandWrap -ComputerName $Computer -ScriptBlock $getStatusBlock -BlockName "Status on $DeploymentName" -UseParameters @("DeploymentName")
+    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $getStatusBlock -BlockName "Status on $DeploymentName" -UseParameters @("DeploymentName")
 }
 finally
 {

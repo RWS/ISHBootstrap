@@ -1,6 +1,8 @@
 ﻿param (
     [Parameter(Mandatory=$false)]
     [string]$Computer,
+    [Parameter(Mandatory=$false)]
+    [pscredential]$Credential=$null,
     [Parameter(Mandatory=$true)]
     [string]$DeploymentName,
     [Parameter(Mandatory=$true)]
@@ -28,7 +30,7 @@ try
     if($Computer)
     {
         $ishDelpoyModuleName="ISHDeploy.$ISHVersion"
-        $remote=Add-ModuleFromRemote -ComputerName $Computer -Name $ishDelpoyModuleName
+        $remote=Add-ModuleFromRemote -ComputerName $Computer -Credential $Credential -Name $ishDelpoyModuleName
     }
 
     #region xopus information

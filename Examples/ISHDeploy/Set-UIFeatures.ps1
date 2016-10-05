@@ -1,6 +1,8 @@
 ﻿param (
     [Parameter(Mandatory=$false)]
     [string]$Computer,
+    [Parameter(Mandatory=$false)]
+    [pscredential]$Credential=$null,
     [Parameter(Mandatory=$true)]
     [string]$DeploymentName
 )
@@ -59,7 +61,7 @@ $setUIFeaturesScirptBlock= {
 #Install the packages
 try
 {
-    Invoke-CommandWrap -ComputerName $Computer -ScriptBlock $setUIFeaturesScirptBlock -BlockName "Set UI Features on $DeploymentName" -UseParameters @("DeploymentName","xopusLicenseKey","xopusLicenseDomain","externalId")
+    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $setUIFeaturesScirptBlock -BlockName "Set UI Features on $DeploymentName" -UseParameters @("DeploymentName","xopusLicenseKey","xopusLicenseDomain","externalId")
 }
 finally
 {

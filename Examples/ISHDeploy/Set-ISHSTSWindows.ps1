@@ -1,6 +1,8 @@
 param (
     [Parameter(Mandatory=$false)]
     [string[]]$Computer,
+    [Parameter(Mandatory=$false)]
+    [pscredential]$Credential=$null,
     [Parameter(Mandatory=$true)]
     [string]$DeploymentName
 )        
@@ -32,8 +34,8 @@ $setWindowsBlock= {
 
 try
 {
-    Invoke-CommandWrap -ComputerName $Computer -ScriptBlock $installIISWinAuthBlock -BlockName "Install IIS Windows Authentication"
-    Invoke-CommandWrap -ComputerName $Computer -ScriptBlock $setWindowsBlock -BlockName "Windows Authentication $DeploymentName" -UseParameters @("DeploymentName")
+    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $installIISWinAuthBlock -BlockName "Install IIS Windows Authentication"
+    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $setWindowsBlock -BlockName "Windows Authentication $DeploymentName" -UseParameters @("DeploymentName")
 }
 finally
 {
