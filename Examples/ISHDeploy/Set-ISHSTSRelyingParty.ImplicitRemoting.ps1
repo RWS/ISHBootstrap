@@ -1,13 +1,13 @@
-﻿param (
+param (
     [Parameter(Mandatory=$false)]
-    [string]$Computer,
+    [string[]]$Computer,
     [Parameter(Mandatory=$false)]
     [pscredential]$Credential=$null,
     [Parameter(Mandatory=$true)]
     [string]$DeploymentName,
     [Parameter(Mandatory=$true)]
-    [string]$ISHVersion    
-)
+    [string]$ISHVersion
+)        
 $ishBootStrapRootPath=Resolve-Path "$PSScriptRoot\..\.."
 $cmdletsPaths="$ishBootStrapRootPath\Source\Cmdlets"
 $scriptsPaths="$ishBootStrapRootPath\Source\Scripts"
@@ -31,8 +31,9 @@ try
         $remote=Add-ModuleFromRemote -ComputerName $Computer -Credential $Credential -Name $ishDelpoyModuleName
     }
 
-    Undo-ISHDeployment -ISHDeployment $DeploymentName
-    Clear-ISHDeploymentHistory -ISHDeployment $DeploymentName
+    Set-ISHSTSRelyingParty -ISHDeployment $DeploymentName -Name "3rd party" -Realm "https://3rdparty.example.com/"
+    Set-ISHSTSRelyingParty -ISHDeployment $DeploymentName -Name "Content Review" -Realm "https://lc.example.com/" -LC
+    Set-ISHSTSRelyingParty -ISHDeployment $DeploymentName -Name "Quality Assistant" -Realm "https://bl.example.com/" -BL
 }
 finally
 {

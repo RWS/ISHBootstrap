@@ -10,6 +10,7 @@ $ishBootStrapRootPath=Resolve-Path "$PSScriptRoot\..\.."
 $cmdletsPaths="$ishBootStrapRootPath\Source\Cmdlets"
 $scriptsPaths="$ishBootStrapRootPath\Source\Scripts"
 
+. $ishBootStrapRootPath\Examples\Cmdlets\Get-ISHBootstrapperContextValue.ps1
 . $ishBootStrapRootPath\Examples\ISHDeploy\Cmdlets\Write-Separator.ps1
 Write-Separator -Invocation $MyInvocation -Header -Name "Configure"
 
@@ -25,10 +26,10 @@ if(-not (Get-Command Invoke-CommandWrap -ErrorAction SilentlyContinue))
 
 #region xopus information
 #XOPUS License Key
-$xopusLicenseKey = "license"
-$xopusLicenseDomain= "ish.example.com"
+$xopusLicenseKey = Get-ISHBootstrapperContextValue -ValuePath "Configuration.XOPUS.LisenceKey"
+$xopusLicenseDomain= Get-ISHBootstrapperContextValue -ValuePath "Configuration.XOPUS.Domain"
 
-$externalId="ExternalUser"
+$externalId=Get-ISHBootstrapperContextValue -ValuePath "Configuration.ExternalID"
 #endegion
 
 $setUIFeaturesScirptBlock= {

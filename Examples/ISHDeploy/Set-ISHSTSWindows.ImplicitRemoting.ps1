@@ -19,11 +19,9 @@ if(-not $Computer)
 {
     & "$scriptsPaths\Helpers\Test-Administrator.ps1"
 }
-else
-{
-   . $cmdletsPaths\Helpers\Add-ModuleFromRemote.ps1
-   . $cmdletsPaths\Helpers\Remove-ModuleFromRemote.ps1
-}
+
+. $cmdletsPaths\Helpers\Add-ModuleFromRemote.ps1
+. $cmdletsPaths\Helpers\Remove-ModuleFromRemote.ps1
 
 try
 {
