@@ -96,8 +96,8 @@ Function Invoke-CommandWrap {
         $BlockName,
         [Parameter(Mandatory=$false)]
         $ArgumentList=$null,
-        [Parameter(Mandatory=$true,ParameterSetName="Computer")]
-        $ComputerName,
+        [Parameter(Mandatory=$false,ParameterSetName="Computer")]
+        $ComputerName=$null,
         [Parameter(Mandatory=$false,ParameterSetName="Computer")]
         [pscredential]$Credential=$null,
         [Parameter(Mandatory=$true,ParameterSetName="Session")]

@@ -2,8 +2,8 @@
 
 Function Add-ModuleFromRemote {
     param (
-        [Parameter(Mandatory=$true,ParameterSetName="Computer")]
-        $ComputerName,
+        [Parameter(Mandatory=$false,ParameterSetName="Computer")]
+        $ComputerName=$null,
         [Parameter(Mandatory=$false,ParameterSetName="Computer")]
         [pscredential]$Credential=$null,
         [Parameter(Mandatory=$true,ParameterSetName="Session")]
@@ -36,7 +36,14 @@ Function Add-ModuleFromRemote {
         Write-Verbose "[$BlockName] Begin on $($Session.ComputerName)"
         $Name | ForEach-Object { 
             Write-Debug "Import module $_ from $($Session.ComputerName)"
-            Import-Module -Name $_ -PSSession $Session -Force
+            if($Session)
+            {
+                Import-Module -Name $_ -PSSession $Session -Force
+            }
+            else
+            {
+                Import-Module -Name $_ -Force
+            }
             Write-Verbose "Imported module $_ from $($Session.ComputerName)"
         }
     }
