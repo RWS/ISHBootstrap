@@ -86,7 +86,7 @@ try
         $targetPath=Get-ISHServerFolderPath
     }
     Write-Debug "targetPath=$targetPath"
-    if($PSVersionTable.PSVersion.Major -ge 5)
+    if($computer)
     {
         Copy-Item -Path $filePathToCopy -Destination $targetPath -Force -ToSession $remote.Session
     }
