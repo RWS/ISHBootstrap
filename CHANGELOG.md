@@ -1,6 +1,6 @@
 # Change log
 
-**20160930**
+**20161007**
 
 - Major code refactoring. **Before** this all code expected to access and execute remote code without specifying crendetial. This worked for domain credentials. 
   - Impoved the `Add-ModuleFromRemote.ps1` to accept a `-Credential` parameter. 
@@ -8,7 +8,6 @@
   - All scripts accept a `-Credential` parameter.
 - **xISHServer** is now smarter:
   - `Get-ISHOSInfo` breaks down the information from the caption of the operating system.
-  - `Get-ISHNETInfo` returns .NET available .NET versions.
   - `Get-ISHNETInfo` returns .NET available .NET versions.
   - `Get-ISHCOMPlus` returns COM+ applications and their state.
   - `Test-ISHServerCompliance` checks if the target operating system is supported by this bootstrapper.
