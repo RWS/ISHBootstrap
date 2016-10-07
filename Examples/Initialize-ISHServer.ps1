@@ -14,17 +14,17 @@ if(-not $computerName)
     & "$scriptsPaths\Helpers\Test-Administrator.ps1"
 }
 
-$isSupported=& $scriptsPaths\xISHServer\Test-SupportedServer.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion
-if(-not $isSupported)
-{
-    return
-}
-
 $osUserCredential=Get-ISHBootstrapperContextValue -ValuePath "OSUserCredentialExpression" -Invoke
 $prerequisitesSourcePath=Get-ISHBootstrapperContextValue -ValuePath "PrerequisitesSourcePath"
 $ishVersion=Get-ISHBootstrapperContextValue -ValuePath "ISHVersion"
 $ishServerVersion=($ishVersion -split "\.")[0]
 $installOracle=Get-ISHBootstrapperContextValue -ValuePath "InstallOracle" -DefaultValue $false
+
+$isSupported=& $scriptsPaths\xISHServer\Test-SupportedServer.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion
+if(-not $isSupported)
+{
+    return
+}
 
 & $scriptsPaths\xISHServer\Upload-ISHServerPrerequisites.ps1 -Computer $computerName -Credential $credential -PrerequisitesSourcePath $prerequisitesSourcePath -ISHServerVersion $ishServerVersion
 & $scriptsPaths\xISHServer\Install-ISHServerPrerequisites.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -InstallOracle:$installOracle
