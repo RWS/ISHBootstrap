@@ -1,6 +1,6 @@
 # Change log
 
-**20161007**
+**20161010**
 
 - Major code refactoring. **Before** this all code expected to access and execute remote code without specifying crendetial. This worked for domain credentials. 
   - Impoved the `Add-ModuleFromRemote.ps1` to accept a `-Credential` parameter. 
@@ -20,6 +20,11 @@
     - Grant logon as privilege for a user. Added new `Grant-ISHUserLogOnAsService`.
     - Add user to local users group. Use `Add-LocalGroupMember` available on Windows PowerShell v.5.
 - Script `Test-SupportedServer.ps1` checks if the target operating system is supported by this bootstrapper.
+
+**Known Issues**
+
+- When executing against a remote server that is not in the same domain, certain copy actions will not be supported when the client is powered by PowerShell v.4 because the `Copy-Item` doesn't accept specific credentials. 
+  - `Upload-ISHServerPrerequisites.ps1` should work but not tested.
 
 **20160908**
 

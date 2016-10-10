@@ -1,6 +1,6 @@
 # Examples Change log
 
-**20161007**
+**20161010**
 
 To align with the major changes in Source:
 
@@ -14,6 +14,12 @@ To align with the major changes in Source:
   - `Set-InternalAuthentication.ps1` enables the internal authentication flow.
   - `Set-ISHSTSRelyingParty.ps1` adds relying parties to ISHSTS.
   - `Set-ISHSTSWindows.ps1` enables windows authentication on ISHSTS.
+
+**Known Issues**
+
+- When executing against a remote server that is not in the same domain, certain copy actions will not be supported when the client is powered by PowerShell v.4 because the `Copy-Item` doesn't accept specific credentials. 
+  - `Set-ADFSIntegrationISH.ImplicitRemoting.ps1` will break
+  
   
 **20160908**
 

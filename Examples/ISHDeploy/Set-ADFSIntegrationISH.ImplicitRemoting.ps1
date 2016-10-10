@@ -54,7 +54,14 @@ try
     Write-Debug "Downloading file from $sourceUncZipPath"
     if($Computer)
     {
-        Copy-Item -Path $sourceAbsoluteOnRemoteZipPath -Destination $env:TEMP -Force -FromSession $remote.Session
+        if($PSVersionTable.PSVersion.Major -ge 5)
+        {
+            Copy-Item -Path $sourceAbsoluteOnRemoteZipPath -Destination $env:TEMP -Force -FromSession $remote.Session
+        }
+        else
+        {
+            throw "Not supported path. Required PowerShell v5"
+        }
     }
     else
     {
