@@ -52,7 +52,14 @@ try
     $sourceAbsoluteOnRemoteZipPath=Join-Path $absoluteOnRemotePath $adfsIntegrationISHFilename
     $tempZipPath=Join-Path $env:TEMP $adfsIntegrationISHFilename
     Write-Debug "Downloading file from $sourceUncZipPath"
-    Copy-Item -Path $sourceAbsoluteOnRemoteZipPath -Destination $env:TEMP -Force -FromSession $remote.Session
+    if($Computer)
+    {
+        Copy-Item -Path $sourceAbsoluteOnRemoteZipPath -Destination $env:TEMP -Force -FromSession $remote.Session
+    }
+    else
+    {
+        Copy-Item -Path $sourceAbsoluteOnRemoteZipPath -Destination $env:TEMP -Force
+    }
     if(-not (Test-Path $tempZipPath))
     {
         throw "Cannot find file $tempZipPath"

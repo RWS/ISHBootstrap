@@ -78,6 +78,7 @@ try
         }
         else
         {
+            # Need a unc path to copy to remote server from PowerShell v.4
             $targetPath=Get-ISHServerFolderPath -UNC
         }
     }    
@@ -85,11 +86,21 @@ try
     {
         $targetPath=Get-ISHServerFolderPath
     }
+
     Write-Debug "targetPath=$targetPath"
-    if($PSVersionTable.PSVersion.Major -ge 5)
+
+    if($Computer)
     {
-        Copy-Item -Path $filePathToCopy -Destination $targetPath -Force -ToSession $remote.Session
-    }
+        if($PSVersionTable.PSVersion.Major -ge 5)
+        {
+            Copy-Item -Path $filePathToCopy -Destination $targetPath -Force -ToSession $remote.Session
+        }
+        else
+        {
+            # Use the unc path
+            Copy-Item -Path $filePathToCopy -Destination $targetPath -Force
+        }
+    }    
     else
     {
         Copy-Item -Path $filePathToCopy -Destination $targetPath -Force
