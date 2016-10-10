@@ -2,7 +2,8 @@
 
 Function Remove-ModuleFromRemote {
     param (
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory=$true)]
+        [AllowNull()]
         [PSObject]$Remote=$null
     ) 
     if($Remote)

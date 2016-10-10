@@ -2,13 +2,17 @@
 
 Function Add-ModuleFromRemote {
     param (
-        [Parameter(Mandatory=$false,ParameterSetName="Computer")]
+        [Parameter(Mandatory=$true,ParameterSetName="Computer")]
+        [AllowNull()]
         $ComputerName=$null,
         [Parameter(Mandatory=$false,ParameterSetName="Computer")]
         [pscredential]$Credential=$null,
         [Parameter(Mandatory=$true,ParameterSetName="Session")]
+        [AllowNull()]
         $Session,
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$true,ParameterSetName="Local")]
+        [Parameter(Mandatory=$true,ParameterSetName="Computer")]
+        [Parameter(Mandatory=$true,ParameterSetName="Session")]
         [string[]]$Name
     ) 
 

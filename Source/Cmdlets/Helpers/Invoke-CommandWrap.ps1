@@ -90,19 +90,29 @@
 #>
 Function Invoke-CommandWrap {
     param (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$true,ParameterSetName="Local")]
+        [Parameter(Mandatory=$true,ParameterSetName="Computer")]
+        [Parameter(Mandatory=$true,ParameterSetName="Session")]
         $ScriptBlock,
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$true,ParameterSetName="Local")]
+        [Parameter(Mandatory=$true,ParameterSetName="Computer")]
+        [Parameter(Mandatory=$true,ParameterSetName="Session")]
         $BlockName,
-        [Parameter(Mandatory=$false)]
-        $ArgumentList=$null,
+        [Parameter(Mandatory=$false,ParameterSetName="Local")]
         [Parameter(Mandatory=$false,ParameterSetName="Computer")]
+        [Parameter(Mandatory=$false,ParameterSetName="Session")]
+        $ArgumentList=$null,
+        [Parameter(Mandatory=$true,ParameterSetName="Computer")]
+        [AllowNull()]
         $ComputerName=$null,
         [Parameter(Mandatory=$false,ParameterSetName="Computer")]
         [pscredential]$Credential=$null,
         [Parameter(Mandatory=$true,ParameterSetName="Session")]
+        [AllowNull()]
         $Session=$null,
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory=$false,ParameterSetName="Local")]
+        [Parameter(Mandatory=$false,ParameterSetName="Computer")]
+        [Parameter(Mandatory=$false,ParameterSetName="Session")]
         [string[]]$UseParameters=$null
     ) 
 
