@@ -1,6 +1,6 @@
 # Examples Change log
 
-**20161010**
+**20161011**
 
 To align with the major changes in Source:
 
@@ -8,6 +8,7 @@ To align with the major changes in Source:
 - `Initialize-ISHServer.ps1` checks if the target operating system is supported by this bootstrapper.
 - Improved the configuration scripts
   - When the value is localized, the value is read from the json file
+  - Changes in the required parameters for each configuration script. Check [How to use the repository (Examples)](Topics\How to use the repository (Examples).md)
   - Split the ADFS integration in two files 
     - `Set-ISHIntegrationADFS.ps1` configures the ADFS artifacts on ISH.
     - `Set-ADFSIntegrationISH.ps1` configures the ISH artifacts on ADFS. **Knownissue** when the remote ish server is not in the same domain as with the client. The implicit variant **works**.

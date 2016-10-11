@@ -1,6 +1,6 @@
 # Change log
 
-**20161010**
+**20161011**
 
 - Major code refactoring. **Before** this all code expected to access and execute remote code without specifying crendetial. This worked for domain credentials. 
   - Impoved the `Add-ModuleFromRemote.ps1` to accept a `-Credential` parameter. 

@@ -228,26 +228,11 @@ I've created a script `Invoke-ISHDeployScript.ps1` that wraps up functionality f
 	  "UseRelativePaths": false,
 	  "Scripts": [
 		"ISHDeploy\\Set-UIFeatures.ps1",
-		"ISHDeploy\\Set-ADFSIntegration.ps1"
+		"ISHDeploy\\Set-ISHSTSRelyingParty.ps1"
 	  ]
 	}
   ]
 ```
-
-To showcase the potential of ISHDeploy I've crafted a two scripts with a variation. 
-
-- `Set-UIFeatures.ps1` shows a small script that 
-  - Enables Content Editor and sets the license.
-  - Enables Quality Assurance.
-  - Enables Externa Preview for a specific user.
-  - Adds a dummy tab to Content Manager Event Monitor.
-- `Set-ADFSIntegration.ps1` combines the **ADFS** PowerShell module to
-  1. Figure out all values configured on a specific ADFS**
-  1. Configure the Content Manager with them 
-  1. Extract a script from the deployment that configures ADFS**
-  1. Execute the script
- 
-`Set-ADFSIntegration.ps1` is prime example of how someone can utilize multiple modules to fully automate a manual process.
 
 You can trigger the sequence with 
 
@@ -271,7 +256,7 @@ Although much of the noise is hidden away using the `Invoke-CommandWrap` which i
 For this reason all scripts have a sibling counterpart that uses implicit remoting as described on [import and use module from a remote server](https://sarafian.github.io/post/powershell/Import-Use-Module-Remote-Server/).
 
 - `Set-UIFeatures.ImplicitRemoting.ps1`
-- `Set-ADFSIntegration.ImplicitRemoting.ps1`
+- `Set-ISHSTSRelyingParty.ImplicitRemoting.ps1`
 - `Get-Status.ImplicitRemoting.ps1`
 - `Undo-ISHDeployment.ImplicitRemoting.ps1`
 
@@ -297,6 +282,14 @@ You can any of the above options for `Invoke-ISHDeployScript.ps1` with the `-Use
 # Undo
 & .\Examples\Invoke-ISHDeployScript.ps1 -Undo -UseImplicitRemoting
 ```
+
+All scripts targetted by `Invoke-ISHDeployScript.ps1` must offer a minimum parameter set
+| Parameter | Mandatory | AllowNull | Variant |
+| --------- | --------- | --------- | ------- |
+| Computer | False | True | Both | 
+| Credential | False | True | Both | 
+| DeploymentName | True | False | Both | 
+| ISHVersion | True | False | Implicit remoting | 
 
 # Verify deployments
 
