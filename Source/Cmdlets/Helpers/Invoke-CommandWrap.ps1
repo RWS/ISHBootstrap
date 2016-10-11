@@ -10,7 +10,7 @@
         Name of the block. This is for logging purposes.
     .PARAMETER  ArgumentList
         Arguments for the script block.
-    .PARAMETER  Computer
+    .PARAMETER  ComputerName
         Target computer
     .PARAMETER  Credential
         Target Credential
