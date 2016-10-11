@@ -13,6 +13,7 @@ try
     . "$cmdletsPaths\Helpers\Invoke-CommandWrap.ps1"
 
     $computerName=Get-ISHBootstrapperContextValue -ValuePath "ComputerName" -DefaultValue $null
+    $credential=Get-ISHBootstrapperContextValue -ValuePath "CredentialExpression" -Invoke
 
     if(-not $computerName)
     {
@@ -27,16 +28,16 @@ try
     $ishDeployRepository=Get-ISHBootstrapperContextValue -ValuePath "ISHDeployRepository"
     $ishDeployModuleName="ISHDeploy.$ishVersion"
 
-    & $scriptsPaths\PowerShellGet\Install-Module.ps1 -Computer $computerName -ModuleName @("CertificatePS","Carbon","PSFTP") -Repository PSGallery
-    & $scriptsPaths\PowerShellGet\Install-Module.ps1 -Computer $computerName -ModuleName $ishDeployModuleName -Repository $ishDeployRepository
+    & $scriptsPaths\PowerShellGet\Install-Module.ps1 -Computer $computerName -Credential $credential -ModuleName @("CertificatePS","PSFTP") -Repository PSGallery
+    & $scriptsPaths\PowerShellGet\Install-Module.ps1 -Computer $computerName -Credential $credential -ModuleName $ishDeployModuleName -Repository $ishDeployRepository
 
     if($computerName)
     {
         $ishServerRepository=Get-ISHBootstrapperContextValue -ValuePath "xISHServerRepository"
         $xISHInstallRepository=Get-ISHBootstrapperContextValue -ValuePath "xISHInstallRepository"
     
-        & $scriptsPaths\PowerShellGet\Install-Module.ps1 -Computer $computerName -ModuleName $ishServerModuleName -Repository $ishServerRepository
-        & $scriptsPaths\PowerShellGet\Install-Module.ps1 -Computer $computerName -ModuleName xISHInstall -Repository $xISHInstallRepository
+        & $scriptsPaths\PowerShellGet\Install-Module.ps1 -Computer $computerName -Credential $credential -ModuleName $ishServerModuleName -Repository $ishServerRepository
+        & $scriptsPaths\PowerShellGet\Install-Module.ps1 -Computer $computerName -Credential $credential -ModuleName xISHInstall -Repository $xISHInstallRepository
     }
     else
     {

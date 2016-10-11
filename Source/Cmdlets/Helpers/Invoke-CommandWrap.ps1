@@ -10,8 +10,10 @@
         Name of the block. This is for logging purposes.
     .PARAMETER  ArgumentList
         Arguments for the script block.
-    .PARAMETER  Computer
+    .PARAMETER  ComputerName
         Target computer
+    .PARAMETER  Credential
+        Target Credential
     .PARAMETER  Session
         Target session
     .PARAMETER  UseParameters
@@ -88,17 +90,29 @@
 #>
 Function Invoke-CommandWrap {
     param (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$true,ParameterSetName="Local")]
+        [Parameter(Mandatory=$true,ParameterSetName="Computer")]
+        [Parameter(Mandatory=$true,ParameterSetName="Session")]
         $ScriptBlock,
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$true,ParameterSetName="Local")]
+        [Parameter(Mandatory=$true,ParameterSetName="Computer")]
+        [Parameter(Mandatory=$true,ParameterSetName="Session")]
         $BlockName,
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory=$false,ParameterSetName="Local")]
+        [Parameter(Mandatory=$false,ParameterSetName="Computer")]
+        [Parameter(Mandatory=$false,ParameterSetName="Session")]
         $ArgumentList=$null,
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory=$true,ParameterSetName="Computer")]
+        [AllowNull()]
         $ComputerName=$null,
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory=$false,ParameterSetName="Computer")]
+        [pscredential]$Credential=$null,
+        [Parameter(Mandatory=$true,ParameterSetName="Session")]
+        [AllowNull()]
         $Session=$null,
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory=$false,ParameterSetName="Local")]
+        [Parameter(Mandatory=$false,ParameterSetName="Computer")]
+        [Parameter(Mandatory=$false,ParameterSetName="Session")]
         [string[]]$UseParameters=$null
     ) 
 
@@ -159,7 +173,14 @@ Function Invoke-CommandWrap {
     {
         Write-Debug "Targetting remote computer $ComputerName"
         Write-Verbose "[$BlockName] Begin on $ComputerName"
-        Invoke-Command -ComputerName $ComputerName -ScriptBlock $ScriptBlock -ArgumentList $ArgumentList
+        if($Credential)
+        {
+            Invoke-Command -ComputerName $ComputerName -Credential $Credential -ScriptBlock $ScriptBlock -ArgumentList $ArgumentList
+        }
+        else
+        {
+            Invoke-Command -ComputerName $ComputerName -ScriptBlock $ScriptBlock -ArgumentList $ArgumentList
+        }
         Write-Host "[$BlockName] Finish on $ComputerName"
         return
     }

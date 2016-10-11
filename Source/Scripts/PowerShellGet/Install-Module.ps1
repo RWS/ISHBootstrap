@@ -1,6 +1,8 @@
 ﻿param (
     [Parameter(Mandatory=$false)]
     [string[]]$Computer,
+    [Parameter(Mandatory=$false)]
+    [pscredential]$Credential=$null,
     [Parameter(Mandatory=$true)]
     [string[]]$ModuleName,
     [Parameter(Mandatory=$false)]
@@ -33,11 +35,10 @@ $installScriptBlock={
 
         if(-not $latestModule)
         {
-            Write-Error "Could not find package $name"
+            Write-Error "Could not find module $name"
             return
         }
         Write-Verbose "Found module $name with version $($latestModule.Version)"
-        Write-Verbose "Installing module $name with version $($latestPackage.Version)"
 
         $latestModule|Install-Module -Scope $Scope -Force|Out-Null
    
@@ -48,7 +49,7 @@ $installScriptBlock={
 #Install the packages
 try
 {
-    Invoke-CommandWrap -ComputerName $Computer -ScriptBlock $installScriptBlock -BlockName "Install Modules $ModuleName" -UseParameters @("ModuleName","Repository","Scope")
+    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $installScriptBlock -BlockName "Install Modules $ModuleName" -UseParameters @("ModuleName","Repository","Scope")
 }
 catch
 {

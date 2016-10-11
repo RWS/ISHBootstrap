@@ -19,7 +19,7 @@ if($BuildNumber)
     $build=[string](1200 * ($date.Year -2015)+$date.Month*100+$date.Day)
     if($TimeStamp)
     {
-        $build+=$date.ToString("HHmmss")
+        $build+=$date.ToString("HHmm")
     }
     $version="$major.$minor.$build.$patch"    
 }

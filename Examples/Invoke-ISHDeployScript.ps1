@@ -22,6 +22,7 @@ try
 
     . "$PSScriptRoot\Cmdlets\Get-ISHBootstrapperContextValue.ps1"
     $computerName=Get-ISHBootstrapperContextValue -ValuePath "ComputerName" -DefaultValue $null
+    $credential=Get-ISHBootstrapperContextValue -ValuePath "CredentialExpression" -Invoke
 
     if(-not $computerName)
     {
@@ -48,15 +49,23 @@ try
             'Configure' {
                 $ishDeployment.Scripts | ForEach-Object {
                     $scriptFileName=$_
-                    $folderPath=Get-ISHBootstrapperContextValue -ValuePath "FolderPath"
-                    $scriptPath=Join-Path $folderPath $scriptFileName
+                    $scriptPath=Join-Path $PSScriptRoot $scriptFileName
                     if(Test-Path $scriptPath)
                     {
                         $scriptsToExecute+=$scriptPath
                     }
                     else
                     {
-                        Write-Warning "$scriptPath not found. Skipping."
+                        $folderPath=Get-ISHBootstrapperContextValue -ValuePath "FolderPath"
+                        $scriptPath=Join-Path $folderPath $scriptFileName
+                        if(Test-Path $scriptPath)
+                        {
+                            $scriptsToExecute+=$scriptPath
+                        }
+                        else
+                        {
+                            Write-Warning "$scriptFileName not found in $PSScriptRoot or in $folderPath. Skipping."
+                        }
                     }
                 }            
             }
@@ -78,11 +87,11 @@ try
 
             if($UseISHDeployImplicit)
             {
-                & $scriptPath -Computer $computerName -DeploymentName $deploymentName -ISHVersion $ishVersion
+                & $scriptPath -Computer $computerName -Credential $credential -DeploymentName $deploymentName -ISHVersion $ishVersion
             }
             else
             {
-                & $scriptPath -Computer $computerName -DeploymentName $deploymentName
+                & $scriptPath -Computer $computerName -Credential $credential -DeploymentName $deploymentName
             }
             Write-Verbose "Executing $scriptPath -Computer $computerName -DeploymentName $deploymentName"
         }

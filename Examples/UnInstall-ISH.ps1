@@ -8,6 +8,7 @@ $scriptsPaths="$sourcePath\Scripts"
 
 . "$PSScriptRoot\Cmdlets\Get-ISHBootstrapperContextValue.ps1"
 $computerName=Get-ISHBootstrapperContextValue -ValuePath "ComputerName" -DefaultValue $null
+$credential=Get-ISHBootstrapperContextValue -ValuePath "CredentialExpression" -Invoke
 $ishVersion=Get-ISHBootstrapperContextValue -ValuePath "ISHVersion"
 
 . "$cmdletsPaths\Helpers\Invoke-CommandWrap.ps1"
@@ -62,7 +63,7 @@ try
     {
         & "$scriptsPaths\Helpers\Test-Administrator.ps1"
     }
-    Invoke-CommandWrap -ComputerName $computerName -ScriptBlock $uninstallBlock -BlockName "Uninstall ISH" -UseParameters @("ishVersion")
+    Invoke-CommandWrap -ComputerName $computerName -Credential $credential -ScriptBlock $uninstallBlock -BlockName "Uninstall ISH" -UseParameters @("ishVersion")
 
 }
 finally

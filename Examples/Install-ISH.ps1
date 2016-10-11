@@ -8,20 +8,23 @@ $scriptsPaths="$sourcePath\Scripts"
 
 . "$PSScriptRoot\Cmdlets\Get-ISHBootstrapperContextValue.ps1"
 $computerName=Get-ISHBootstrapperContextValue -ValuePath "ComputerName" -DefaultValue $null
+$credential=Get-ISHBootstrapperContextValue -ValuePath "CredentialExpression" -Invoke
+
 $ishVersion=Get-ISHBootstrapperContextValue -ValuePath "ISHVersion"
 
 . "$cmdletsPaths\Helpers\Invoke-CommandWrap.ps1"
 
 $ishDeployments=Get-ISHBootstrapperContextValue -ValuePath "ISHDeployment"
-$osUserNetworkCredential=(Invoke-Expression (Get-ISHBootstrapperContextValue -ValuePath "OSUserCredentialExpression")).GetNetworkCredential();
+$osUserNetworkCredential=(Get-ISHBootstrapperContextValue -ValuePath "OSUserCredentialExpression" -Invoke).GetNetworkCredential()
 if($osUserNetworkCredential.Domain -and ($osUserNetworkCredential.Domain -ne ""))
 {
-    $osUser=$osUserNetworkCredential.Domain+"\"+$osUserNetworkCredential.UserName
+    $osUser=$osUserNetworkCredential.Domain
 }
 else
 {
-    $osUser=$osUserNetworkCredential.UserName
+    $osUser="."
 }
+$osUser+="\"+$osUserNetworkCredential.UserName
 $osPassword=$osUserNetworkCredential.Password
 
 $installBlock= {
@@ -68,7 +71,7 @@ try
     {
         & "$scriptsPaths\Helpers\Test-Administrator.ps1"
     }
-    Invoke-CommandWrap -ComputerName $computerName -ScriptBlock $installBlock -BlockName "Install ISH" -UseParameters @("ishDeployments","ishVersion","osUser","osPassword")
+    Invoke-CommandWrap -ComputerName $computerName -Credential $credential -ScriptBlock $installBlock -BlockName "Install ISH" -UseParameters @("ishDeployments","ishVersion","osUser","osPassword")
 
 }
 finally

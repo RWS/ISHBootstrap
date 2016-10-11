@@ -4,7 +4,9 @@
     [Parameter(Mandatory=$false,ParameterSetName="Remote")]
     $SessionOptions=$null,
     [Parameter(Mandatory=$true,ParameterSetName="Remote")]
-    [PSCredential]$CrentialForCredSSP,
+    [PSCredential]$Credential,
+    [Parameter(Mandatory=$false,ParameterSetName="Remote")]
+    [switch]$CredSSP,
     [Parameter(Mandatory=$true,ParameterSetName="Local")]
     [Parameter(ParameterSetName="Remote")]
     [string]$OSUser,
@@ -28,13 +30,20 @@ try
     if($Computer)
     {
         $ishServerModuleName="xISHServer.$ISHServerVersion"
-        if($SessionOptions)
+        if($CredSSP)
         {
-            $session=New-PSSession -ComputerName $Computer -Credential $CrentialForCredSSP -UseSSL -Authentication Credssp –SessionOption $SessionOptions
+            if($SessionOptions)
+            {
+                $session=New-PSSession -ComputerName $Computer -Credential $Credential -UseSSL -Authentication Credssp –SessionOption $SessionOptions
+            }
+            else
+            {
+                $session=New-PSSession -ComputerName $Computer -Credential $Credential -UseSSL -Authentication Credssp
+            }
         }
         else
         {
-            $session=New-PSSession -ComputerName $Computer -Credential $CrentialForCredSSP -UseSSL -Authentication Credssp
+            $session=New-PSSession -ComputerName $Computer -Credential $Credential
         }
         $remote=Add-ModuleFromRemote -Session $session -Name $ishServerModuleName
     }

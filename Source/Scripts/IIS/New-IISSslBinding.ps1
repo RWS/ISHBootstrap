@@ -1,6 +1,8 @@
 param (
     [Parameter(Mandatory=$false)]
-    [string]$Computer=$null
+    [string]$Computer=$null,
+    [Parameter(Mandatory=$false)]
+    [pscredential]$Credential=$null
 )
 $cmdletsPaths="$PSScriptRoot\..\..\Cmdlets"
 
@@ -37,7 +39,7 @@ try
             Write-Warning "IIS has already an https binding"
         }
     }
-    Invoke-CommandWrap -ComputerName $Computer -BlockName "Initialize IIS Binding" -ScriptBlock $block
+    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -BlockName "Initialize IIS Binding" -ScriptBlock $block
 }
 
 finally

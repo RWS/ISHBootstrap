@@ -1,5 +1,27 @@
 # Examples Change log
 
+**20161011**
+
+To align with the major changes in Source:
+
+- Added new supported property in JSON `CredentialExpression` that drives authorization for all remote calls.
+- `Initialize-ISHServer.ps1` checks if the target operating system is supported by this bootstrapper.
+- Improved the configuration scripts
+  - When the value is localized, the value is read from the json file
+  - Changes in the required parameters for each configuration script. Check [How to use the repository (Examples)](Topics\How to use the repository (Examples).md)
+  - Split the ADFS integration in two files 
+    - `Set-ISHIntegrationADFS.ps1` configures the ADFS artifacts on ISH.
+    - `Set-ADFSIntegrationISH.ps1` configures the ISH artifacts on ADFS. **Knownissue** when the remote ish server is not in the same domain as with the client. The implicit variant **works**.
+  - `Set-InternalAuthentication.ps1` enables the internal authentication flow.
+  - `Set-ISHSTSRelyingParty.ps1` adds relying parties to ISHSTS.
+  - `Set-ISHSTSWindows.ps1` enables windows authentication on ISHSTS.
+
+**Known Issues**
+
+- When executing against a remote server that is not in the same domain, certain copy actions will not be supported when the client is powered by PowerShell v.4 because the `Copy-Item` doesn't accept specific credentials. 
+  - `Set-ADFSIntegrationISH.ImplicitRemoting.ps1` will break
+  
+  
 **20160908**
 
 - New json parameter supported for `Initialize-Remote.ps1`.

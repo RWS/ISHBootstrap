@@ -1,6 +1,13 @@
 #requires -runasadministrator
 
+#region Helpers
+. $PSScriptRoot\Get-ISHOSInfo.ps1
+. $PSScriptRoot\Get-ISHNETInfo.ps1
+. $PSScriptRoot\Test-ISHServerCompliance.ps1
 . $PSScriptRoot\Get-ISHServerFolderPath.ps1
+. $PSScriptRoot\Grant-ISHUserLogOnAsService.ps1
+. $PSScriptRoot\Get-ISHCOMPlus.ps1
+#endregion
 
 #region Ports
 . $PSScriptRoot\Set-ISHFirewallMSDTC.ps1
@@ -32,6 +39,7 @@
 . $PSScriptRoot\Install-ISHToolOracleODAC.ps1
 . $PSScriptRoot\Install-ISHWindowsFeature.ps1
 . $PSScriptRoot\Install-ISHWindowsFeatureIISWinAuth.ps1
+. $PSScriptRoot\Install-ISHVisualBasicRuntime.ps1
 #endregion
 
 #region Regional settings

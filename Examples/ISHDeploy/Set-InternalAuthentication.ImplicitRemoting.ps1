@@ -31,8 +31,9 @@ try
         $remote=Add-ModuleFromRemote -ComputerName $Computer -Credential $Credential -Name $ishDelpoyModuleName
     }
 
-    Undo-ISHDeployment -ISHDeployment $DeploymentName
-    Clear-ISHDeploymentHistory -ISHDeployment $DeploymentName
+    Enable-ISHIntegrationSTSInternalAuthentication -ISHDeployment $DeploymentName
+    Write-Host "Internal authentication enabled"
+
 }
 finally
 {
@@ -41,5 +42,3 @@ finally
         Remove-ModuleFromRemote -Remote $remote
     }
 }
-
-Write-Separator -Invocation $MyInvocation -Footer -Name "Configure"

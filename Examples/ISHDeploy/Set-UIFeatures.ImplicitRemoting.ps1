@@ -1,6 +1,8 @@
 ﻿param (
     [Parameter(Mandatory=$false)]
     [string]$Computer,
+    [Parameter(Mandatory=$false)]
+    [pscredential]$Credential=$null,
     [Parameter(Mandatory=$true)]
     [string]$DeploymentName,
     [Parameter(Mandatory=$true)]
@@ -10,6 +12,7 @@ $ishBootStrapRootPath=Resolve-Path "$PSScriptRoot\..\.."
 $cmdletsPaths="$ishBootStrapRootPath\Source\Cmdlets"
 $scriptsPaths="$ishBootStrapRootPath\Source\Scripts"
 
+. $ishBootStrapRootPath\Examples\Cmdlets\Get-ISHBootstrapperContextValue.ps1
 . $ishBootStrapRootPath\Examples\ISHDeploy\Cmdlets\Write-Separator.ps1
 Write-Separator -Invocation $MyInvocation -Header -Name "Configure"
 
@@ -17,26 +20,24 @@ if(-not $Computer)
 {
     & "$scriptsPaths\Helpers\Test-Administrator.ps1"
 }
-else
-{
-   . $cmdletsPaths\Helpers\Add-ModuleFromRemote.ps1
-   . $cmdletsPaths\Helpers\Remove-ModuleFromRemote.ps1
-}
+
+. $cmdletsPaths\Helpers\Add-ModuleFromRemote.ps1
+. $cmdletsPaths\Helpers\Remove-ModuleFromRemote.ps1
 
 try
 {
     if($Computer)
     {
         $ishDelpoyModuleName="ISHDeploy.$ISHVersion"
-        $remote=Add-ModuleFromRemote -ComputerName $Computer -Name $ishDelpoyModuleName
+        $remote=Add-ModuleFromRemote -ComputerName $Computer -Credential $Credential -Name $ishDelpoyModuleName
     }
 
     #region xopus information
     #XOPUS License Key
-    $xopusLicenseKey = "license"
-    $xopusLicenseDomain= "ish.example.com"
+    $xopusLicenseKey = Get-ISHBootstrapperContextValue -ValuePath "Configuration.XOPUS.LisenceKey"
+    $xopusLicenseDomain= Get-ISHBootstrapperContextValue -ValuePath "Configuration.XOPUS.Domain"
 
-    $externalId="ExternalUser"
+    $externalId=Get-ISHBootstrapperContextValue -ValuePath "Configuration.ExternalID"
     #endegion
 
     # Set the license and enable the Content Editor

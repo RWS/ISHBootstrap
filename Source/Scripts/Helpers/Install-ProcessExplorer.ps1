@@ -1,6 +1,8 @@
 ﻿Param (
     [Parameter(Mandatory = $false)]
-    [string]$Computer=$null
+    [string]$Computer=$null,
+    [Parameter(Mandatory=$false)]
+    [pscredential]$Credential=$null
 )
 
 $cmdletsPaths="$PSScriptRoot\..\..\Cmdlets"
@@ -33,7 +35,7 @@ $block= {
 
 try
 {
-    Invoke-CommandWrap -ComputerName $Computer -ScriptBlock $block -BlockName "Install Process Explorer"
+    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $block -BlockName "Install Process Explorer"
 }
 finally
 {

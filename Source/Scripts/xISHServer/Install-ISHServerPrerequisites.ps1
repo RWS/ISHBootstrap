@@ -1,6 +1,8 @@
 ﻿param (
     [Parameter(Mandatory=$false)]
     [string]$Computer=$null,
+    [Parameter(Mandatory=$false)]
+    [pscredential]$Credential=$null,
     [Parameter(Mandatory=$true)]
     [ValidateSet("12","13")]
     [string]$ISHServerVersion,
@@ -25,10 +27,15 @@ try
     if($Computer)
     {
         $ishServerModuleName="xISHServer.$ISHServerVersion"
-        $remote=Add-ModuleFromRemote -ComputerName $Computer -Name $ishServerModuleName
+        $remote=Add-ModuleFromRemote -ComputerName $Computer -Credential $Credential -Name $ishServerModuleName
     }
+    $osInfo=Get-ISHOSInfo
 
     Install-ISHWindowsFeature
+    if($osInfo.IsCore)
+    {
+        Install-ISHVisualBasicRuntime
+    }
     Install-ISHToolDotNET
     Install-ISHToolVisualCPP
     Install-ISHToolMSXML4

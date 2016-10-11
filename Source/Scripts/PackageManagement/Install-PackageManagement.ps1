@@ -2,6 +2,8 @@
     [Parameter(Mandatory=$false)]
     [string[]]$Computer,
     [Parameter(Mandatory=$false)]
+    [pscredential]$Credential=$null,
+    [Parameter(Mandatory=$false)]
     [switch]$ReInstall=$false
 )        
 
@@ -49,7 +51,7 @@ $packageManagementScriptBlock={
 #Install the packages
 try
 {
-    Invoke-CommandWrap -ComputerName $Computer -ScriptBlock $packageManagementScriptBlock -BlockName "PackageManagement" -UseParameters @("ReInstall")
+    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $packageManagementScriptBlock -BlockName "PackageManagement" -UseParameters @("ReInstall")
 }
 catch
 {
