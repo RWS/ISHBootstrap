@@ -93,7 +93,8 @@ An obfuscated file looks like this
 	  "LucenePort": 9010,
 	  "UseRelativePaths": false,
 	  "Scripts": [
-		"ISHDeploy\\Set-UIFeatures.ps1",
+		"ISHDeploy\\Set-ISHCMComponents.ps1",
+		"ISHDeploy\\Set-ISHCMMenuAndButton.ps1",
 		"ISHDeploy\\Set-ADFSIntegration.ps1"
 	  ],
 	  "Pester": [
@@ -227,7 +228,8 @@ I've created a script `Invoke-ISHDeployScript.ps1` that wraps up functionality f
 	  "LucenePort": 9010,
 	  "UseRelativePaths": false,
 	  "Scripts": [
-		"ISHDeploy\\Set-UIFeatures.ps1",
+		"ISHDeploy\\Set-ISHCMComponents.ps1",
+		"ISHDeploy\\Set-ISHCMMenuAndButton.ps1",
 		"ISHDeploy\\Set-ISHSTSRelyingParty.ps1"
 	  ]
 	}
@@ -255,7 +257,8 @@ This pattern is not very friendly to the concept of code as configuration as des
 Although much of the noise is hidden away using the `Invoke-CommandWrap` which is available on [gist](https://gist.github.com/Sarafian/a277cd64468a570dff74682eb929ff3c) for some people it is not good enough. 
 For this reason all scripts have a sibling counterpart that uses implicit remoting as described on [import and use module from a remote server](https://sarafian.github.io/post/powershell/Import-Use-Module-Remote-Server/).
 
-- `Set-UIFeatures.ImplicitRemoting.ps1`
+- `Set-ISHCMComponents.ImplicitRemoting.ps1`
+- `Set-ISHCMMenuAndButton.ImplicitRemoting.ps1`
 - `Set-ISHSTSRelyingParty.ImplicitRemoting.ps1`
 - `Get-Status.ImplicitRemoting.ps1`
 - `Undo-ISHDeployment.ImplicitRemoting.ps1`
@@ -334,7 +337,8 @@ Declare the test script section in the JSON within a deployment with key `Pester
 	  "LucenePort": 9010,
 	  "UseRelativePaths": false,
 	  "Scripts": [
-		"ISHDeploy\\Set-UIFeatures.ps1",
+		"ISHDeploy\\Set-ISHCMComponents.ps1",
+		"ISHDeploy\\Set-ISHCMMenuAndButton.ps1",
 		"ISHDeploy\\Set-ADFSIntegration.ps1"
 	  ],
 	  "Pester": [

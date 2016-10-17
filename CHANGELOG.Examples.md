@@ -1,5 +1,11 @@
 # Examples Change log
 
+**20161017**
+
+- Due to ISHDeploy's upcoming cmdlet renaming and tutorial changes the `Set-ISHUIFeatures.ps1` was split into
+  - `Set-ISHCMComponents.ps1`
+  - `Set-ISHCMMenuAndButton.ps1`
+
 **20161011**
 
 To align with the major changes in Source:
