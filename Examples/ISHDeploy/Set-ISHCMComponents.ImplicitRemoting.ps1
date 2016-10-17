@@ -4,7 +4,9 @@
     [Parameter(Mandatory=$false)]
     [pscredential]$Credential=$null,
     [Parameter(Mandatory=$true)]
-    [string]$DeploymentName
+    [string]$DeploymentName,
+    [Parameter(Mandatory=$true)]
+    [string]$ISHVersion    
 )
 $ishBootStrapRootPath=Resolve-Path "$PSScriptRoot\..\.."
 $cmdletsPaths="$ishBootStrapRootPath\Source\Cmdlets"
@@ -19,20 +21,25 @@ if(-not $Computer)
     & "$scriptsPaths\Helpers\Test-Administrator.ps1"
 }
 
-if(-not (Get-Command Invoke-CommandWrap -ErrorAction SilentlyContinue))
+. $cmdletsPaths\Helpers\Add-ModuleFromRemote.ps1
+. $cmdletsPaths\Helpers\Remove-ModuleFromRemote.ps1
+
+try
 {
-    . $cmdletsPaths\Helpers\Invoke-CommandWrap.ps1
-}        
+    if($Computer)
+    {
+        $ishDelpoyModuleName="ISHDeploy.$ISHVersion"
+        $remote=Add-ModuleFromRemote -ComputerName $Computer -Credential $Credential -Name $ishDelpoyModuleName
+    }
 
-#region xopus information
-#XOPUS License Key
-$xopusLicenseKey = Get-ISHBootstrapperContextValue -ValuePath "Configuration.XOPUS.LisenceKey"
-$xopusLicenseDomain= Get-ISHBootstrapperContextValue -ValuePath "Configuration.XOPUS.Domain"
+    #region xopus information
+    #XOPUS License Key
+    $xopusLicenseKey = Get-ISHBootstrapperContextValue -ValuePath "Configuration.XOPUS.LisenceKey"
+    $xopusLicenseDomain= Get-ISHBootstrapperContextValue -ValuePath "Configuration.XOPUS.Domain"
 
-$externalId=Get-ISHBootstrapperContextValue -ValuePath "Configuration.ExternalID"
-#endegion
+    $externalId=Get-ISHBootstrapperContextValue -ValuePath "Configuration.ExternalID"
+    #endegion
 
-$setUIFeaturesScirptBlock= {
     # Set the license and enable the Content Editor
     Set-ISHContentEditor -ISHDeployment $DeploymentName -LicenseKey "$xopusLicenseKey" -Domain $xopusLicenseDomain
     Enable-ISHUIContentEditor -ISHDeployment $DeploymentName
@@ -46,27 +53,13 @@ $setUIFeaturesScirptBlock= {
     Enable-ISHExternalPreview -ISHDeployment $DeploymentName -ExternalId $externalId
     Write-Host "External preview enabled"
 
-    # Create a new tab for CUSTOM event types
-    $hash=@{
-        Label="Custom Event"
-        Description="Show all custom events"
-        EventTypesFilter=@("CUSTOM1","CUSTOM2")
-        UserRole=@("Administrator","Author")
-    }
-    Set-ISHUIEventMonitorTab -ISHDeployment $DeploymentName @hash
-    Move-ISHUIEventMonitorTab -ISHDeployment $DeploymentName -Label $hash["Label"] -First
-    Write-Host "Event monitor tab created"
-}
-
-
-#Install the packages
-try
-{
-    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $setUIFeaturesScirptBlock -BlockName "Set UI Features on $DeploymentName" -UseParameters @("DeploymentName","xopusLicenseKey","xopusLicenseDomain","externalId")
 }
 finally
 {
-
+    if($Computer)
+    {
+        Remove-ModuleFromRemote -Remote $remote
+    }
 }
 
 Write-Separator -Invocation $MyInvocation -Footer -Name "Configure"

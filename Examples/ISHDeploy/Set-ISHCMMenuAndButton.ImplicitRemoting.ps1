@@ -32,27 +32,6 @@ try
         $remote=Add-ModuleFromRemote -ComputerName $Computer -Credential $Credential -Name $ishDelpoyModuleName
     }
 
-    #region xopus information
-    #XOPUS License Key
-    $xopusLicenseKey = Get-ISHBootstrapperContextValue -ValuePath "Configuration.XOPUS.LisenceKey"
-    $xopusLicenseDomain= Get-ISHBootstrapperContextValue -ValuePath "Configuration.XOPUS.Domain"
-
-    $externalId=Get-ISHBootstrapperContextValue -ValuePath "Configuration.ExternalID"
-    #endegion
-
-    # Set the license and enable the Content Editor
-    Set-ISHContentEditor -ISHDeployment $DeploymentName -LicenseKey "$xopusLicenseKey" -Domain $xopusLicenseDomain
-    Enable-ISHUIContentEditor -ISHDeployment $DeploymentName
-    Write-Host "Content editor enabled and licensed"
-
-    # Enable the Quality Assistant
-    Enable-ISHUIQualityAssistant -ISHDeployment $DeploymentName
-    Write-Host "Quality assistant enabled"
-
-    # Enable the External Preview using externalid
-    Enable-ISHExternalPreview -ISHDeployment $DeploymentName -ExternalId $externalId
-    Write-Host "External preview enabled"
-
     # Create a new tab for CUSTOM event types
     $hash=@{
         Label="Custom Event"
