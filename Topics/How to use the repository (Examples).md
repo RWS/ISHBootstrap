@@ -22,21 +22,19 @@ In this example the name of the repository is `asarafian`.
   
 # Steps
 
-The process depends on scripts in the examples directory. To help run these scripts we need to use a json file that drives the files. Read more [About Example Scripts](About Example Scripts.md)
+The process depends on scripts in the examples directory. To help run these scripts we need to use a json file that drives the files.
 
-1. Publish the repository modules to an internal NuGet Server (asarafian).
+1. Publish the repository modules to an internal NuGet Server (mymachine).
 1. Initialize PowerShellGet on remote server.
   1. Install PackageManagement
   1. Update the NuGet package provider.
-  1. Register a repository for `asarafian`.
+  1. Register a repository for `mymachine`.
 1. Install all modules
 1. Enable the CredSSP authentication for PSSession. 
-1. Install the server prerequisites using xISHServer.12
+1. Install the server prerequisites using module **xISHServer.12**.
 1. Seed the server with a Content Manager CD.
-1. Install a deployment using xISHInstall.
-1. Apply code as configuration scripts using one of the following
-  - ISHDeploy.12.0.0
-  - ISHDeploy.12.0.1
+1. Install a deployment using **xISHInstall**.
+1. Apply code as configuration scripts using PowerShell module [ISHDeploy.12.0.1](www.powershellgallery.com/packages/ISHDeploy.12.0.1/). Other module variants are also possible
 1. Run Pester tests
 
 ## Publish the modules to the internal Nuget Server repository
@@ -54,20 +52,66 @@ This allows a repeative publish as ofter as we want.
 ```powershell
 & .\Examples\Load-ISHBootstrapperContext.ps1 -JSONFile "server01.json"
 ```
-
-An obfuscated file looks like this
+An obfuscated file for local execution looks like this
 ```json
 {
-  "ComputerName": "SERVER01",
-  "CredentialExpression": "New-MyCredential",
   "ISHVersion": "12.0.1",
-  "CertificateAuthority" : "CertificateAuthority",
-  "InstallProcessExplorer": true,
+  "ISHDeployRepository": "PSGallery",
+  "PSRepository": [
+  ],
+  "WebCertificate": {
+    "Authority": "Authority",
+    "OrganizationalUnit": "OrganizationUnit",
+    "Organization": "Organization"
+  },
+  "FTP": {
+    "Host": "host",
+    "CredentialExpression": "New-Credential -Message \"FTP\"",
+    "ISHServerFolder": "Download/InfoShare120/ISHServer/",
+    "ISHCDFolder": "Download/InfoShare120/SP1/",
+    "ISHCDFileName": "20160815.CD.InfoShare.12.0.3215.1.Trisoft-DITA-OT.exe",
+    "AntennaHouseLicensePath": "License/AntennaHouse/AHFormatter.lic"
+  },
+  "OSUserCredentialExpression": "New-Credential -Message \"OSUser\"",
+  "Configuration": [
+    {
+      "XOPUS": [
+        {
+          "LisenceKey": "license",
+          "Domain": "domain"
+        }
+      ],
+      "ExternalID": "username",
+      "ADFSComputerName": "adfs.example.com"
+    }
+  ],
+  "ISHDeployment": [
+    {
+      "Name": "InfoShare",
+      "IsOracle": false,
+      "ConnectionString": "",
+      "LucenePort": 9010,
+      "UseRelativePaths": false,
+      "Scripts": [
+        "ISHDeploy\\Set-ISHCMComponents.ps1",
+        "ISHDeploy\\Set-ISHCMMenuAndButton.ps1",
+        "ISHDeploy\\Set-ADFSIntegration.ps1"
+      ]
+    }
+  ]
+}
+```
+
+An obfuscated file for remote execution looks like this
+```json
+{
+  "ISHVersion": "12.0.1",
+  "ComputerName": "Server",
+  "DOMAIN": "Domain",
+  "CredentialExpression": "New-Credential -Message \"Remote Administrator\"",
+  "ISHDeployRepository": "PSGallery",
   "xISHServerRepository": "mymachine",
   "xISHInstallRepository": "mymachine",
-  "ISHDeployRepository": "PSGallery",
-  "PrerequisitesSourcePath": "C:\\inetpubopen\\xISHServer",
-  "OSUserCredentialExpression": "New-InfoShareServiceUserCredential",
   "PSRepository": [
     {
       "Name": "mymachine",
@@ -75,35 +119,51 @@ An obfuscated file looks like this
       "InstallationPolicy": "Trusted"
     }
   ],
-  "FTP": {
-    "Host": "host"
-    "User": "user",
-    "Password": "password",
-    "ISHCDFolder": "path",
-    "ISHCDFileName": "filename"
+  "WebCertificate": {
+    "Authority": "Authority",
+    "OrganizationalUnit": "OrganizationUnit",
+    "Organization": "Organization"
   },
-  "Pester": [
-	"Pester\\Module.Tests.ps1"
+  "FTP": {
+    "Host": "host",
+    "CredentialExpression": "New-Credential -Message \"FTP\"",
+    "ISHServerFolder": "Download/InfoShare120/ISHServer/",
+    "ISHCDFolder": "Download/InfoShare120/SP1/",
+    "ISHCDFileName": "20160815.CD.InfoShare.12.0.3215.1.Trisoft-DITA-OT.exe",
+    "AntennaHouseLicensePath": "License/AntennaHouse/AHFormatter.lic"
+  },
+  "OSUserCredentialExpression": "New-Credential -Message \"OSUser\"",
+  "Configuration": [
+    {
+      "XOPUS": [
+        {
+          "LisenceKey": "license",
+          "Domain": "domain"
+        }
+      ],
+      "ExternalID": "username",
+      "ADFSComputerName": "adfs.example.com"
+    }
   ],
   "ISHDeployment": [
-	{
-	  "Name": "InfoShare",
-	  "IsOracle": false,
-	  "ConnectionString": "",
-	  "LucenePort": 9010,
-	  "UseRelativePaths": false,
-	  "Scripts": [
-		"ISHDeploy\\Set-ISHCMComponents.ps1",
-		"ISHDeploy\\Set-ISHCMMenuAndButton.ps1",
-		"ISHDeploy\\Set-ADFSIntegration.ps1"
-	  ],
-	  "Pester": [
-		"Pester\\Basic.Tests.ps1",
-	  ]
-	}
+    {
+      "Name": "InfoShare",
+      "IsOracle": false,
+      "ConnectionString": "",
+      "LucenePort": 9010,
+      "UseRelativePaths": false,
+      "Scripts": [
+        "ISHDeploy\\Set-ISHCMComponents.ps1",
+        "ISHDeploy\\Set-ISHCMMenuAndButton.ps1",
+        "ISHDeploy\\Set-ADFSIntegration.ps1"
+      ]
+    }
   ]
 }
 ```
+
+Please note that if you are already a customer of SDL Knowledge Center, the above FTP paths will not be available. 
+This is an example of how I currently envision this, without changing the structure much and verified against my very own ftp.
 
 ## Initialize PowerShellGet on remote server
 
@@ -162,10 +222,10 @@ Behind the scenes the scripts in folder `Source\Scripts\xISHServer` are executed
 The `Initialize-ISHServerOSUser.ps1` is the most tricky one because it needs to add the `osuser` to the local administrator group. 
 To do that the remote call needs to access the active directory and this is where the double hop issue appears. Read more on [About CredSSP authentication for PSSession](About CredSSP authentication for PSSession.md). 
 CredSSP requires secure SSL. That means that a session must be created using the Fully Qualified Domain Name of the computer because the certificate should have as Common Name (CN) the same. 
-As an example if the server is `server01` and the FQDN is `server01.x1.x2.x3` the code that imports implicitly a module looks like 
+As an example if the server is `server` and the FQDN is `server.x1.x2.x3` the code that imports implicitly a module looks like 
 
 ```powershell
-$session=New-PSSession "server01.x.y.z" -Credential -UseSSL -Authentication CredSSP
+$session=New-PSSession "server.x1.x2.x3" -Credential -UseSSL -Authentication CredSSP
 Import-Module $moduleName -PSSession $session -Force
 ```
 
@@ -178,12 +238,11 @@ Then ssl validation will fail with
 
 > The SSL certificate contains a common name (CN) that does not match the hostname. For more information, see the about_Remote_Troubleshooting Help topic.
 
-To not use the lengthy FQDN and bypass the certificate common name validation adjust the JSON next to `CredentialForCredSSPExpression` like this
+To not use the lengthy FQDN and bypass the certificate common name validation adjust the JSON  like this
 
 ```json
-  "CredentialExpression": "New-MyCredential",
-  "UseFQDNForCredSSPExpression": false,
-  "SessionOptionsForCredSSPExpression": "New-PSSessionOption -SkipCNCheck",
+  "UseFQDNWithCredSSP": false,
+  "SessionOptionsWithCredSSPExpression": "New-PSSessionOption -SkipCNCheck",
 ```
 
 ## Seed the server with a Content Manager CD
@@ -196,11 +255,12 @@ This step uses the values in
 
 ```json
   "FTP": {
-    "Host": "host"
-    "User": "user",
-    "Password": "password",
-    "ISHCDFolder": "path",
-    "ISHCDFileName": "filename"
+    "Host": "host",
+    "CredentialExpression": "New-Credential -Message \"FTP\"",
+    "ISHServerFolder": "Download/InfoShare120/ISHServer/",
+    "ISHCDFolder": "Download/InfoShare120/SP1/",
+    "ISHCDFileName": "20160815.CD.InfoShare.12.0.3215.1.Trisoft-DITA-OT.exe",
+    "AntennaHouseLicensePath": "License/AntennaHouse/AHFormatter.lic"
   }
 ```
 
@@ -228,12 +288,12 @@ I've created a script `Invoke-ISHDeployScript.ps1` that wraps up functionality f
 	  "LucenePort": 9010,
 	  "UseRelativePaths": false,
 	  "Scripts": [
-		"ISHDeploy\\Set-ISHCMComponents.ps1",
-		"ISHDeploy\\Set-ISHCMMenuAndButton.ps1",
-		"ISHDeploy\\Set-ISHSTSRelyingParty.ps1"
+      "ISHDeploy\\Set-ISHCMComponents.ps1",
+      "ISHDeploy\\Set-ISHCMMenuAndButton.ps1",
+      "ISHDeploy\\Set-ISHSTSRelyingParty.ps1"
 	  ]
 	}
-  ]
+]
 ```
 
 You can trigger the sequence with 
@@ -308,7 +368,7 @@ Declare the test script section in the JSON on the rool level with key `Pester`
 ```json
 {
   "Pester": [
-	"Pester\\Module.Tests.ps1"
+	  "Pester\\Module.Tests.ps1"
   ]
 }
 ```
@@ -337,12 +397,12 @@ Declare the test script section in the JSON within a deployment with key `Pester
 	  "LucenePort": 9010,
 	  "UseRelativePaths": false,
 	  "Scripts": [
-		"ISHDeploy\\Set-ISHCMComponents.ps1",
-		"ISHDeploy\\Set-ISHCMMenuAndButton.ps1",
-		"ISHDeploy\\Set-ADFSIntegration.ps1"
+      "ISHDeploy\\Set-ISHCMComponents.ps1",
+      "ISHDeploy\\Set-ISHCMMenuAndButton.ps1",
+      "ISHDeploy\\Set-ADFSIntegration.ps1"
 	  ],
 	  "Pester": [
-		"Pester\\Basic.Tests.ps1",
+  		"Pester\\Basic.Tests.ps1",
 	  ]
 	}
   ]

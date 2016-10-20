@@ -1,4 +1,4 @@
-#requires -runasadministrator
+#Requires -runasadministrator
 
 #region Helpers
 . $PSScriptRoot\Get-ISHOSInfo.ps1
@@ -21,6 +21,7 @@
 
 #region Global
 . $PSScriptRoot\Get-ISHServerFolderPath.ps1
+. $PSScriptRoot\Get-ISHPrerequisites.ISH13.ps1
 . $PSScriptRoot\Initialize-ISHLocale.ps1
 . $PSScriptRoot\Initialize-ISHIIS.ps1
 . $PSScriptRoot\Initialize-ISHUser.ps1
@@ -45,44 +46,6 @@
 . $PSScriptRoot\Initialize-ISHRegionalDefault.ps1
 #endregion
 
-<#
-$exportedCmdLetName=@(
-    "Get-ISHServerFolderPath"
-
-#region Ports
-    "Set-ISHFirewallHTTPS"
-    "Set-ISHFirewallNETBIOS"
-    "Set-ISHFirewallOracle"
-    "Set-ISHFirewallHTTPS"
-    "Set-ISHFirewallSMTP"
-    "Set-ISHFirewallSQLServer"
+#region License
+. $PSScriptRoot\Set-ISHToolAntennaHouseLicense.ps1
 #endregion
-
-#region Global
-    "Get-ISHServerFolderPath"
-    "Initialize-ISHLocale"
-    "Initialize-ISHIIS"
-    "Initialize-ISHUser"
-#endregion
-
-#region Install
-    "Install-ISHToolMSXML4"
-    "Install-ISHToolDotNET"
-    "Install-ISHToolVisualCPP"
-    "Install-ISHToolJAVA"
-    "Install-ISHToolJavaHelp"
-    "Install-ISHToolHtmlHelp"
-    "Install-ISHToolAntennaHouse"
-    "Install-ISHToolOracleODAC"
-    "Install-ISHWindowsFeature"
-#endregion
-
-#region Regional settings
-    "Initialize-ISHRegional"
-    "Initialize-ISHRegionalDefault"
-#endregion
-)
-
-$exportedCmdLetName|Export-ModuleMember -Cmdlet $_
-
-#>

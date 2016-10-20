@@ -59,12 +59,4 @@ function Install-ISHToolAntennaHouse
     Write-Debug "Installing $filePath using $issFilePath and logging to $logFile"
     Start-Process $filePath -ArgumentList $arguments -Wait -Verb RunAs
     Write-Verbose "Installed $fileName"
-
-    $fileName="AHFormatter.lic"
-    $filePath=Join-Path (Get-ISHServerFolderPath) $fileName
-    $targetPath=Join-Path $env:ProgramFiles "Antenna House\AHFormatterV62\"
-    Write-Debug "Copying License $filePath"
-    Copy-Item $filePath $targetPath
-    Write-Verbose "License copied $fileName"
-
 }

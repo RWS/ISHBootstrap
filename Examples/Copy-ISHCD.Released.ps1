@@ -13,12 +13,12 @@ $ishVersion=Get-ISHBootstrapperContextValue -ValuePath "ISHVersion"
 
 . "$cmdletsPaths\Helpers\Invoke-CommandWrap.ps1"
 
-$ftpHost=Get-ISHBootstrapperContextValue -ValuePath "FTP.Host"
-$ftpIp=Get-ISHBootstrapperContextValue -ValuePath "FTP.Ip"
-$ftpUser=Get-ISHBootstrapperContextValue -ValuePath "FTP.User"
-$ftpPassword=Get-ISHBootstrapperContextValue -ValuePath "FTP.Password"
-$ftpCDFolder=Get-ISHBootstrapperContextValue -ValuePath "FTP.ISHCDFolder"
-$ftpCDFileName=Get-ISHBootstrapperContextValue -ValuePath "FTP.ISHCDFileName"
+$ftp=Get-ISHBootstrapperContextValue -ValuePath "FTP" -DefaultValue $null
+$ftpHost=$ftp.Host
+$ftpCredential=Get-ISHBootstrapperContextValue -ValuePath "FTP.CredentialExpression" -Invoke
+$ftpAlternateHost=$ftp.AlternativeHost
+$ftpCDFolder=$ftp.ISHCDFolder
+$ftpCDFileName=$ftp.ISHCDFileName
 
 $copyBlock= {
     $targetPath="C:\IshCD\$ishVersion"
@@ -27,12 +27,11 @@ $copyBlock= {
 
     if(-not (Test-Connection $ftpHost -Quiet))
     {
-        Write-Warning "Using $ftpIp instead of $ftpHost"
-        $ftpHost=$ftpIp
+        Write-Warning "Using alternate host $ftpAlternateHost instead of $ftpHost"
+        $ftpHost=$ftpAlternateHost
     }
 
-    $sdlCredentials=New-Object System.Management.Automation.PSCredential($ftpUser,(ConvertTo-SecureString $ftpPassword -AsPlainText -Force))
-    Set-FTPConnection -Server $ftpHost -Credentials $sdlCredentials -UseBinary -KeepAlive -UsePassive | Out-Null
+    Set-FTPConnection -Server $ftpHost -Credentials $ftpCredential -UseBinary -KeepAlive -UsePassive | Out-Null
     $ftpUrl="$ftpCDFolder$ftpCDFileName"
     $localPath=$env:TEMP
 
@@ -65,7 +64,7 @@ try
         & "$scriptsPaths\Helpers\Test-Administrator.ps1"
     }
 
-    Invoke-CommandWrap -ComputerName $computerName -Credential $credential -ScriptBlock $copyBlock -BlockName "Copy and Extract ISH.$ishVersion" -UseParameters @("ishVersion","ftpHost","ftpIp","ftpUser","ftpPassword","ftpCDFolder","ftpCDFileName")
+    Invoke-CommandWrap -ComputerName $computerName -Credential $credential -ScriptBlock $copyBlock -BlockName "Copy and Extract ISH.$ishVersion" -UseParameters @("ishVersion","ftpHost","ftpAlternateHost","ftpCredential","ftpCDFolder","ftpCDFileName")
 }
 finally
 {

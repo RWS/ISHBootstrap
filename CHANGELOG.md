@@ -1,5 +1,24 @@
 # Change log
 
+## pre-release v0.3
+
+**20161020**
+
+- Changes in module **xISHServer**
+  - Use new cmdlet `Get-ISHPrerequisites` for one of the following functions: 
+    - Download the necessary files.
+      - Initial supported method is with FTP.
+    - Get the file names of the necessary files.
+  - The cmdlet `Install-ISHToolAntennaHouse.ps1` will not set the license.
+  - To add or update the Antenna House Formatter license use cmdlet `Set-ISHToolAntennaHouseLicense.ps1`
+- Changes in scripts folder **xISHServer**
+  - To seed the **xISHServer** module folder with the prerequisites:
+    - Use **new** script `Get-ISHServerPrerequisites.ps1` and the **xISHServer** module will download the files. 
+    - Use **updated** script `Upload-ISHServerPrerequisites.ps1`. Script uses the `Get-ISHPrerequisites` to know which files to copy.
+  - Use **new** script `Set-ISHAntennaHouseLicense.ps1` to set the Antenna House Formatter license. 
+  
+## Before pre-release v0.2
+
 **20161011**
 
 - Major code refactoring. **Before** this all code expected to access and execute remote code without specifying crendetial. This worked for domain credentials. 
