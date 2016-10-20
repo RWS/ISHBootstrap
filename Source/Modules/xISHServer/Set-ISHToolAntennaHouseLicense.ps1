@@ -26,8 +26,9 @@ function Set-ISHToolAntennaHouseLicense
         {
             $stamp=Get-Date -Format "yyyyMMdd-hhmmss"
             $newFileName="$stamp.ISHServer.$antennaHouseLicenseFileName.bak"
+            $backupPath=Join-Path (Get-ISHServerFolderPath) $newFileName
         }
-        Copy-Item -Path $antennaHouseLicensePath -Destination $newFileName
+        Copy-Item -Path $antennaHouseLicensePath -Destination $backupPath
         Write-Warning "License $antennaHouseLicensePath already exists. Backup available as $newFileName"
     }
 
