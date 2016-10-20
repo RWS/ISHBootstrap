@@ -30,43 +30,8 @@ try
         $remote=Add-ModuleFromRemote -ComputerName $Computer -Credential $Credential -Name $ishServerModuleName
     }
     
-    $osInfo=Get-ISHOSInfo
-    $filesToCopy=@(
-        "MSXML.40SP3.msi"
-        "jdk-8u60-windows-x64.exe"
-        "jre-8u60-windows-x64.exe"
-        "javahelp-2_0_05.zip"
-        "htmlhelp.zip"
-        "AHFormatter.lic"
-        "V6-2-M9-Windows_X64_64E.exe"
-        "V6-2-M9-Windows_X64_64E.exe.iss"
-        "V6-2-M9-Windows_X64_64E.exe.vcredist_x64.exe"
-        "V6-2-M9-Windows_X64_64E.exe.vcredist_x86.exe"
-        "ODTwithODAC121012.zip"
-        "ODTwithODAC121012.rsp"
-    )
+    $filesToCopy=Get-ISHPrerequisites -FileNames
 
-    switch ($ISHServerVersion)
-    {
-        '12' {
-            $filesToCopy+="NETFramework2013_4.5_MicrosoftVisualC++Redistributable_(vcredist_x64).exe"
-        }
-        '13' {
-            if($osInfo.Server -eq "2016")
-            {
-            }
-            else
-            {
-                $filesToCopy+="NETFramework2015_4.6.1.xxxxx_(NDP461-KB3102436-x86-x64-AllOS-ENU).exe"
-            }
-
-            $filesToCopy+="NETFramework2015_4.6_MicrosoftVisualC++Redistributable_(vc_redist.x64).exe"
-        }
-    }
-    if($osInfo.IsCore)
-    {
-        $filesToCopy+="vbrun60sp6.exe"
-    }
     Write-Debug "filesToCopy=$filesToCopy"
     $filePathToCopy=$filesToCopy|ForEach-Object{Join-Path $PrerequisitesSourcePath $_}
     

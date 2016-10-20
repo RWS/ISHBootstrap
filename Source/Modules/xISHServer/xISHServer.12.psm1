@@ -1,4 +1,4 @@
-#requires -runasadministrator
+#Requires -runasadministrator
 
 #region Helpers
 . $PSScriptRoot\Get-ISHOSInfo.ps1
@@ -21,6 +21,7 @@
 
 #region Global
 . $PSScriptRoot\Get-ISHServerFolderPath.ps1
+. $PSScriptRoot\Get-ISHPrerequisites.ISH12.ps1
 . $PSScriptRoot\Initialize-ISHLocale.ps1
 . $PSScriptRoot\Initialize-ISHIIS.ps1
 . $PSScriptRoot\Initialize-ISHUser.ps1
@@ -45,4 +46,8 @@
 #region Regional settings
 . $PSScriptRoot\Initialize-ISHRegional.ps1
 . $PSScriptRoot\Initialize-ISHRegionalDefault.ps1
+#endregion
+
+#region License
+. $PSScriptRoot\Set-ISHToolAntennaHouseLicense.ps1
 #endregion

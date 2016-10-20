@@ -1,5 +1,13 @@
 # Examples Change log
 
+## pre-release v0.3
+
+**20161020**
+
+- Adaptations in the scripts, json structure and how to topic to match the main codebase. 
+  
+## Before pre-release v0.2
+
 **20161017**
 
 - Due to ISHDeploy's upcoming cmdlet renaming and tutorial changes the `Set-ISHUIFeatures.ps1` was split into

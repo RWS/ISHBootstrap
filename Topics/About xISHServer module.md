@@ -50,7 +50,6 @@ Some of the pre-requisites require to server to restart.
 - AntennaHouse
   - V6-2-M9-Windows_X64_64E.exe
   - V6-2-M9-Windows_X64_64E.exe.iss
-  - AHFormatter.lic
 - Visual Basic Runtime (required only for core variants)
   - vbrun60sp6.exe. Get it from [Service Pack 6 for Visual Basic 6.0: Run-Time Redistribution Pack (vbrun60sp6.exe)](https://www.microsoft.com/en-us/download/details.aspx?id=24417) and then extract.
 
@@ -78,7 +77,6 @@ Some of the pre-requisites require to server to restart.
 - AntennaHouse
   - V6-2-M9-Windows_X64_64E.exe
   - V6-2-M9-Windows_X64_64E.exe.iss
-  - AHFormatter.lic
 - Visual Basic Runtime (required only for core variants)
   - vbrun60sp6.exe. Get it from [Service Pack 6 for Visual Basic 6.0: Run-Time Redistribution Pack (vbrun60sp6.exe)](https://www.microsoft.com/en-us/download/details.aspx?id=24417) and then extract.
   
