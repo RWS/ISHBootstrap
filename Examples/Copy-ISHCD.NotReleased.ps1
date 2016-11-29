@@ -1,3 +1,4 @@
+
 if ($PSBoundParameters['Debug']) {
     $DebugPreference = 'Continue'
 }
@@ -10,6 +11,7 @@ $scriptsPaths="$sourcePath\Scripts"
 $computerName=Get-ISHBootstrapperContextValue -ValuePath "ComputerName" -DefaultValue $null
 $credential=Get-ISHBootstrapperContextValue -ValuePath "CredentialExpression" -Invoke
 $ishVersion=Get-ISHBootstrapperContextValue -ValuePath "ISHVersion"
+$ishServerVersion=($ishVersion -split "\.")[0]
 
 . "$cmdletsPaths\Helpers\Invoke-CommandWrap.ps1"
 
@@ -34,11 +36,18 @@ $copyBlock= {
     Remove-Item "$targetPath\*" -Force -Recurse
     Write-Verbose "$targetPath is ready"
 
-    $arguments=@(
-        "-y" 
-        "-gm2" 
-        "-InstallPath=`"$($targetPath.Replace('\','\\'))`"" 
-    )
+    if($ISHServerVersion -eq "12") 
+    {
+        $arguments=@("-d$targetPath","-s")
+    }
+    else 
+    {
+        $arguments=@(
+    		"-y" 
+    		"-gm2" 
+    		"-InstallPath=`"$($targetPath.Replace('\','\\'))`"" 
+    	)
+    }
     Write-Debug "Unzipping $cdPath in $targetPath"
     Start-Process $cdPath -ArgumentList $arguments -Wait
     Write-Host "Unzipped $cdPath in $targetPath"
