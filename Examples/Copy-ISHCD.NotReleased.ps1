@@ -1,3 +1,4 @@
+
 if ($PSBoundParameters['Debug']) {
     $DebugPreference = 'Continue'
 }
@@ -10,6 +11,7 @@ $scriptsPaths="$sourcePath\Scripts"
 $computerName=Get-ISHBootstrapperContextValue -ValuePath "ComputerName" -DefaultValue $null
 $credential=Get-ISHBootstrapperContextValue -ValuePath "CredentialExpression" -Invoke
 $ishVersion=Get-ISHBootstrapperContextValue -ValuePath "ISHVersion"
+$ishServerVersion=($ishVersion -split "\.")[0]
 
 . "$cmdletsPaths\Helpers\Invoke-CommandWrap.ps1"
 
