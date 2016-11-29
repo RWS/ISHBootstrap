@@ -34,11 +34,18 @@ $copyBlock= {
     Remove-Item "$targetPath\*" -Force -Recurse
     Write-Verbose "$targetPath is ready"
 
-    $arguments=@(
-        "-y" 
-        "-gm2" 
-        "-InstallPath=`"$($targetPath.Replace('\','\\'))`"" 
-    )
+    if($ISHServerVersion -eq "12") 
+    {
+        $arguments=@("-d$targetPath","-s")
+    }
+    else 
+    {
+        $arguments=@(
+    		"-y" 
+    		"-gm2" 
+    		"-InstallPath=`"$($targetPath.Replace('\','\\'))`"" 
+    	)
+    }
     Write-Debug "Unzipping $cdPath in $targetPath"
     Start-Process $cdPath -ArgumentList $arguments -Wait
     Write-Host "Unzipped $cdPath in $targetPath"
