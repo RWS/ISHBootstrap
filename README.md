@@ -1,13 +1,9 @@
-# Badges 
-
-- [![Gitter](https://badges.gitter.im/Sarafian/ISHBootstrap.svg)](https://gitter.im/Sarafian/ISHBootstrap)
-
 # ISHBootstrap
 Bootstrapper for [SDL Knowledge Center](https://sdl.com/xml) Content Manager deployments
 
 # Description
 
-For those who don't like repetive tasks, this repository is all about automating the deployment of [SDL Knowledge Center](sdl.com/xml) Content Manager.
+For those who don't like repetitive tasks, this repository is all about automating the deployment of [SDL Knowledge Center](sdl.com/xml) Content Manager.
 [SDL Knowledge Center](sdl.com/xml) Content Manager is also known as with historical names ~~Trisoft~~, ~~InfoShare~~ or as we recently established **ISH**.
 
 I initially started this codebase as my own internal automation for a lab that I use to experiment with [ISHDeploy](https://sarafian.github.io/tags/ishdeploy/). 
@@ -23,7 +19,7 @@ With the ISHBootstrapper the following flow gets automated for a clean/default W
 1. Install Content Manager. One or more deployments.
 1. Execute [ISHDeploy](powershellgallery.com/packages/ISHDeploy.12.0.0/) based code as configuration scripts
 
-Do all of the above with minumum manual actions and all should work locally and remotely. 
+Do all of the above with minimum manual actions and all should work locally and remotely. 
 At the end the dream goal is to execute a seamless update of a Content Manager deployments   
 
 **Remarks**:

@@ -2,8 +2,7 @@
 
 ## pre-release v0.4
 
-**20161129**
-
+- Support for upcoming internal releases of ISH.12.0.* in `Copy-ISHCD.NotReleased.ps1`.  
 - Support for json property `InstallModuleScope` as `CurrentUser` or `AllUsers` to drive the `-Scope` parameter for `Install-Module`. 
 
 ## pre-release v0.3
