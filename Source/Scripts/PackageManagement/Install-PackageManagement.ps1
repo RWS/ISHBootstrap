@@ -44,7 +44,7 @@ $packageManagementScriptBlock={
 
     $logFile=Join-Path $env:TEMP "$msiName.log"
     Write-Debug "Installing $msiPath"
-    Start-Process $msiPath -ArgumentList @(“/qn”,"/lv",$logFile) -Wait
+    Start-Process $msiPath -ArgumentList @("/qn","/lv",$logFile) -Wait
     Write-Verbose "Installed $msiPath"
 }
 

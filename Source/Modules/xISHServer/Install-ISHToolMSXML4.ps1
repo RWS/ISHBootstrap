@@ -8,7 +8,7 @@ function Install-ISHToolMSXML4
     $arguments=@(
         "/package"
         $filePath
-        “/qn”
+        "/qn"
         "/lv"
         $logFile
     )
