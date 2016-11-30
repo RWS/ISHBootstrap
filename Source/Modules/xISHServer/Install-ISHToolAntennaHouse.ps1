@@ -1,3 +1,19 @@
+<#
+# Copyright (c) 2014 All Rights Reserved by the SDL Group.
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#>
+
 . $PSScriptRoot\Get-ISHServerFolderPath.ps1
 
 function Install-ISHToolAntennaHouse
@@ -12,11 +28,11 @@ function Install-ISHToolAntennaHouse
     <# Workign with IIS files .
     Recommendation by Jered Bastinck <jbastinck@sdl.com>.
     Quote from his email
-    I recommend to install Visual C++ 2010 prior installing AntennaHouse. This is a prereq of Antennahouse and I’ve seen different results if this is not installed (the installer is trying to install it for you but the user has to accept the Microsoft Agreement)
+    I recommend to install Visual C++ 2010 prior installing AntennaHouse. This is a prereq of Antennahouse and Iâ€™ve seen different results if this is not installed (the installer is trying to install it for you but the user has to accept the Microsoft Agreement)
 
     Steps:
 
-    1.	Create an setup answer file: example: V6-3-R1a-Windows_X86_32E.exe –r
+    1.	Create an setup answer file: example: V6-3-R1a-Windows_X86_32E.exe â€“r
     2.	File is created in the Windows folder: setup.iss
     3.	Copy this file in the same location as the AntennaHouse installer
     4.	Execute V6-3-R1a-Windows_X86_32E.exe /S /f1.\setup.iss

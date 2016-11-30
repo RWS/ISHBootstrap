@@ -1,5 +1,9 @@
 # Examples Change log
 
+## pre-release v0.4
+
+- Support for upcoming internal releases of ISH.12.0.* in `Copy-ISHCD.NotReleased.ps1`.  
+
 ## pre-release v0.3
 
 **20161020**
