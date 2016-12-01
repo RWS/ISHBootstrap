@@ -50,20 +50,13 @@ try
     if($computerName)
     {
         $ishServerRepository=Get-ISHBootstrapperContextValue -ValuePath "xISHServerRepository"
-        $xISHInstallRepository=Get-ISHBootstrapperContextValue -ValuePath "xISHInstallRepository"
-    
         & $scriptsPaths\PowerShellGet\Install-Module.ps1 -Computer $computerName -Credential $credential -ModuleName $ishServerModuleName -Repository $ishServerRepository
-        & $scriptsPaths\PowerShellGet\Install-Module.ps1 -Computer $computerName -Credential $credential -ModuleName xISHInstall -Repository $xISHInstallRepository
     }
     else
     {
         $path="$modulesPaths\xISHServer\$ishServerModuleName.psm1"
         Import-Module $path -Force
         Write-Warning "Not installed $ishServerModuleName. Instead loaded from $path"
-
-        $path="$modulesPaths\xISHInstall\xISHInstall.psm1"
-        Import-Module $path -Force        
-        Write-Warning "Not installed xISHInstall. Instead loaded from $path"
     }
 }
 finally

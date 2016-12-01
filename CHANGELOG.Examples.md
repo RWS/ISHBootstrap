@@ -2,7 +2,8 @@
 
 ## pre-release v0.4
 
-- Support for upcoming internal releases of ISH.12.0.* in `Copy-ISHCD.NotReleased.ps1`.  
+- Support for upcoming internal releases of ISH.12.0.* in `Copy-ISHCD.NotReleased.ps1`.
+- Updated scripts to match source's removal of **xISHInstall** module.  
 
 ## pre-release v0.3
 
