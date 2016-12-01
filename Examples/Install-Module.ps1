@@ -44,19 +44,15 @@ try
     $ishDeployRepository=Get-ISHBootstrapperContextValue -ValuePath "ISHDeployRepository"
     $ishDeployModuleName="ISHDeploy.$ishVersion"
 
-    & $scriptsPaths\PowerShellGet\Install-Module.ps1 -Computer $computerName -Credential $credential -ModuleName @("CertificatePS","PSFTP") -Repository PSGallery
-    & $scriptsPaths\PowerShellGet\Install-Module.ps1 -Computer $computerName -Credential $credential -ModuleName $ishDeployModuleName -Repository $ishDeployRepository
+    $scope=Get-ISHBootstrapperContextValue -ValuePath "InstallModuleScope" -DefaultValue "AllUsers"
+
+    & $scriptsPaths\PowerShellGet\Install-Module.ps1 -Computer $computerName -Credential $credential -ModuleName @("CertificatePS","PSFTP") -Repository PSGallery -Scope:$scope
+    & $scriptsPaths\PowerShellGet\Install-Module.ps1 -Computer $computerName -Credential $credential -ModuleName $ishDeployModuleName -Repository $ishDeployRepository -Scope:$scope
 
     if($computerName)
     {
         $ishServerRepository=Get-ISHBootstrapperContextValue -ValuePath "xISHServerRepository"
         & $scriptsPaths\PowerShellGet\Install-Module.ps1 -Computer $computerName -Credential $credential -ModuleName $ishServerModuleName -Repository $ishServerRepository
-    }
-    else
-    {
-        $path="$modulesPaths\xISHServer\$ishServerModuleName.psm1"
-        Import-Module $path -Force
-        Write-Warning "Not installed $ishServerModuleName. Instead loaded from $path"
     }
 }
 finally

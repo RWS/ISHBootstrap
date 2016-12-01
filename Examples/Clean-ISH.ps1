@@ -31,6 +31,9 @@ $ishServerVersion=($ishVersion -split "\.")[0]
 . "$cmdletsPaths\Helpers\Invoke-CommandWrap.ps1"
 
 $cleanBlock= {
+    & taskkill /im DllHost.exe /f
+    Write-Host "Killed DllHost.exe"
+
     $infoSharePath="C:\InfoShare"
     Write-Debug "infoSharePath=$infoSharePath"
 

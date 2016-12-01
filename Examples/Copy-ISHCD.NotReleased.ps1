@@ -30,7 +30,7 @@ $ishServerVersion=($ishVersion -split "\.")[0]
 
 . "$cmdletsPaths\Helpers\Invoke-CommandWrap.ps1"
 
-$internalCDFolder=Get-ISHBootstrapperContextValue -ValuePath "InternalRelease.ISHCDFolder"
+$internalCDFolder=Get-ISHBootstrapperContextValue -ValuePath "UNC.ISHCDFolder"
 
 $copyBlock= {
     $targetPath="C:\IshCD\$ishVersion"

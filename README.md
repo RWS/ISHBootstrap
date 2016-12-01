@@ -34,7 +34,7 @@ For this reason, some remote instructions fill face the double hop limitation de
 
 Please refer to topic [How to use the repository (Examples)](Topics/How to use the repository (Examples).md).
 
-Additional topics are also provided in [Topics](Topics) folder.
+Additional tutorials are also provided in [Tutorials](Tutorials) folder.
 
 # Future
 
