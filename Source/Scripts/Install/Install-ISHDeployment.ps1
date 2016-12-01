@@ -14,50 +14,71 @@
 # limitations under the License.
 #>
 
-function New-ISHDeploymentInputParameters {
-    param (
-        [Parameter(Mandatory=$true)]
-        $CDPath,
-        [Parameter(Mandatory=$true)]
-        $Version,
-        [Parameter(Mandatory=$true)]
-        $OSUser,
-        [Parameter(Mandatory=$true)]
-        $OSPassword,
-        [Parameter(Mandatory=$true)]
-        $ConnectionString,
-        [Parameter(Mandatory=$false)]
-        [switch]$IsOracle=$false,
-        [Parameter(Mandatory=$false)]
-        [ValidatePattern("(?# Name doesn't start with InfoShare)InfoShare.*")]
-        $Name="InfoShare",
-        [Parameter(Mandatory=$false)]
-        $RootPath="C:\InfoShare\$Version",
-        [Parameter(Mandatory=$false)]
-        [int]$LucenePort="8080",
-        [Parameter(Mandatory=$false)]
-        [switch]$UseRelativePaths=$false,
-        [Parameter(Mandatory=$false)]
-        $ServiceCertificateThumbprint=$null
-    )
+param (
+    [Parameter(Mandatory=$false)]
+    [string]$Computer=$null,
+    [Parameter(Mandatory=$false)]
+    [pscredential]$Credential=$null,
+    [Parameter(Mandatory=$true)]
+    $CDPath,
+    [Parameter(Mandatory=$true)]
+    $Version,
+    [Parameter(Mandatory=$true)]
+    [pscredential]$OSUserCredential,
+    [Parameter(Mandatory=$true)]
+    $ConnectionString,
+    [Parameter(Mandatory=$false)]
+    [switch]$IsOracle=$false,
+    [Parameter(Mandatory=$false)]
+    [ValidatePattern("(?# Name doesn't start with InfoShare)InfoShare.*")]
+    $Name="InfoShare",
+    [Parameter(Mandatory=$false)]
+    $RootPath="C:\InfoShare\$Version",
+    [Parameter(Mandatory=$false)]
+    [int]$LucenePort="8080",
+    [Parameter(Mandatory=$false)]
+    [switch]$UseRelativePaths=$false
+)
+
+$cmdletsPaths="$PSScriptRoot\..\..\Cmdlets"
+
+. "$cmdletsPaths\Helpers\Write-Separator.ps1"
+Write-Separator -Invocation $MyInvocation -Header
+
+. "$cmdletsPaths\Helpers\Invoke-CommandWrap.ps1"
+
+$newParameterScriptBlock={
+
     $isMatch=$Name -match "InfoShare(?<suffix>.*)"
     $suffix=$Matches["suffix"]
 
     $computerName=$env:COMPUTERNAME.ToLower()
     $infosharestswebappname="ISHSTS$suffix".ToLower()
 
-    if($ServiceCertificateThumbprint -eq $null)
-    {
-        $ServiceCertificateThumbprint=(Get-WebBinding 'Default Web Site' -Protocol "https").certificateHash
-    }
-    $serviceCertificate=Get-ChildItem -path "cert:\LocalMachine\My" | Where-Object {$_.Thumbprint -eq $ServiceCertificateThumbprint}
+    $serviceCertificateThumbprint=(Get-WebBinding 'Default Web Site' -Protocol "https").certificateHash
+
+    $serviceCertificate=Get-ChildItem -path "cert:\LocalMachine\My" | Where-Object {$_.Thumbprint -eq $serviceCertificateThumbprint}
     #Take the fqdn from the web site's attached certificate or from the Service Certificate thumbprint
     $fqdn=(($serviceCertificate.Subject -split ', ')[0] -split '=')[1];
     $baseUrl="https://$fqdn".ToLower()
 
+    $osUserNetworkCredential=$OSUserCredential.GetNetworkCredential()
+    if($osUserNetworkCredential.Domain -and ($osUserNetworkCredential.Domain -ne ""))
+    {
+        $osUser=$osUserNetworkCredential.Domain
+    }
+    else
+    {
+        $osUser="."
+    }
+    $osUser+="\"+$osUserNetworkCredential.UserName
+    $osPassword=$osUserNetworkCredential.Password
+
+
+
     $inputParameters=@{}
-    $inputParameters["osuser"]=$OSUser
-    $inputParameters["ospassword"]=$OSPassword
+    $inputParameters["osuser"]=$osUser
+    $inputParameters["ospassword"]=$osPassword
     $inputParameters["connectstring"]=$ConnectionString
     if($IsOracle)
     {
@@ -93,7 +114,7 @@ function New-ISHDeploymentInputParameters {
     $inputParameters["infoshareauthorwebappname"]="ISHCM$suffix".ToLower()
     $inputParameters["infosharewswebappname"]="ISHWS$suffix".ToLower()
     $inputParameters["infosharestswebappname"]=$infosharestswebappname
-    $inputParameters["servicecertificatethumbprint"]=$ServiceCertificateThumbprint
+    $inputParameters["servicecertificatethumbprint"]=$serviceCertificateThumbprint
 
     $inputParameters["issuerwstrustbindingtype"]="UsernameMixed"
 
@@ -149,7 +170,12 @@ function New-ISHDeploymentInputParameters {
         $node.Node.InnerText=""
     }
 
-    
+    $fileName="inputparameters-$Name.xml"
+    $folderPath=Resolve-Path "$CDPath\.."
+    Write-Debug "folderPath=$folderPath"
+    $filePath=Join-Path $folderPath $fileName
+    Write-Debug "filePath=$filePath"
+
     $StringWriter = New-Object System.IO.StringWriter 
     $XmlWriter = New-Object System.XMl.XmlTextWriter $StringWriter 
     $xmlWriter.Formatting = "indented" 
@@ -157,5 +183,44 @@ function New-ISHDeploymentInputParameters {
     $xml.WriteContentTo($XmlWriter) 
     $XmlWriter.Flush() 
     $StringWriter.Flush() 
-    Write-Output $StringWriter.ToString() 
+    $StringWriter.ToString() |Out-File $filePath -Force
+    Write-Verbose "Saved to $filePath"
+
+<#
+    While(-not (Test-Path $filePath))
+    {
+        Write-Warning "Test path $filePath failed. Sleeping"
+        Start-Sleep -Milliseconds 500
+    }
+#>
+    
 }
+
+$installScriptBlock={
+    $fileName="inputparameters-$Name.xml"
+    $folderPath=Resolve-Path "$CDPath\.."
+    $inputParametersPathPath=Join-Path $folderPath $fileName
+    Write-Debug "inputParametersPathPath=$inputParametersPathPath"
+
+
+    $installToolPath=Join-Path $CDPath "__InstallTool\InstallTool.exe"
+    $installPlanPath=Join-Path $CDPath "__InstallTool\installplan.xml"
+    $installToolArgs=@("-Install",
+        "-cdroot",$CDPath,
+        "-installplan",$installPlanPath
+        "-inputparameters",$inputParametersPathPath
+        )
+    & $installToolPath $installToolArgs
+}
+
+try
+{
+    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $newParameterScriptBlock -BlockName "New deployment parameters for $Name" -UseParameters @("CDPath","Version","OSUserCredential","ConnectionString","IsOracle","Name","RootPath","LucenePort","UseRelativePaths")
+    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $installScriptBlock -BlockName "Install $Name" -UseParameters @("CDPath","Name")
+}
+catch
+{
+    Write-Error $_
+}
+
+Write-Separator -Invocation $MyInvocation -Footer

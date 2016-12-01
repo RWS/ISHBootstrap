@@ -31,63 +31,49 @@ $ishVersion=Get-ISHBootstrapperContextValue -ValuePath "ISHVersion"
 . "$cmdletsPaths\Helpers\Invoke-CommandWrap.ps1"
 
 $ishDeployments=Get-ISHBootstrapperContextValue -ValuePath "ISHDeployment"
-$osUserNetworkCredential=(Get-ISHBootstrapperContextValue -ValuePath "OSUserCredentialExpression" -Invoke).GetNetworkCredential()
-if($osUserNetworkCredential.Domain -and ($osUserNetworkCredential.Domain -ne ""))
-{
-    $osUser=$osUserNetworkCredential.Domain
-}
-else
-{
-    $osUser="."
-}
-$osUser+="\"+$osUserNetworkCredential.UserName
-$osPassword=$osUserNetworkCredential.Password
+$osUserCredential=Get-ISHBootstrapperContextValue -ValuePath "OSUserCredentialExpression" -Invoke
 
-$installBlock= {
+$cdPathBlock= {
+    $rootPath="C:\IshCD\$ishVersion"
+    Write-Debug "rootPath=$rootPath"
+    $cdPath=(Get-ChildItem $rootPath |Where-Object{Test-Path $_.FullName -PathType Container}| Sort-Object FullName -Descending)[0]|Select-Object -ExpandProperty FullName
+    Write-Debug "cdPath=$cdPath"
+    if(-not $cdPath)
+    {
+        Write-Warning "C:\ISHCD\$ishVersion does not contain a cd."
+    }
+    $cdPath
+}
+
+try
+{
+    if(-not $computerName)
+    {
+        & "$scriptsPaths\Helpers\Test-Administrator.ps1"
+    }
+    $cdPath=Invoke-CommandWrap -ComputerName $computerName -Credential $credential -ScriptBlock $cdPathBlock -BlockName "CDPath" -UseParameters @("ishVersion")
+    Write-Debug "cdPath=$cdPath"
+    if(-not $cdPath)
+    {
+        return
+    }
     foreach($ishDeployment in $ishDeployments)
     {
-        $rootPath="C:\IshCD\$ishVersion"
-        Write-Debug "rootPath=$rootPath"
-        $cdPath=(Get-ChildItem $rootPath |Where-Object{Test-Path $_.FullName -PathType Container}| Sort-Object FullName -Descending)[0]|Select-Object -ExpandProperty FullName
-        Write-Debug "cdPath=$cdPath"
-
         $hash=@{
             CDPath=$cdPath
             Version=$ishVersion
-            OSUser=$osUser
-            OSPassword=$osPassword
+            OSUserCredential=$osUserCredential
             ConnectionString=$ishDeployment.ConnectionString
             IsOracle=$ishDeployment.IsOracle
             Name=$ishDeployment.Name
             LucenePort=$ishDeployment.LucenePort
             UseRelativePaths=$ishDeployment.UseRelativePaths
         }
-        $inputParameters=New-ISHDeploymentInputParameters @hash
-        $fileName="inputparameters-$($ishDeployment.Name).xml"
-        $filePath=Join-Path $rootPath $fileName
-        Write-Debug "filePath=$filePath"
-        $inputParameters|Out-File $filePath
-        Write-Verbose "Saved to $filePath"
-        While(-not (Test-Path $filePath))
-        {
-            Write-Warning "Test path $filePath failed. Sleeping"
-            Start-Sleep -Milliseconds 500
-        }
 
-        Write-Debug "Installing from $cdPath with $filePath"
-        Install-ISHDeployment -CDPath $cdPath -InputParametersPath $filePath
-        Write-Verbose "Installed from $cdPath with $filePath"
+        Write-Debug "Installing $($ishDeployment.Name) from $cdPath"
+        & $scriptsPaths\Install\Install-ISHDeployment.ps1 -Computer $computerName -Credential $credential @hash
+        Write-Verbose "Installed $($ishDeployment.Name) from $cdPath"
     }
-}
-
-try
-{
-
-    if(-not $computerName)
-    {
-        & "$scriptsPaths\Helpers\Test-Administrator.ps1"
-    }
-    Invoke-CommandWrap -ComputerName $computerName -Credential $credential -ScriptBlock $installBlock -BlockName "Install ISH" -UseParameters @("ishDeployments","ishVersion","osUser","osPassword")
 
 }
 finally

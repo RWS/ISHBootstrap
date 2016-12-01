@@ -14,16 +14,40 @@
 # limitations under the License.
 #>
 
-function Uninstall-ISHDeployment{
-    param (
-        [Parameter(Mandatory=$true)]
-        $CDPath,
-        [Parameter(Mandatory=$false)]
-        $Name="InfoShare"
-    )
+param (
+    [Parameter(Mandatory=$false)]
+    [string]$Computer=$null,
+    [Parameter(Mandatory=$false)]
+    [pscredential]$Credential=$null,
+    [Parameter(Mandatory=$true)]
+    $CDPath,
+    [Parameter(Mandatory=$false)]
+    $Name="InfoShare"
+)
+
+$cmdletsPaths="$PSScriptRoot\..\..\Cmdlets"
+
+. "$cmdletsPaths\Helpers\Write-Separator.ps1"
+Write-Separator -Invocation $MyInvocation -Header
+
+. "$cmdletsPaths\Helpers\Invoke-CommandWrap.ps1"
+
+$scriptBlock={
+    & taskkill /im DllHost.exe /f
     $installToolPath=Join-Path $CDPath "__InstallTool\InstallTool.exe"
     $installToolArgs=@("-Uninstall",
         "-project",$Name
         )
     & $installToolPath $installToolArgs
 }
+
+try
+{
+    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $scriptBlock -BlockName "Uninstall $Name" -UseParameters @("CDPath","Name")
+}
+catch
+{
+    Write-Error $_
+}
+
+Write-Separator -Invocation $MyInvocation -Footer
