@@ -60,9 +60,6 @@ $cleanBlock= {
     Remove-Item $ishServerProgramDataPath -Recurse -Force
     Write-Host "Removed $ishServerProgramDataPath"
 
-    Uninstall-Module xISHInstall -Force
-    Write-Host "Uninstalled xISHInstall"
-    
     Remove-Item $infoSharePath -Recurse -Force
     Write-Host "Removed $infoSharePath"
 

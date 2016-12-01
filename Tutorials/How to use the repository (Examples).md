@@ -14,7 +14,6 @@ Starting from a clean server operating system this how you end up with a [SDL Kn
   - [ISHDeploy.12.0.0](http://www.powershellgallery.com/packages/ISHDeploy.12.0.0/). This is used to download files from an ftp server
 - Dependency to PowerShell modules in this repository. The following modules must be published to an internal NuGet server. The target server
   - xISHServer.12. This module helps installs all *ISH* prerequisites as described in the online [documentation](http://docs.sdl.com/LiveContent/web/pub.xql?action=home&pub=SDL%20Knowledge%20Center%20full%20documentation-v2&lang=en-US#docid=GUID-2AB53FDA-E9CB-4D46-A393-EEE6CF256554&addHistory=true&query=&scope=&tid=&filename=&resource=&inner_id=&toc=false&eventType=lcContent.loadDocGUID-2AB53FDA-E9CB-4D46-A393-EEE6CF256554)
-  - xISHInstall. This module is a wrapper for simple cmdlets that install/uninstall a Content Manager. This allows easily to install/uninstall remotely.
 
 To quickly host an internal NuGet server follow the instructions in this [article](https://docs.nuget.org/create/hosting-your-own-nuget-feeds). 
 Once the server is up you need to register the repository on your system while specifying the both the `-SourceLocation` and `PublishLocation` parameters. 
@@ -33,7 +32,7 @@ The process depends on scripts in the examples directory. To help run these scri
 1. Enable the CredSSP authentication for PSSession. 
 1. Install the server prerequisites using module **xISHServer.12**.
 1. Seed the server with a Content Manager CD.
-1. Install a deployment using **xISHInstall**.
+1. Install a deployment.
 1. Apply code as configuration scripts using PowerShell module [ISHDeploy.12.0.1](www.powershellgallery.com/packages/ISHDeploy.12.0.1/). Other module variants are also possible
 1. Run Pester tests
 
@@ -41,11 +40,10 @@ The process depends on scripts in the examples directory. To help run these scri
 
 ```powershell
 & .\Source\Modules\Publish-xISHServer.ps1 -ModuleName xISHServer.12 -Repository mymachine -APIKey mykey -BuildNumber -TimeStamp
-& .\Source\Modules\Publish-xISHInstall.ps1 -Repository mymachine -APIKey mykey -BuildNumber -TimeStamp
 ```
 
 Because the repository is internal we force a very detailed build number on the module version using `-BuildNumber` and `-TimeStamp`. 
-This allows a repeative publish as ofter as we want.
+This allows a repetitive publish as ofter as we want.
 
 ## Load the data container json file
 
@@ -111,7 +109,6 @@ An obfuscated file for remote execution looks like this
   "CredentialExpression": "New-Credential -Message \"Remote Administrator\"",
   "ISHDeployRepository": "PSGallery",
   "xISHServerRepository": "mymachine",
-  "xISHInstallRepository": "mymachine",
   "PSRepository": [
     {
       "Name": "mymachine",
@@ -182,7 +179,7 @@ As part of this step, [ProcessExplorer](https://technet.microsoft.com/en-us/sysi
 
 This step uses the `xISHServerRepository`,`` and `ISHDeployRepository` to install the modules from the matching repository name. In this example the internal repository is specified by `asarafian` name in `PSRepository`.
 
-Note that when executing the scripts locally, the script will load the **xISHInstall** and **xISHServer** from their respected paths.
+Note that when executing the scripts locally, the script will load **xISHServer** from their respected paths.
 
 ## Enable the CredSSP authentication for PSSession
 
