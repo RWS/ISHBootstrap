@@ -35,6 +35,15 @@ if(-not $computerName)
 $osUserCredential=Get-ISHBootstrapperContextValue -ValuePath "OSUserCredentialExpression" -Invoke
 $ishVersion=Get-ISHBootstrapperContextValue -ValuePath "ISHVersion"
 $ishServerVersion=($ishVersion -split "\.")[0]
+
+if(-not $computerName)
+{
+    Write-Warning "xISHServer will be imported from the repository"
+    Remove-Module -Name xISHServer.12 -ErrorAction SilentlyContinue
+    Remove-Module -Name xISHServer.13 -ErrorAction SilentlyContinue
+    Import-Module "$sourcePath\Modules\xISHServer\xISHServer.$ishServerVersion.psm1"
+}
+
 $installOracle=Get-ISHBootstrapperContextValue -ValuePath "InstallOracle" -DefaultValue $false
 
 $isSupported=& $scriptsPaths\xISHServer\Test-SupportedServer.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion

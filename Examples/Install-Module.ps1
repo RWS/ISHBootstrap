@@ -54,12 +54,6 @@ try
         $ishServerRepository=Get-ISHBootstrapperContextValue -ValuePath "xISHServerRepository"
         & $scriptsPaths\PowerShellGet\Install-Module.ps1 -Computer $computerName -Credential $credential -ModuleName $ishServerModuleName -Repository $ishServerRepository
     }
-    else
-    {
-        $path="$modulesPaths\xISHServer\$ishServerModuleName.psm1"
-        Import-Module $path -Force
-        Write-Warning "Not installed $ishServerModuleName. Instead loaded from $path"
-    }
 }
 finally
 {
