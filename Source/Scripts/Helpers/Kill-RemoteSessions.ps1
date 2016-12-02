@@ -38,5 +38,6 @@ $killRemoteSessionsScriptBlock={
 $blockName="Killing remote powershell sessions"
 Write-Progress @scriptProgress -Status $blockName
 Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $killRemoteSessionsScriptBlock -BlockName $blockName
+
 Write-Progress @scriptProgress -Completed
 Write-Separator -Invocation $MyInvocation -Footer
