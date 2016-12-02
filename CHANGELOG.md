@@ -4,7 +4,8 @@
 
 - All source code has header based on SDL's open source policy.
   - SDLDevTools module helps power `Test-OpenSourceHeaders.Tests.ps1` to safe guard SDL's open source policy.
-- Dropped module **xISHInstall** and ported the code into **Install** scripts    
+- Dropped module **xISHInstall** and ported the code into **Install** scripts.    
+- Enhanced progress indicators in scripts.
 
 ## pre-release v0.3
 
