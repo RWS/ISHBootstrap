@@ -28,7 +28,9 @@ param (
 $cmdletsPaths="$PSScriptRoot\..\..\Cmdlets"
 
 . "$cmdletsPaths\Helpers\Write-Separator.ps1"
+. "$cmdletsPaths\Helpers\Get-ProgressHash.ps1"
 Write-Separator -Invocation $MyInvocation -Header
+$scriptProgress=Get-ProgressHash -Invocation $MyInvocation
 
 . "$cmdletsPaths\Helpers\Invoke-CommandWrap.ps1"
 
@@ -72,6 +74,8 @@ try
 
     if($Computer)
     {
+        Write-Progress @scriptProgress -Status "Copying files to $Computer"
+
         if($PSVersionTable.PSVersion.Major -ge 5)
         {
             Copy-Item -Path $filePathToCopy -Destination $targetPath -Force -ToSession $remote.Session
@@ -84,6 +88,8 @@ try
     }    
     else
     {
+        Write-Progress @scriptProgress -Status "Copying files"
+
         Copy-Item -Path $filePathToCopy -Destination $targetPath -Force
     }
 
@@ -98,4 +104,5 @@ finally
     }
 }
 
+Write-Progress @scriptProgress -Completed
 Write-Separator -Invocation $MyInvocation -Footer

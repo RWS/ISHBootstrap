@@ -28,7 +28,9 @@ param (
 $cmdletsPaths="$PSScriptRoot\..\..\Cmdlets"
 
 . "$cmdletsPaths\Helpers\Write-Separator.ps1"
+. "$cmdletsPaths\Helpers\Get-ProgressHash.ps1"
 Write-Separator -Invocation $MyInvocation -Header
+$scriptProgress=Get-ProgressHash -Invocation $MyInvocation
 
 . "$cmdletsPaths\Helpers\Invoke-CommandWrap.ps1"
 
@@ -43,11 +45,14 @@ $scriptBlock={
 
 try
 {
-    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $scriptBlock -BlockName "Uninstall $Name" -UseParameters @("CDPath","Name")
+    $blockName="Uninstalling $Name"
+    Write-Progress @scriptProgress -Status $blockName
+    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $scriptBlock -BlockName $blockName -UseParameters @("CDPath","Name")
 }
 catch
 {
     Write-Error $_
 }
 
+Write-Progress @scriptProgress -Completed
 Write-Separator -Invocation $MyInvocation -Footer

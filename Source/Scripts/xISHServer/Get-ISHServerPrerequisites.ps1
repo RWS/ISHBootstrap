@@ -32,7 +32,9 @@ param (
 $cmdletsPaths="$PSScriptRoot\..\..\Cmdlets"
 
 . "$cmdletsPaths\Helpers\Write-Separator.ps1"
+. "$cmdletsPaths\Helpers\Get-ProgressHash.ps1"
 Write-Separator -Invocation $MyInvocation -Header
+$scriptProgress=Get-ProgressHash -Invocation $MyInvocation
 
 . "$cmdletsPaths\Helpers\Invoke-CommandWrap.ps1"
 
@@ -49,6 +51,7 @@ try
         $ishServerModuleName="xISHServer.$ISHServerVersion"
         $remote=Add-ModuleFromRemote -ComputerName $Computer -Credential $Credential -Name $ishServerModuleName
     }
+    Write-Progress @scriptProgress -Status "Downloading prerequisites"
     Get-ISHPrerequisites -FTPHost $FTPHost -Credential $FTPCredential -FTPFolder $FTPFolder
 }
 
@@ -60,4 +63,5 @@ finally
     }
 }
 
+Write-Progress @scriptProgress -Completed
 Write-Separator -Invocation $MyInvocation -Footer

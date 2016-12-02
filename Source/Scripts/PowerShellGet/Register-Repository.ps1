@@ -35,7 +35,9 @@ param (
 $cmdletsPaths="$PSScriptRoot\..\..\Cmdlets"
 
 . "$cmdletsPaths\Helpers\Write-Separator.ps1"
+. "$cmdletsPaths\Helpers\Get-ProgressHash.ps1"
 Write-Separator -Invocation $MyInvocation -Header
+$scriptProgress=Get-ProgressHash -Invocation $MyInvocation
 
 . "$cmdletsPaths\Helpers\Invoke-CommandWrap.ps1"
 
@@ -61,11 +63,14 @@ $registerPSRepositoryBlock = {
 
 try
 {
-    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $registerPSRepositoryBlock -BlockName "Register Repository $Name" -UseParameters @("Name","SourceLocation","PublishLocation","InstallationPolicy")
+    $blockName="Registering Repository $Name"
+    Write-Progress @scriptProgress -Status $blockName
+    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $registerPSRepositoryBlock -BlockName $blockName -UseParameters @("Name","SourceLocation","PublishLocation","InstallationPolicy")
 }
 catch
 {
     Write-Error $_
 }
 
+Write-Progress @scriptProgress -Completed
 Write-Separator -Invocation $MyInvocation -Footer

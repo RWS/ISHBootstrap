@@ -28,7 +28,9 @@ param (
 $cmdletsPaths="$PSScriptRoot\..\..\Cmdlets"
 
 . "$cmdletsPaths\Helpers\Write-Separator.ps1"
+. "$cmdletsPaths\Helpers\Get-ProgressHash.ps1"
 Write-Separator -Invocation $MyInvocation -Header
+$scriptProgress=Get-ProgressHash -Invocation $MyInvocation
 
 . "$cmdletsPaths\Helpers\Invoke-CommandWrap.ps1"
 
@@ -47,11 +49,13 @@ try
     }
     $osInfo=Get-ISHOSInfo
 
+    Write-Progress @scriptProgress -Status "Installing windows features"
     Install-ISHWindowsFeature
     if($osInfo.IsCore)
     {
         Install-ISHVisualBasicRuntime
     }
+    Write-Progress @scriptProgress -Status "Installing packages"
     Install-ISHToolDotNET
     Install-ISHToolVisualCPP
     Install-ISHToolMSXML4
@@ -64,6 +68,7 @@ try
         Install-ISHToolOracleODAC
     }
 
+    Write-Progress @scriptProgress -Status "Initializing"
     Initialize-ISHLocale
     Initialize-ISHIIS
     Initialize-ISHRegionalDefault
@@ -74,6 +79,7 @@ try
         Initialize-ISHMSDTCSettings
     }
 
+    Write-Progress @scriptProgress -Status "Configuring firewall"
     Set-ISHFirewallNETBIOS
     Set-ISHFirewallSMTP
     Set-ISHFirewallSQLServer
@@ -96,4 +102,5 @@ finally
     }
 }
 
+Write-Progress @scriptProgress -Completed
 Write-Separator -Invocation $MyInvocation -Footer

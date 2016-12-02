@@ -31,14 +31,15 @@ param (
 $cmdletsPaths="$PSScriptRoot\..\..\Cmdlets"
 
 . "$cmdletsPaths\Helpers\Write-Separator.ps1"
+. "$cmdletsPaths\Helpers\Get-ProgressHash.ps1"
 Write-Separator -Invocation $MyInvocation -Header
+$scriptProgress=Get-ProgressHash -Invocation $MyInvocation
 
 . "$cmdletsPaths\Helpers\Invoke-CommandWrap.ps1"
 
 $installScriptBlock={
     foreach($name in $ModuleName)
     {
-    
         Write-Debug "Finding modules $name"
         if($Repository)
         {
@@ -65,11 +66,14 @@ $installScriptBlock={
 #Install the packages
 try
 {
-    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $installScriptBlock -BlockName "Install Modules $ModuleName" -UseParameters @("ModuleName","Repository","Scope")
+    $blockName="Installing Module(s) $($ModuleName -join ',')"
+    Write-Progress @scriptProgress -Status $blockName
+    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $installScriptBlock -BlockName $blockName -UseParameters @("ModuleName","Repository","Scope")
 }
 catch
 {
     Write-Error $_
 }
 
+Write-Progress @scriptProgress -Completed
 Write-Separator -Invocation $MyInvocation -Footer

@@ -34,6 +34,16 @@ Function Add-ModuleFromRemote {
 
     try 
     {
+        . $PSScriptRoot\Get-ProgressHash.ps1
+        $activity="Import module"
+        switch ($PSCmdlet.ParameterSetName)
+        {
+            'Local' {$cmdLetProgress=Get-ProgressHash -Activity $activity}
+            'Computer' {$cmdLetProgress=Get-ProgressHash -Activity $activity -ComputerName $ComputerName}
+            'Session' {$cmdLetProgress=Get-ProgressHash -Activity $activity -Session $Session}
+        }
+        Write-Progress @cmdLetProgress -Status "$($Name -join ',')"
+
         $undoHash=@{
             Session=$null
             Module=$Name
@@ -51,7 +61,6 @@ Function Add-ModuleFromRemote {
             $undoHash.Session=$Session
             Invoke-CommandWrap -Session $session -BlockName "Initialize Debug/Verbose preference on $($Session.ComputerName)" -ScriptBlock {}
         }
-
         Write-Debug "Targetting remote session $($Session.ComputerName)"
         Write-Verbose "[$BlockName] Begin on $($Session.ComputerName)"
         $Name | ForEach-Object { 
@@ -70,6 +79,7 @@ Function Add-ModuleFromRemote {
 
     finally
     {
+        Write-Progress @cmdLetProgress -Completed
         New-Object PSObject -Property $undoHash
     }
 }
