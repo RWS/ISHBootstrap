@@ -23,7 +23,9 @@ param (
     [ValidateSet("12","13")]
     [string]$ISHServerVersion,
     [Parameter(Mandatory=$false)]
-    [switch]$InstallOracle=$false
+    [switch]$InstallOracle=$false,
+    [Parameter(Mandatory=$false)]
+    [switch]$InstallMSXML4=$false
 )    
 $cmdletsPaths="$PSScriptRoot\..\..\Cmdlets"
 
@@ -54,7 +56,10 @@ try
     }
     Install-ISHToolDotNET
     Install-ISHToolVisualCPP
-    Install-ISHToolMSXML4
+    if(($ISHServerVersion -eq "12") -and ($InstallMSXML4))
+    {
+        Install-ISHToolMSXML4
+    }
     Install-ISHToolJAVA
     Install-ISHToolJavaHelp
     Install-ISHToolHtmlHelp
