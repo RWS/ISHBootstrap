@@ -28,6 +28,8 @@ $scriptsPaths="$ishBootStrapRootPath\Source\Scripts"
 
 . $ishBootStrapRootPath\Examples\ISHDeploy\Cmdlets\Write-Separator.ps1
 Write-Separator -Invocation $MyInvocation -Header -Name "Configure"
+. "$cmdletsPaths\Helpers\Get-ProgressHash.ps1"
+$scriptProgress=Get-ProgressHash -Invocation $MyInvocation
 
 if(-not $Computer)
 {
@@ -51,11 +53,14 @@ $getStatusBlock= {
 #Install the packages
 try
 {
-    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $getStatusBlock -BlockName "Status on $DeploymentName" -UseParameters @("DeploymentName")
+    $blockName="Getting status on $DeploymentName"
+    Write-Progress @scriptProgress -Status $blockName
+    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $getStatusBlock -BlockName $blockName -UseParameters @("DeploymentName")
 }
 finally
 {
 
 }
 
+Write-Progress @scriptProgress -Completed
 Write-Separator -Invocation $MyInvocation -Footer -Name "Configure"

@@ -30,6 +30,8 @@ $scriptsPaths="$ishBootStrapRootPath\Source\Scripts"
 
 . $ishBootStrapRootPath\Examples\ISHDeploy\Cmdlets\Write-Separator.ps1
 Write-Separator -Invocation $MyInvocation -Header -Name "Configure"
+. "$cmdletsPaths\Helpers\Get-ProgressHash.ps1"
+$scriptProgress=Get-ProgressHash -Invocation $MyInvocation
 
 if(-not $Computer)
 {
@@ -41,6 +43,8 @@ if(-not $Computer)
 
 try
 {
+    Write-Progress @scriptProgress -Status "Installing IIS Windows Authentication"
+
     if($Computer)
     {
         $ishServerVersion=($ISHVersion -split "\.")[0]
@@ -50,6 +54,8 @@ try
     }
 
     Install-ISHWindowsFeatureIISWinAuth
+
+    Write-Progress @scriptProgress -Status "Enabling Windows Authentication $DeploymentName"
     Set-ISHSTSConfiguration -ISHDeployment $DeploymentName -AuthenticationType Windows
 }
 finally
@@ -60,4 +66,5 @@ finally
     }
 }
 
+Write-Progress @scriptProgress -Completed
 Write-Separator -Invocation $MyInvocation -Footer -Name "Configure"

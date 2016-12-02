@@ -31,6 +31,8 @@ $scriptsPaths="$ishBootStrapRootPath\Source\Scripts"
 . $ishBootStrapRootPath\Examples\Cmdlets\Get-ISHBootstrapperContextValue.ps1
 . $ishBootStrapRootPath\Examples\ISHDeploy\Cmdlets\Write-Separator.ps1
 Write-Separator -Invocation $MyInvocation -Header -Name "Configure"
+. "$cmdletsPaths\Helpers\Get-ProgressHash.ps1"
+$scriptProgress=Get-ProgressHash -Invocation $MyInvocation
 
 if(-not $Computer)
 {
@@ -42,6 +44,8 @@ if(-not $Computer)
 
 try
 {
+    Write-Progress @scriptProgress -Status "Setting UI Features on $DeploymentName"
+    
     if($Computer)
     {
         $ishDelpoyModuleName="ISHDeploy.$ISHVersion"
@@ -68,4 +72,5 @@ finally
     }
 }
 
+Write-Progress @scriptProgress -Completed
 Write-Separator -Invocation $MyInvocation -Footer -Name "Configure"

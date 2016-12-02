@@ -30,6 +30,8 @@ $scriptsPaths="$ishBootStrapRootPath\Source\Scripts"
 
 . $ishBootStrapRootPath\Examples\ISHDeploy\Cmdlets\Write-Separator.ps1
 Write-Separator -Invocation $MyInvocation -Header -Name "Configure"
+. "$cmdletsPaths\Helpers\Get-ProgressHash.ps1"
+$scriptProgress=Get-ProgressHash -Invocation $MyInvocation
 
 if(-not $Computer)
 {
@@ -41,6 +43,8 @@ if(-not $Computer)
 
 try
 {
+    Write-Progress @scriptProgress -Status "Enabling internal authentication on $DeploymentName"
+
     if($Computer)
     {
         $ishDelpoyModuleName="ISHDeploy.$ISHVersion"
@@ -58,3 +62,6 @@ finally
         Remove-ModuleFromRemote -Remote $remote
     }
 }
+
+Write-Progress @scriptProgress -Completed
+Write-Separator -Invocation $MyInvocation -Footer -Name "Configure"
