@@ -31,6 +31,8 @@ $scriptsPaths="$ishBootStrapRootPath\Source\Scripts"
 . $ishBootStrapRootPath\Examples\Cmdlets\Get-ISHBootstrapperContextValue.ps1
 . $ishBootStrapRootPath\Examples\ISHDeploy\Cmdlets\Write-Separator.ps1
 Write-Separator -Invocation $MyInvocation -Header -Name "Configure"
+. "$cmdletsPaths\Helpers\Get-ProgressHash.ps1"
+$scriptProgress=Get-ProgressHash -Invocation $MyInvocation
 
 if(-not $Computer)
 {
@@ -88,7 +90,9 @@ $integrationBlock= {
 
 try
 {
-    $adfsInformation=Invoke-CommandWrap -ComputerName $adfsComputerName -ScriptBlock $getADFSInformationBlock -BlockName "Get ADFS information"
+    $blockName="Getting information from ADFS"
+    Write-Progress @scriptProgress -Status $blockName
+    $adfsInformation=Invoke-CommandWrap -ComputerName $adfsComputerName -ScriptBlock $getADFSInformationBlock -BlockName $blockName
     $primaryTokenSigningCertificate=$adfsInformation.TokenSigningCertificate|Where-Object -Property IsPrimary -EQ $true
 
     #Issuer name
@@ -105,11 +109,14 @@ try
     $tokenSigningCertificateThumbprint=$primaryTokenSigningCertificate.Thumbprint
     $issuercertificatevalidationmode = "None"
 
-    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $integrationBlock -BlockName "Integrate ADFS on $DeploymentName" -UseParameters @("DeploymentName","issuerName","wsFederationUri","wsTrustUri","wsTrustMexUri","bindingType","tokenSigningCertificateThumbprint","issuercertificatevalidationmode","includeInternalClients")
+    $blockName="Integrating ADFS on $DeploymentName"
+    Write-Progress @scriptProgress -Status $blockName
+    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $integrationBlock -BlockName $blockName -UseParameters @("DeploymentName","issuerName","wsFederationUri","wsTrustUri","wsTrustMexUri","bindingType","tokenSigningCertificateThumbprint","issuercertificatevalidationmode","includeInternalClients")
 }
 finally
 {
 
 }
 
+Write-Progress @scriptProgress -Completed
 Write-Separator -Invocation $MyInvocation -Footer -Name "Configure"

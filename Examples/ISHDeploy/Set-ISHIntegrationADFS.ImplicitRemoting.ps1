@@ -33,6 +33,8 @@ $scriptsPaths="$ishBootStrapRootPath\Source\Scripts"
 . $ishBootStrapRootPath\Examples\Cmdlets\Get-ISHBootstrapperContextValue.ps1
 . $ishBootStrapRootPath\Examples\ISHDeploy\Cmdlets\Write-Separator.ps1
 Write-Separator -Invocation $MyInvocation -Header -Name "Configure"
+. "$cmdletsPaths\Helpers\Get-ProgressHash.ps1"
+$scriptProgress=Get-ProgressHash -Invocation $MyInvocation
 
 if(-not $Computer)
 {
@@ -47,6 +49,8 @@ try
     #region adfs information
     $adfsComputerName=Get-ISHBootstrapperContextValue -ValuePath "Configuration.ADFSComputerName"
     #endegion
+
+    Write-Progress @scriptProgress -Status "Getting information from ADFS"
 
     if($Computer)
     {
@@ -77,7 +81,8 @@ try
     #endregion
 
     #region Configure ADFS integration
-    
+    Write-Progress @scriptProgress -Status "Integrating ADFS on $DeploymentName"
+
     # Set WS Federation integration
     Set-ISHIntegrationSTSWSFederation -ISHDeployment $DeploymentName -Endpoint $wsFederationUri
     # Set WS Trust integration
@@ -103,4 +108,5 @@ finally
     Remove-ModuleFromRemote -Remote $remoteADFS
 }
 
+Write-Progress @scriptProgress -Completed
 Write-Separator -Invocation $MyInvocation -Footer -Name "Configure"

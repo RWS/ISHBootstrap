@@ -4,10 +4,11 @@
 
 - All source code has header based on SDL's open source policy.
   - SDLDevTools module helps power `Test-OpenSourceHeaders.Tests.ps1` to safe guard SDL's open source policy.
-- Dropped module **xISHInstall** and ported the code into **Install** scripts    
+- Dropped module **xISHInstall** and ported the code into **Install** scripts.    
 - As the MSXML4 is not required for ISH
-    - Removed `Install-ISHToolMSXML4` from **xISHServer.13**
+    - Removed `Install-ISHToolMSXML4` from **xISHServer.13**.
     - Script `Install-ISHServerPrerequisites.ps1` will invoke `Install-ISHToolMSXML4` only for version 12 and when parameter `-InstallMSXML` is specified. 
+- Enhanced progress indicators in scripts.
 
 ## pre-release v0.3
 

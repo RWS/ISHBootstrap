@@ -28,6 +28,8 @@ $scriptsPaths="$ishBootStrapRootPath\Source\Scripts"
 
 . $ishBootStrapRootPath\Examples\ISHDeploy\Cmdlets\Write-Separator.ps1
 Write-Separator -Invocation $MyInvocation -Header -Name "Configure"
+. "$cmdletsPaths\Helpers\Get-ProgressHash.ps1"
+$scriptProgress=Get-ProgressHash -Invocation $MyInvocation
 
 if(-not $Computer)
 {
@@ -46,10 +48,14 @@ try
         Undo-ISHDeployment -ISHDeployment $DeploymentName
         Clear-ISHDeploymentHistory -ISHDeployment $DeploymentName
     }
-    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $undoBlock -BlockName "Undo deployment $deploymentName" -UseParameters @("DeploymentName")
+
+    $blockName="Undoing deployment $deploymentName"
+    Write-Progress @scriptProgress -Status $blockName
+    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $undoBlock -BlockName $blockName -UseParameters @("DeploymentName")
 }
 finally
 {
 }
 
+Write-Progress @scriptProgress -Completed
 Write-Separator -Invocation $MyInvocation -Footer -Name "Configure"

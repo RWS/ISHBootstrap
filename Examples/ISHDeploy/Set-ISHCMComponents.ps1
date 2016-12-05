@@ -29,6 +29,8 @@ $scriptsPaths="$ishBootStrapRootPath\Source\Scripts"
 . $ishBootStrapRootPath\Examples\Cmdlets\Get-ISHBootstrapperContextValue.ps1
 . $ishBootStrapRootPath\Examples\ISHDeploy\Cmdlets\Write-Separator.ps1
 Write-Separator -Invocation $MyInvocation -Header -Name "Configure"
+. "$cmdletsPaths\Helpers\Get-ProgressHash.ps1"
+$scriptProgress=Get-ProgressHash -Invocation $MyInvocation
 
 if(-not $Computer)
 {
@@ -67,11 +69,14 @@ $setUIFeaturesScirptBlock= {
 #Install the packages
 try
 {
-    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $setUIFeaturesScirptBlock -BlockName "Set UI Features on $DeploymentName" -UseParameters @("DeploymentName","xopusLicenseKey","xopusLicenseDomain","externalId")
+    $blockName="Toggling UI Features on $DeploymentName"
+    Write-Progress @scriptProgress -Status $blockName
+    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $setUIFeaturesScirptBlock -BlockName $blockName -UseParameters @("DeploymentName","xopusLicenseKey","xopusLicenseDomain","externalId")
 }
 finally
 {
 
 }
 
+Write-Progress @scriptProgress -Completed
 Write-Separator -Invocation $MyInvocation -Footer -Name "Configure"

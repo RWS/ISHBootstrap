@@ -28,6 +28,8 @@ $scriptsPaths="$ishBootStrapRootPath\Source\Scripts"
 
 . $ishBootStrapRootPath\Examples\ISHDeploy\Cmdlets\Write-Separator.ps1
 Write-Separator -Invocation $MyInvocation -Header -Name "Configure"
+. "$cmdletsPaths\Helpers\Get-ProgressHash.ps1"
+$scriptProgress=Get-ProgressHash -Invocation $MyInvocation
 
 if(-not $Computer)
 {
@@ -49,11 +51,14 @@ $setBlock= {
 
 try
 {
-    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $setBlock -BlockName "Add relying parties on $DeploymentName" -UseParameters @("DeploymentName")
+    $blockName="Adding relying parties on $DeploymentName"
+    Write-Progress @scriptProgress -Status $blockName
+    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $setBlock -BlockName $blockName -UseParameters @("DeploymentName")
 }
 finally
 {
 
 }
 
+Write-Progress @scriptProgress -Completed
 Write-Separator -Invocation $MyInvocation -Footer -Name "Configure"

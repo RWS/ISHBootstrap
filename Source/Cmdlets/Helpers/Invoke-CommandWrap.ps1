@@ -131,12 +131,16 @@ Function Invoke-CommandWrap {
         [Parameter(Mandatory=$false,ParameterSetName="Session")]
         [string[]]$UseParameters=$null
     ) 
-
-    if($Session -and $ComputerName)
+    
+    . $PSScriptRoot\Get-ProgressHash.ps1
+    $activity="Invoke script block"
+    switch ($PSCmdlet.ParameterSetName)
     {
-        throw "Cannot process both ComputerName and Session"
+        'Local' {$cmdLetProgress=Get-ProgressHash -Activity $activity}
+        'Computer' {$cmdLetProgress=Get-ProgressHash -Activity $activity -ComputerName $ComputerName}
+        'Session' {$cmdLetProgress=Get-ProgressHash -Activity $activity -Session $Session}
     }
-
+    
     if($Session -or $ComputerName)
     {
         $scriptSegments=@()
@@ -176,32 +180,34 @@ Function Invoke-CommandWrap {
         $ScriptBlock=$enhancedScriptBlock
     }
 
-
-    if($Session)
+    Write-Progress @cmdLetProgress -Status $BlockName
+    switch ($PSCmdlet.ParameterSetName)
     {
-        Write-Debug "Targetting remote session $($session.ComputerName)"
-        Write-Verbose "[$BlockName] Begin on $($session.ComputerName)"
-        Invoke-Command -Session $Session -ScriptBlock $ScriptBlock -ArgumentList $ArgumentList
-        Write-Host "[$BlockName] Finish on $($session.ComputerName)"
-        return
-    }
-    if($ComputerName)
-    {
-        Write-Debug "Targetting remote computer $ComputerName"
-        Write-Verbose "[$BlockName] Begin on $ComputerName"
-        if($Credential)
-        {
-            Invoke-Command -ComputerName $ComputerName -Credential $Credential -ScriptBlock $ScriptBlock -ArgumentList $ArgumentList
+        'Session' {
+            Write-Debug "Targetting remote session $($session.ComputerName)"
+            Write-Verbose "[$BlockName] Begin on $($session.ComputerName)"
+            Invoke-Command -Session $Session -ScriptBlock $ScriptBlock -ArgumentList $ArgumentList
+            Write-Host "[$BlockName] Finish on $($session.ComputerName)"        
         }
-        else
-        {
-            Invoke-Command -ComputerName $ComputerName -ScriptBlock $ScriptBlock -ArgumentList $ArgumentList
+        'Computer' {
+            Write-Debug "Targetting remote computer $ComputerName"
+            Write-Verbose "[$BlockName] Begin on $ComputerName"
+            if($Credential)
+            {
+                Invoke-Command -ComputerName $ComputerName -Credential $Credential -ScriptBlock $ScriptBlock -ArgumentList $ArgumentList
+            }
+            else
+            {
+                Invoke-Command -ComputerName $ComputerName -ScriptBlock $ScriptBlock -ArgumentList $ArgumentList
+            }
+            Write-Host "[$BlockName] Finish on $ComputerName"
         }
-        Write-Host "[$BlockName] Finish on $ComputerName"
-        return
+        'Local' {
+            Write-Debug "Targetting local"
+            Write-Verbose "[$BlockName] Begin local"
+            Invoke-Command -ScriptBlock $ScriptBlock -ArgumentList $ArgumentList
+            Write-Host "[$BlockName] Finish local"
+        }
     }
-    Write-Debug "Targetting local"
-    Write-Verbose "[$BlockName] Begin local"
-    Invoke-Command -ScriptBlock $ScriptBlock -ArgumentList $ArgumentList
-    Write-Host "[$BlockName] Finish local"
+    Write-Progress @cmdLetProgress -Completed
 }

@@ -24,12 +24,16 @@ param (
 $cmdletsPaths="$PSScriptRoot\..\..\Cmdlets"
 
 . "$cmdletsPaths\Helpers\Write-Separator.ps1"
+. "$cmdletsPaths\Helpers\Get-ProgressHash.ps1"
 Write-Separator -Invocation $MyInvocation -Header
+$scriptProgress=Get-ProgressHash -Invocation $MyInvocation
 
 . "$cmdletsPaths\Helpers\Invoke-CommandWrap.ps1"
 
 Write-Verbose "Restarting $Computer"
-Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock {Restart-Computer -Force} -BlockName "Restarting" -ErrorAction SilentlyContinue
+$blockName="Restarting $Computer"
+Write-Progress @scriptProgress -Status $blockName
+Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock {Restart-Computer -Force} -BlockName $blockName -ErrorAction SilentlyContinue
 
 Write-Host "Initiated $Computer restart"
 
@@ -40,8 +44,11 @@ $testBlock = {
     
 do {
     $sleepSeconds=5
-    Write-Debug "Sleeping for $sleepSeconds seconds"
-    Start-Sleep -Seconds $sleepSeconds
+    for($i=0;$i -lt $sleepSeconds;$i++)
+    {
+        Write-Progress @scriptProgress -SecondsRemaining ($sleepSeconds-$i) -Status "Waiting before next attempt to connect with $Computer"
+        Start-Sleep -Seconds 1
+    }
     
     Write-Verbose "Testing $Computer"
 
@@ -63,6 +70,7 @@ do {
     try
     {
         Write-Debug "Invoking powershell remote for $Computer"
+        Write-Progress @scriptProgress -Status "Attempting PowerShell remoting to $Computer"
         Invoke-Command -ComputerName $Computer -Credential $Credential -ScriptBlock $testBlock -ErrorVariable $errorVariable -ErrorAction Stop
     }
     catch
@@ -74,4 +82,5 @@ do {
 }while(-not $areAlive)
 
 Write-Host "$Computer is back online"
+Write-Progress @scriptProgress -Completed
 Write-Separator -Invocation $MyInvocation -Footer

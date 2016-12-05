@@ -28,6 +28,8 @@ $scriptsPaths="$ishBootStrapRootPath\Source\Scripts"
 
 . $ishBootStrapRootPath\Examples\ISHDeploy\Cmdlets\Write-Separator.ps1
 Write-Separator -Invocation $MyInvocation -Header -Name "Configure"
+. "$cmdletsPaths\Helpers\Get-ProgressHash.ps1"
+$scriptProgress=Get-ProgressHash -Invocation $MyInvocation
 
 if(-not $Computer)
 {
@@ -50,12 +52,18 @@ $setWindowsBlock= {
 
 try
 {
-    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $installIISWinAuthBlock -BlockName "Install IIS Windows Authentication"
-    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $setWindowsBlock -BlockName "Windows Authentication $DeploymentName" -UseParameters @("DeploymentName")
+    $blockName="Installing IIS Windows Authentication"
+    Write-Progress @scriptProgress -Status $blockName
+    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $installIISWinAuthBlock -BlockName $blockName
+
+    $blockName="Enabling Windows Authentication $DeploymentName"
+    Write-Progress @scriptProgress -Status $blockName
+    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $setWindowsBlock -BlockName $blockName -UseParameters @("DeploymentName")
 }
 finally
 {
 
 }
 
+Write-Progress @scriptProgress -Completed
 Write-Separator -Invocation $MyInvocation -Footer -Name "Configure"

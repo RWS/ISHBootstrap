@@ -7,6 +7,7 @@
 - Support for upcoming internal releases of ISH.12.0.* in `Copy-ISHCD.NotReleased.ps1`.
 - Updated scripts to match source's removal of **xISHInstall** module.  
 - When executing script `Initialize-ISHServer.ps1` locally, all **xISHServer.\*** loaded instances are removed and the correct **xISHServer.Y** is automatically imported.
+- Enhanced progress indicators in scripts.
 
 ## pre-release v0.3
 

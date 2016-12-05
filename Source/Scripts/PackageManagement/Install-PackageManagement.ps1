@@ -26,7 +26,9 @@ param (
 $cmdletsPaths="$PSScriptRoot\..\..\Cmdlets"
 
 . "$cmdletsPaths\Helpers\Write-Separator.ps1"
+. "$cmdletsPaths\Helpers\Get-ProgressHash.ps1"
 Write-Separator -Invocation $MyInvocation -Header
+$scriptProgress=Get-ProgressHash -Invocation $MyInvocation
 
 . "$cmdletsPaths\Helpers\Invoke-CommandWrap.ps1"
 
@@ -67,11 +69,13 @@ $packageManagementScriptBlock={
 #Install the packages
 try
 {
-    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $packageManagementScriptBlock -BlockName "PackageManagement" -UseParameters @("ReInstall")
+    $blockName="Installing Package Management"
+    Write-Progress @scriptProgress -Status $blockName
+    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $packageManagementScriptBlock -BlockName $blockName -UseParameters @("ReInstall")
 }
 catch
 {
     Write-Error $_
 }
-
+Write-Progress @scriptProgress -Completed
 Write-Separator -Invocation $MyInvocation -Footer

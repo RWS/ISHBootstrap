@@ -31,6 +31,8 @@ $scriptsPaths="$ishBootStrapRootPath\Source\Scripts"
 . $ishBootStrapRootPath\Examples\Cmdlets\Get-ISHBootstrapperContextValue.ps1
 . $ishBootStrapRootPath\Examples\ISHDeploy\Cmdlets\Write-Separator.ps1
 Write-Separator -Invocation $MyInvocation -Header -Name "Configure"
+. "$cmdletsPaths\Helpers\Get-ProgressHash.ps1"
+$scriptProgress=Get-ProgressHash -Invocation $MyInvocation
 
 if(-not $Computer)
 {
@@ -60,7 +62,9 @@ $integrationBlock= {
 
 try
 {
-    $uncPath=Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $integrationBlock -BlockName "Acquire $DeploymentName integration for ADFS" -UseParameters @("DeploymentName","adfsIntegrationISHFilename")
+    $blockName="Acquiring $DeploymentName integration for ADFS"
+    Write-Progress @scriptProgress -Status $blockName
+    $uncPath=Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $integrationBlock -BlockName $blockName -UseParameters @("DeploymentName","adfsIntegrationISHFilename")
 
     $sourceUncZipPath=Join-Path $uncPath $adfsIntegrationISHFilename
     $tempZipPath=Join-Path $env:TEMP $adfsIntegrationISHFilename
@@ -90,6 +94,7 @@ try
     $scriptADFSIntegrationISHPath=Join-Path $expandPath "Invoke-ADFSIntegrationISH.ps1"
 
     Write-Verbose "Configurating rellying parties on $adfsComputerName"
+    Write-Progress @scriptProgress -Status "Configuring $DeploymentName integration on ADFS"
     & $scriptADFSIntegrationISHPath -Computer $adfsComputerName -Action Set -Verbose
     Write-Host "Configured rellying parties on $adfsComputerName"
 
@@ -98,3 +103,6 @@ finally
 {
 
 }
+
+Write-Progress @scriptProgress -Completed
+Write-Separator -Invocation $MyInvocation -Footer -Name "Configure"
