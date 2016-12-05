@@ -18,59 +18,66 @@ if ($PSBoundParameters['Debug']) {
     $DebugPreference = 'Continue'
 }
 
-$sourcePath=Resolve-Path "$PSScriptRoot\..\Source"
-$cmdletsPaths="$sourcePath\Cmdlets"
-$scriptsPaths="$sourcePath\Scripts"
+try
+{
+    $sourcePath=Resolve-Path "$PSScriptRoot\..\Source"
+    $cmdletsPaths="$sourcePath\Cmdlets"
+    $scriptsPaths="$sourcePath\Scripts"
 
-. "$PSScriptRoot\Cmdlets\Get-ISHBootstrapperContextValue.ps1"
-$computerName=Get-ISHBootstrapperContextValue -ValuePath "ComputerName" -DefaultValue $null
+    . "$PSScriptRoot\Cmdlets\Get-ISHBootstrapperContextValue.ps1"
+    $computerName=Get-ISHBootstrapperContextValue -ValuePath "ComputerName" -DefaultValue $null
 
-if(-not $computerName)
-{
-    & "$scriptsPaths\Helpers\Test-Administrator.ps1"
-}
-
-$webCertificate=Get-ISHBootstrapperContextValue -ValuePath "WebCertificate"
-$parameters=@(
-    "-CertificateAuthority `"$($webCertificate.Authority)`""
-)
-if($webCertificate.OrganizationalUnit)
-{
-    $parameters+="-OrganizationalUnit `"$($webCertificate.OrganizationalUnit)`""
-}
-if($webCertificate.Organization)
-{
-    $parameters+="-Organization `"$($webCertificate.Organization)`""
-}
-if($webCertificate.Locality)
-{
-    $parameters+="-Locality `"$($webCertificate.Locality)`""
-}
-if($webCertificate.State)
-{
-    $parameters+="-State `"$($webCertificate.State)`""
-}
-if($webCertificate.Country)
-{
-    $parameters+="-Country `"$($webCertificate.Country)`""
-}
-$scriptLine="Initialize-Remote.ps1 "+ ($parameters -join ' ')
-
-
-
-if($computerName)
-{
-    $targetPath="\\$computerName\C$\Users\$env:USERNAME\Documents\WindowsPowerShell\"
-    if(-not (Test-Path $targetPath))
+    if(-not $computerName)
     {
-        New-Item $targetPath -ItemType Directory | Out-Null
+        Write-Error "This script works only against a remote server"
     }
-    Copy-Item -Path "$scriptsPaths\Remote\Initialize-Remote.ps1" -Destination $targetPath -Force
-    
-    Write-Host "Login to $Computer and execute locally C:\Users\$env:USERNAME\Documents\WindowsPowerShell\$scriptLine"
+    & "$scriptsPaths\Helpers\Test-Administrator.ps1"
+
+    & $scriptsPaths\WinRM\Install-WinRMPrerequisites.ps1 -Computer $computerName -Credential $credential
+
+    $winRmCertificate=Get-ISHBootstrapperContextValue -ValuePath "WinRMCertificate"
+    $hash=@{
+        CertificateAuthority=$winRmCertificate.Authority
+    }
+    if($winRmCertificate.OrganizationalUnit)
+    {
+        $hash.OrganizationalUnit=$winRmCertificate.OrganizationalUnit
+    }
+    if($winRmCertificate.Organization)
+    {
+        $hash.Organization=$winRmCertificate.Organization
+    }
+    if($winRmCertificate.Locality)
+    {
+        $hash.Locality=$winRmCertificate.Locality
+    }
+    if($winRmCertificate.State)
+    {
+        $hash.State=$winRmCertificate.State
+    }
+    if($winRmCertificate.Country)
+    {
+        $hash.Country=$winRmCertificate.Country
+    }
+    if($winRmCertificate.MoveChain)
+    {
+        $hash.MoveChain=$winRmCertificate.MoveChain
+    }
+    if($winRmCertificate.PfxPassword)
+    {
+        $hash.PfxPassword=ConvertTo-SecureString $WinRMCertificate.PfxPassword -AsPlainText -Force
+    }
+    elseif($winRmCertificate.PfxPasswordExpression)
+    {
+        $hash.PfxPassword=Invoke-Expression $WinRMCertificate.PfxPasswordExpression
+    }
+    else
+    {
+        throw "PfxPassword or PfxPasswordExpression must be defined within WinRMCertificate"
+    }
+
+    & $scriptsPaths\WinRM\Enable-WSManCredSSP.ps1 -Computer $computerName -Credential $credential @hash
 }
-else
+finally
 {
-    Write-Host "Executing $scriptsPaths\Remote\$scriptLine"
-    & "$scriptsPaths\Remote\$scriptLine"
 }
