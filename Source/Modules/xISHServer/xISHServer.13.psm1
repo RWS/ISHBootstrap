@@ -44,7 +44,6 @@
 #endregion
 
 #region Install
-. $PSScriptRoot\Install-ISHToolMSXML4.ps1
 . $PSScriptRoot\Install-ISHToolDotNET.ISH13.ps1
 . $PSScriptRoot\Install-ISHToolVisualCPP.ISH13.ps1
 . $PSScriptRoot\Install-ISHToolJAVA.ps1
