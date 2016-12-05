@@ -45,7 +45,7 @@ if(-not $computerName)
 }
 
 $installOracle=Get-ISHBootstrapperContextValue -ValuePath "InstallOracle" -DefaultValue $false
-
+$installMSXML=(($ishVersion -eq "12.0.0") -or ($ishVersion -eq "12.0.1"))
 $isSupported=& $scriptsPaths\xISHServer\Test-SupportedServer.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion
 if(-not $isSupported)
 {
@@ -80,7 +80,7 @@ if($ftp)
     & $scriptsPaths\xISHServer\Get-ISHServerPrerequisites.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -FTPHost $ftpHost -FTPCredential $ftpCredential -FTPFolder $ftpISHServerFolder
 }
 
-& $scriptsPaths\xISHServer\Install-ISHServerPrerequisites.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -InstallOracle:$installOracle
+& $scriptsPaths\xISHServer\Install-ISHServerPrerequisites.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -InstallOracle:$installOracle -InstallMSXML4:$installMSXML
 
 if($computerName)
 {
