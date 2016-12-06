@@ -8,6 +8,7 @@
 - Updated scripts to match source's removal of **xISHInstall** module.  
 - When executing script `Initialize-ISHServer.ps1` locally, all **xISHServer.\*** loaded instances are removed and the correct **xISHServer.Y** is automatically imported.
 - Enhanced progress indicators in scripts.
+- Changes in the JSON structure regarding WinRM secure.
 
 ## pre-release v0.3
 

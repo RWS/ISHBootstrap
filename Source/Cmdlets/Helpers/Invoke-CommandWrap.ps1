@@ -181,33 +181,33 @@ Function Invoke-CommandWrap {
     }
 
     Write-Progress @cmdLetProgress -Status $BlockName
-    switch ($PSCmdlet.ParameterSetName)
+    if($Session)
     {
-        'Session' {
-            Write-Debug "Targetting remote session $($session.ComputerName)"
-            Write-Verbose "[$BlockName] Begin on $($session.ComputerName)"
-            Invoke-Command -Session $Session -ScriptBlock $ScriptBlock -ArgumentList $ArgumentList
-            Write-Host "[$BlockName] Finish on $($session.ComputerName)"        
+        Write-Debug "Targetting remote session $($session.ComputerName)"
+        Write-Verbose "[$BlockName] Begin on $($session.ComputerName)"
+        Invoke-Command -Session $Session -ScriptBlock $ScriptBlock -ArgumentList $ArgumentList
+        Write-Host "[$BlockName] Finish on $($session.ComputerName)"        
+    }
+    elseif($ComputerName)
+    {
+        Write-Debug "Targetting remote computer $ComputerName"
+        Write-Verbose "[$BlockName] Begin on $ComputerName"
+        if($Credential)
+        {
+            Invoke-Command -ComputerName $ComputerName -Credential $Credential -ScriptBlock $ScriptBlock -ArgumentList $ArgumentList
         }
-        'Computer' {
-            Write-Debug "Targetting remote computer $ComputerName"
-            Write-Verbose "[$BlockName] Begin on $ComputerName"
-            if($Credential)
-            {
-                Invoke-Command -ComputerName $ComputerName -Credential $Credential -ScriptBlock $ScriptBlock -ArgumentList $ArgumentList
-            }
-            else
-            {
-                Invoke-Command -ComputerName $ComputerName -ScriptBlock $ScriptBlock -ArgumentList $ArgumentList
-            }
-            Write-Host "[$BlockName] Finish on $ComputerName"
+        else
+        {
+            Invoke-Command -ComputerName $ComputerName -ScriptBlock $ScriptBlock -ArgumentList $ArgumentList
         }
-        'Local' {
-            Write-Debug "Targetting local"
-            Write-Verbose "[$BlockName] Begin local"
-            Invoke-Command -ScriptBlock $ScriptBlock -ArgumentList $ArgumentList
-            Write-Host "[$BlockName] Finish local"
-        }
+        Write-Host "[$BlockName] Finish on $ComputerName"
+    }
+    else
+    {
+        Write-Debug "Targetting local"
+        Write-Verbose "[$BlockName] Begin local"
+        Invoke-Command -ScriptBlock $ScriptBlock -ArgumentList $ArgumentList
+        Write-Host "[$BlockName] Finish local"
     }
     Write-Progress @cmdLetProgress -Completed
 }

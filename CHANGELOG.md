@@ -6,9 +6,16 @@
   - SDLDevTools module helps power `Test-OpenSourceHeaders.Tests.ps1` to safe guard SDL's open source policy.
 - Dropped module **xISHInstall** and ported the code into **Install** scripts.    
 - As the MSXML4 is not required for ISH
-    - Removed `Install-ISHToolMSXML4` from **xISHServer.13**.
-    - Script `Install-ISHServerPrerequisites.ps1` will invoke `Install-ISHToolMSXML4` only for version 12 and when parameter `-InstallMSXML` is specified. 
+  - Removed `Install-ISHToolMSXML4` from **xISHServer.13**.
+  - Script `Install-ISHServerPrerequisites.ps1` will invoke `Install-ISHToolMSXML4` only for version 12 and when parameter `-InstallMSXML` is specified. 
 - Enhanced progress indicators in scripts.
+- Refactored the WinRM secure initialization pipeline. No manual step is required on the remote server.
+  - `Install-WinRMPrerequisites.ps1` 
+  - `Enable-WSManCredSSP.ps1`
+- New script `Install-certificate.ps1` installs a certificate.
+- Renamed the `Invoke-Restart.ps1` to `Restart-Server.ps1`.
+- New script `Test-Server.ps1` to check if a server is alive and can accept PowerShell remoting.
+- Bug fixes.
 
 ## pre-release v0.3
 

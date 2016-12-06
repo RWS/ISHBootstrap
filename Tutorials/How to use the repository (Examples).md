@@ -105,7 +105,6 @@ An obfuscated file for remote execution looks like this
 {
   "ISHVersion": "12.0.1",
   "ComputerName": "Server",
-  "DOMAIN": "Domain",
   "CredentialExpression": "New-Credential -Message \"Remote Administrator\"",
   "ISHDeployRepository": "PSGallery",
   "xISHServerRepository": "mymachine",
@@ -181,16 +180,39 @@ This step uses the `xISHServerRepository`,`` and `ISHDeployRepository` to instal
 
 Note that when executing the scripts locally, the script will load **xISHServer** from their respected paths.
 
-## Enable the CredSSP authentication for PSSession
+## Enable the CredSSP authentication for PSSession 
 
 ```powershell
-& .\Examples\Initialize-ServerForRemote.ps1
+& .\Examples\Initialize-WinRM.ps1
 ```
 
 The required certificate for the Secure WinRM is issued by the domain certificate authority, effectively making it a double hop. More about the issue [PowerShell Remoting Caveats](https://sarafian.github.io/post/powershell/powershell-remoting-caveats/). 
-To configure the system at this moment we need to Remote Desktop and execute locally. I understand that there are alternatives but I'm not a hard core ops engineer and my knowledge about the Windows operating system stops beyond this point.
+For this script to work we need an extra fragment in the JSON
 
-The most promissing alternative is [PowerShell Remoting Kerberos Double Hop Solved Securely](https://blogs.technet.microsoft.com/ashleymcglone/2016/08/30/powershell-remoting-kerberos-double-hop-solved-securely/) that allows central configuration from the domain controller.
+```json
+  "DOMAIN": "GLOBAL",
+  "WinRMCredSSP": {
+	"Certificate": {
+		"Authority": "Authority",
+		"OrganizationalUnit": "OrganizationalUnit",
+		"Organization": "Organization",
+		"State": "State"
+	},
+	"MoveChain": false,
+	"PfxPassword": "sdl"
+  }
+```
+
+Make sure that this section is not the same as with the `WebCertificate` in the JSON. 
+When two certificates with the exact same subject name exist, then **Content Manager** will not work. 
+During the execution:
+
+1. WinRM secure prerequisites are installed.
+1. A certificate is issued locally from the local domain certificate authority.
+1. The certificate is copied to the remote server.
+1. The certificate is used to setup the WinRM secure.
+
+If you can benefit from the alternative described in [PowerShell Remoting Kerberos Double Hop Solved Securely](https://blogs.technet.microsoft.com/ashleymcglone/2016/08/30/powershell-remoting-kerberos-double-hop-solved-securely/) then this step is not necessary at all.
 
 **Important to notice** is that this steps creates a web server certificate that is used later on the HTTPS binding on IIS. If you skip this step then the certificate must be issued.
 

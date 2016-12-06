@@ -41,7 +41,7 @@ try
 
     $ishServerModuleName="xISHServer.$ishServerVersion"
 
-    $ishDeployRepository=Get-ISHBootstrapperContextValue -ValuePath "ISHDeployRepository"
+    $ishDeployRepository=Get-ISHBootstrapperContextValue -ValuePath "ISHDeployRepository" -DefaultValue PSGallery
     $ishDeployModuleName="ISHDeploy.$ishVersion"
 
     $scope=Get-ISHBootstrapperContextValue -ValuePath "InstallModuleScope" -DefaultValue "AllUsers"

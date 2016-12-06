@@ -18,7 +18,9 @@ param (
     [Parameter(Mandatory=$false)]
     [string]$Computer=$null,
     [Parameter(Mandatory=$false)]
-    [pscredential]$Credential=$null
+    [pscredential]$Credential=$null,
+    [Parameter(Mandatory=$false)]
+    [string]$Thumbprint=$null
 )
 $cmdletsPaths="$PSScriptRoot\..\..\Cmdlets"
 
@@ -32,34 +34,41 @@ $scriptProgress=Get-ProgressHash -Invocation $MyInvocation
 try
 {
     $block={
-        Import-Module WebAdministration -ErrorAction Stop
-
-        Write-Verbose "Checing if IIS has https binding"
-        $webBinding=Get-WebBinding 'Default Web Site' -Protocol "https"
-        if(-not $webBinding)
+        if(-not $Thumbprint)
         {
-            Write-Verbose "Creating IIS https binding"
-            New-WebBinding -Name "Default Web Site" -IP "*" -Port 443 -Protocol https|Out-Null
-            Write-Verbose "Created IIS https binding"
             $hostname=[System.Net.Dns]::GetHostEntry([string]$env:computername).HostName
             Write-Debug "hostname=$hostname"
             $certificate=Get-ChildItem "Cert:\LocalMachine\My" |Where-Object {$_.Subject -match $hostname -and (Get-CertificateTemplate $_) -eq "WebServer"}
             Write-Verbose "Using certificate with friendly name $($certificate.Subject)"
-            $sslThumbprint=$certificate.Thumbprint
-            Write-Verbose "Assigning certificate with $sslThumbprint to SSL"
-            Push-Location "IIS:\SslBindings" -StackName "IIS"
-            get-item cert:\LocalMachine\MY\$sslThumbprint | New-Item 0.0.0.0!443 |Out-Null
-            Pop-Location -StackName "IIS"
-            Write-Host "Assigned certificate with $sslThumbprint to SSL"
+            $Thumbprint=$certificate.Thumbprint
         }
-        else
+
+        Import-Module WebAdministration -ErrorAction Stop
+
+        Write-Debug "Querying if IIS has https binding"
+        $webBinding=Get-WebBinding 'Default Web Site' -Protocol "https"
+        if(-not $webBinding)
         {
-            Write-Warning "IIS has already an https binding"
+            Write-Debug "Creating IIS https binding"
+            New-WebBinding -Name "Default Web Site" -IP "*" -Port 443 -Protocol https|Out-Null
+            Write-Verbose "Created IIS https binding"
         }
+
+        Write-Verbose "Assigning certificate with $Thumbprint to SSL"
+        Push-Location "IIS:\SslBindings" -StackName "IIS"
+        $thumbprintItem=Get-Item cert:\LocalMachine\MY\$Thumbprint
+        if(Test-Path 0.0.0.0!443)
+        {
+            Remove-Item 0.0.0.0!443 -Force
+            Write-Verbose "Removed 0.0.0.0!443"
+        }
+        $thumbprintItem | New-Item 0.0.0.0!443 |Out-Null
+        Pop-Location -StackName "IIS"
+        Write-Host "Assigned certificate with $Thumbprint to SSL"
     }
     $blockName="Initialize IIS Binding"
     Write-Progress @scriptProgress -Status $blockName
-    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -BlockName $blockName -ScriptBlock $block
+    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -BlockName $blockName -ScriptBlock $block -UseParameters @("Thumbprint")
 }
 
 finally
