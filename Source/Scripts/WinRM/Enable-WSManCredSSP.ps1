@@ -14,31 +14,13 @@
 # limitations under the License.
 #>
 
-#requires -runasadministrator
-#requires -module CertificatePS
-
 param (
     [Parameter(Mandatory=$true)]
     [string]$Computer,
     [Parameter(Mandatory=$false)]
     [pscredential]$Credential=$null,
     [Parameter(Mandatory=$true)]
-    [ValidateNotNullOrEmpty()]
-    [string]$CertificateAuthority,
-    [Parameter(Mandatory=$false)]
-    [string]$OrganizationalUnit=$null,
-    [Parameter(Mandatory=$false)]
-    [string]$Organization=$null,
-    [Parameter(Mandatory=$false)]
-    [string]$Locality=$null,
-    [Parameter(Mandatory=$false)]
-    [string]$State=$null,
-    [Parameter(Mandatory=$false)]
-    [string]$Country=$null,
-    [Parameter(Mandatory=$true)]
-    [securestring]$PfxPassword,
-    [Parameter(Mandatory=$false)]
-    [switch]$MoveChain=$false
+    [string]$Thumbprint
 )    
 
 $cmdletsPaths="$PSScriptRoot\..\..\Cmdlets"
@@ -63,9 +45,10 @@ $configureWinRMBlock={
     Write-Debug "httpsLine=$httpsLine"
     if(-not $httpsLine)
     {
-        $certificate=Get-ChildItem -Path Cert:\LocalMachine\My |Where-Object -Property Thumbprint -EQ $thumbprint
+        $certificate=Get-ChildItem -Path Cert:\LocalMachine\My |Where-Object -Property Thumbprint -EQ $Thumbprint
+        $hostname=(($certificate.Subject -split ', ')[0] -split '=')[1]
         Write-Debug "Adding winrm https listener"
-        & winrm create winrm/config/Listener?Address=*+Transport=HTTPS  "@{Hostname=""$hostname"";CertificateThumbprint=""$($certificate.Thumbprint)""}"
+        & winrm create winrm/config/Listener?Address=*+Transport=HTTPS  "@{Hostname=""$hostname"";CertificateThumbprint=""$Thumbprint""}"
         Write-Verbose "Added winrm https listener"
         
         Write-Debug "Configuring ACL"
@@ -118,54 +101,26 @@ $openFireWallWinRMBlock= {
 
 try
 {
-    Write-Progress @scriptProgress -Status "Issuing certificate"
-    $hostname=[System.Net.Dns]::GetHostByName($computerName)| FL HostName | Out-String | %{ "{0}" -f $_.Split(':')[1].Trim() };
-    $newDomainSignedCertificateHash=@{
-        Hostname=$hostname
-        CertificateAuthority=$CertificateAuthority
-    }
-    if($OrganizationalUnit)
-    {
-        $newDomainSignedCertificateHash.OrganizationalUnit=$OrganizationalUnit
-    }
-    if($Organization)
-    {
-        $newDomainSignedCertificateHash.Organization=$Organization
-    }
-    if($Locality)
-    {
-        $newDomainSignedCertificateHash.Locality=$Locality
-    }
-    if($State)
-    {
-        $newDomainSignedCertificateHash.State=$State
-    }
-    if($Country)
-    {
-        $newDomainSignedCertificateHash.Country=$Country
-    }
-
-    $certificate=New-DomainSignedCertificate @newDomainSignedCertificateHash
-    Write-Host "Installed new certificate with friendly name $($certificate.FriendlyName)"
-    $thumbprint=$certificate.Thumbprint
-    Write-Progress @scriptProgress -Status "Moving certificate to $computerName"
-    $certificate|Move-CertificateToRemote -ComputerName $computerName -PfxPassword $PfxPassword -MoveChain:$MoveChain
-
     $blockName="Enabling WSManCredSSP role server"
     Write-Progress @scriptProgress -Status $blockName
     Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $enableWSManScriptBlock -BlockName $blockName
 
     $blockName="Configuring WINRM CredSSP authentication"
     Write-Progress @scriptProgress -Status $blockName
-    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $configureWinRMBlock -BlockName $blockName -UseParameters @("hostname","thumbprint")
-
-    $blockName="Restarting WINRM service"
-    Write-Progress @scriptProgress -Status $blockName
-    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $restartWinRMBlock -BlockName $blockName
+    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $configureWinRMBlock -BlockName $blockName -UseParameters @("Thumbprint")
 
     $blockName="Openning WINRM https listener ports"
     Write-Progress @scriptProgress -Status $blockName
     Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $openFireWallWinRMBlock -BlockName $blockName
+
+    $blockName="Restarting WINRM service"
+    Write-Progress @scriptProgress -Status $blockName
+    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $restartWinRMBlock -BlockName $blockName -ErrorAction SilentlyContinue
+
+    if($Computer)
+    {
+        $null=& $PSScriptRoot\..\Helpers\Test-Server -Computer $Computer -Credential $Credential
+    }
 }
 catch
 {

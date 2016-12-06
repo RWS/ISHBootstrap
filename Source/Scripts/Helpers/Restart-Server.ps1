@@ -15,12 +15,12 @@
 #>
 
 param (
-    [Parameter(Mandatory=$false)]
-    [string[]]$Computer,
+    [Parameter(Mandatory=$true)]
+    [string]$Computer,
     [Parameter(Mandatory=$false)]
     [pscredential]$Credential=$null
-)    
-
+) 
+    
 $cmdletsPaths="$PSScriptRoot\..\..\Cmdlets"
 
 . "$cmdletsPaths\Helpers\Write-Separator.ps1"
@@ -30,25 +30,14 @@ $scriptProgress=Get-ProgressHash -Invocation $MyInvocation
 
 . "$cmdletsPaths\Helpers\Invoke-CommandWrap.ps1"
 
-$installScriptBlock={
-    Write-Verbose "Installing WinRM-IIS-Ext"
-    # Add-WindowsFeature WinRM-IIS-Ext | Out-Null breaks on some servers
-    # Instead this seems to work
-    Get-WindowsFeature |Where-Object -Property Name -EQ "WinRM-IIS-Ext"|Add-WindowsFeature
-    Write-Host "WinRM-IIS-Ext feature is ok"
-}
+Write-Verbose "Restarting $Computer"
+$blockName="Restarting $Computer"
+Write-Progress @scriptProgress -Status $blockName
+#Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock {Restart-Computer -Force} -BlockName $blockName -ErrorAction SilentlyContinue
 
-#Install the packages
-try
-{
-    $blockName="Installing WinRM prequisites"
-    Write-Progress @scriptProgress -Status $blockName
-    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $installScriptBlock -BlockName $blockName
-}
-catch
-{
-    Write-Error $_
-}
+Write-Verbose "Initiated $Computer restart"
+
+& $PSScriptRoot\Test-Server.ps1 -Computer $Computer -Credential $Credential
 
 Write-Progress @scriptProgress -Completed
 Write-Separator -Invocation $MyInvocation -Footer

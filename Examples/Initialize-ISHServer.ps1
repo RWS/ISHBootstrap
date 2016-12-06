@@ -109,7 +109,55 @@ else
    & $scriptsPaths\xISHServer\Initialize-ISHServerOSUser.ps1 -ISHServerVersion $ishServerVersion -OSUser ($osUserCredential.UserName)
    Write-Warning "Cannot execute $scriptsPaths\xISHServer\Initialize-ISHServerOSUserRegion.ps1 locally."
 }
- & $scriptsPaths\IIS\New-IISSslBinding.ps1 -Computer $computerName -Credential $credential
+
+$webCertificate=Get-ISHBootstrapperContextValue -ValuePath "WebCertificate"
+$hash=@{
+    CertificateAuthority=$webCertificate.Authority
+}
+#TODO: Add logic for load ballanced environments
+if($computerName)
+{
+    $hash.Hostname=[System.Net.Dns]::GetHostByName($computerName)| FL HostName | Out-String | %{ "{0}" -f $_.Split(':')[1].Trim() }
+}
+else
+{
+    $hash.Hostname=[System.Net.Dns]::GetHostByName($env:COMPUTERNAME)| FL HostName | Out-String | %{ "{0}" -f $_.Split(':')[1].Trim() }
+}
+if($webCertificate.OrganizationalUnit)
+{
+    $hash.OrganizationalUnit=$webCertificate.OrganizationalUnit
+}
+if($webCertificate.Organization)
+{
+    $hash.Organization=$webCertificate.Organization
+}
+if($webCertificate.Locality)
+{
+    $hash.Locality=$webCertificate.Locality
+}
+if($webCertificate.State)
+{
+    $hash.State=$webCertificate.State
+}
+if($webCertificate.Country)
+{
+    $hash.Country=$webCertificate.Country
+}
+
+if($computerName)
+{
+    if(Get-ISHBootstrapperContextValue -ValuePath "Domain")
+    {
+        $fqdn=[System.Net.Dns]::GetHostByName($computerName)| FL HostName | Out-String | %{ "{0}" -f $_.Split(':')[1].Trim() };
+        $certificate=& $scriptsPaths\Certificates\Install-Certificate.ps1 -Computer $fqdn -Credential $credential -CredSSP @hash
+    }
+    else
+    {
+         $certificate=& $scriptsPaths\Certificates\Install-Certificate.ps1 @hash
+    }
+}
+
+& $scriptsPaths\IIS\Set-IISSslBinding.ps1 -Computer $computerName -Credential $credential -Thumbprint $certificate.Thumbprint
 
 if($unc)
 {
@@ -129,7 +177,7 @@ if($ftp)
 
 if($computerName)
 {
-    & $scriptsPaths\Helpers\Invoke-Restart.ps1 -Computer $computerName -Credential $credential
+    & $scriptsPaths\Helpers\Restart-Server.ps1 -Computer $computerName -Credential $credential
 }
 else
 {
