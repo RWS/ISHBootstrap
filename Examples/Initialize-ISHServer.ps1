@@ -111,53 +111,56 @@ else
 }
 
 $webCertificate=Get-ISHBootstrapperContextValue -ValuePath "WebCertificate"
-$hash=@{
-    CertificateAuthority=$webCertificate.Authority
-}
-#TODO: Add logic for load ballanced environments
-if($computerName)
+if($webCertificate)
 {
-    $hash.Hostname=[System.Net.Dns]::GetHostByName($computerName)| FL HostName | Out-String | %{ "{0}" -f $_.Split(':')[1].Trim() }
-}
-else
-{
-    $hash.Hostname=[System.Net.Dns]::GetHostByName($env:COMPUTERNAME)| FL HostName | Out-String | %{ "{0}" -f $_.Split(':')[1].Trim() }
-}
-if($webCertificate.OrganizationalUnit)
-{
-    $hash.OrganizationalUnit=$webCertificate.OrganizationalUnit
-}
-if($webCertificate.Organization)
-{
-    $hash.Organization=$webCertificate.Organization
-}
-if($webCertificate.Locality)
-{
-    $hash.Locality=$webCertificate.Locality
-}
-if($webCertificate.State)
-{
-    $hash.State=$webCertificate.State
-}
-if($webCertificate.Country)
-{
-    $hash.Country=$webCertificate.Country
-}
-
-if($computerName)
-{
-    if(Get-ISHBootstrapperContextValue -ValuePath "Domain")
+    $hash=@{
+        CertificateAuthority=$webCertificate.Authority
+    }
+    #TODO: Add logic for load ballanced environments
+    if($computerName)
     {
-        $fqdn=[System.Net.Dns]::GetHostByName($computerName)| FL HostName | Out-String | %{ "{0}" -f $_.Split(':')[1].Trim() };
-        $certificate=& $scriptsPaths\Certificates\Install-Certificate.ps1 -Computer $fqdn -Credential $credential -CredSSP @hash
+        $hash.Hostname=[System.Net.Dns]::GetHostByName($computerName)| FL HostName | Out-String | %{ "{0}" -f $_.Split(':')[1].Trim() }
     }
     else
     {
-         $certificate=& $scriptsPaths\Certificates\Install-Certificate.ps1 @hash
+        $hash.Hostname=[System.Net.Dns]::GetHostByName($env:COMPUTERNAME)| FL HostName | Out-String | %{ "{0}" -f $_.Split(':')[1].Trim() }
     }
-}
+    if($webCertificate.OrganizationalUnit)
+    {
+        $hash.OrganizationalUnit=$webCertificate.OrganizationalUnit
+    }
+    if($webCertificate.Organization)
+    {
+        $hash.Organization=$webCertificate.Organization
+    }
+    if($webCertificate.Locality)
+    {
+        $hash.Locality=$webCertificate.Locality
+    }
+    if($webCertificate.State)
+    {
+        $hash.State=$webCertificate.State
+    }
+    if($webCertificate.Country)
+    {
+        $hash.Country=$webCertificate.Country
+    }
 
-& $scriptsPaths\IIS\Set-IISSslBinding.ps1 -Computer $computerName -Credential $credential -Thumbprint $certificate.Thumbprint
+    if($computerName)
+    {
+        if(Get-ISHBootstrapperContextValue -ValuePath "Domain")
+        {
+            $fqdn=[System.Net.Dns]::GetHostByName($computerName)| FL HostName | Out-String | %{ "{0}" -f $_.Split(':')[1].Trim() };
+            $certificate=& $scriptsPaths\Certificates\Install-Certificate.ps1 -Computer $fqdn -Credential $credential -CredSSP @hash
+        }
+        else
+        {
+             $certificate=& $scriptsPaths\Certificates\Install-Certificate.ps1 @hash
+        }
+    }
+
+    & $scriptsPaths\IIS\Set-IISSslBinding.ps1 -Computer $computerName -Credential $credential -Thumbprint $certificate.Thumbprint
+}
 
 if($unc)
 {

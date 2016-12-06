@@ -37,7 +37,7 @@ Write-Progress @scriptProgress -Status $blockName
 
 Write-Verbose "Initiated $Computer restart"
 
-& $PSScriptRoot\Test-Server.ps1 -Computer $Computer -Credential $Credential
+$null=& $PSScriptRoot\Test-Server.ps1 -Computer $Computer -Credential $Credential
 
 Write-Progress @scriptProgress -Completed
 Write-Separator -Invocation $MyInvocation -Footer
