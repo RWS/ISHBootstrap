@@ -161,6 +161,10 @@ if($webCertificate)
 
     & $scriptsPaths\IIS\Set-IISSslBinding.ps1 -Computer $computerName -Credential $credential -Thumbprint $certificate.Thumbprint
 }
+else
+{
+    & $scriptsPaths\IIS\Set-IISSslBinding.ps1 -Computer $computerName -Credential $credential
+}
 
 if($unc)
 {
