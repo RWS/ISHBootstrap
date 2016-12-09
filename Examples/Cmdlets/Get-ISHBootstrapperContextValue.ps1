@@ -32,11 +32,11 @@ Function Get-ISHBootstrapperContextValue
     $value = Invoke-Expression "`$data.$ValuePath";
     if ($value -eq $null)
     {
-        if($PSCommandPath.ContainsKey('DefaultValue'))
+        if($MyInvocation.BoundParameters.ContainsKey('DefaultValue'))
         {
             $value=$DefaultValue
         }
-        elseif($PSCommandPath.ContainsKey('Invoke'))
+        elseif($MyInvocation.BoundParameters.ContainsKey('Invoke'))
         {
         }
         else
