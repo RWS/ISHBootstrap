@@ -18,11 +18,22 @@ function Grant-ISHUserLogOnAsService{
 param(
     [string[]] $User
     )
-    
-
+    $tempExportInfPath=Join-Path $env:TEMP tempexport.inf
+    $tempSECEditPath=Join-Path $env:TEMP secedit.sdb
+    $tempExportInfPath=Join-Path $env:TEMP tempexport.inf
+    if(Test-Path $tempExportInfPath)
+    {
+        Write-Warning "Removing $tempExportInfPath"
+        Remove-Item -Path $tempExportInfPath -Force
+    } 
+    if(Test-Path $tempSECEditPath)
+    {
+        Write-Warning "Removing $tempSECEditPath"
+        Remove-Item -Path $tempSECEditPath -Force
+    } 
     #Get list of currently used SIDs 
-    secedit /export /cfg tempexport.inf 
-    $curSIDs = Select-String .\tempexport.inf -Pattern "SeServiceLogonRight" 
+    & secedit /export /cfg $tempExportInfPath 
+    $curSIDs = Select-String $tempExportInfPath -Pattern "SeServiceLogonRight" 
     $Sids = $curSIDs.line 
     $sidstring = ""
     foreach($user in $User){
@@ -35,13 +46,13 @@ param(
     if($sidstring){
         $newSids = $sids + $sidstring
         Write-Host "New Sids: $newSids"
-        $tempinf = Get-Content tempexport.inf
+        $tempinf = Get-Content $tempExportInfPath
         $tempinf = $tempinf.Replace($Sids,$newSids)
-        Add-Content -Path tempimport.inf -Value $tempinf
-        secedit /import /db secedit.sdb /cfg ".\tempimport.inf" 
-        secedit /configure /db secedit.sdb 
+        Add-Content -Path $tempExportInfPath -Value $tempinf
+        & secedit /import /db secedit.sdb /cfg $tempExportInfPath 
+        & secedit /configure /db secedit.sdb 
  
-        gpupdate /force 
+        & gpupdate /force 
     }
     else{
         Write-Host "No new sids"
@@ -49,8 +60,7 @@ param(
 
     
  
-    Remove-Item ".\tempimport.inf" -force -ErrorAction SilentlyContinue
-    Remove-Item ".\secedit.sdb" -force -ErrorAction SilentlyContinue
-    Remove-Item ".\tempexport.inf" -force
+    Remove-Item $tempSECEditPath -force -ErrorAction SilentlyContinue
+    Remove-Item $tempExportInfPath -force -ErrorAction SilentlyContinue
 
 }
