@@ -30,6 +30,10 @@ You will get this error
 To enable the feature either follow the steps described in the error or execute this
 
 ```powershell
+$service=Get-Service -Name WinRm
+$service.StartType="Automatic"
+$service|Set-Service 
+Start-Service  -Name WinRm
 Enable-WSManCredSSP -Role client -DelegateComputer *.domain.com
 ```
 

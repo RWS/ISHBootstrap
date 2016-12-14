@@ -1,4 +1,20 @@
 <#
+# Copyright (c) 2014 All Rights Reserved by the SDL Group.
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#>
+
+<#
     .SYNOPSIS
         Wraps the Invoke-Command to seamlessy execute script blocks remote or local
     .DESCRIPTION
@@ -115,12 +131,16 @@ Function Invoke-CommandWrap {
         [Parameter(Mandatory=$false,ParameterSetName="Session")]
         [string[]]$UseParameters=$null
     ) 
-
-    if($Session -and $ComputerName)
+    
+    . $PSScriptRoot\Get-ProgressHash.ps1
+    $activity="Invoke script block"
+    switch ($PSCmdlet.ParameterSetName)
     {
-        throw "Cannot process both ComputerName and Session"
+        'Local' {$cmdLetProgress=Get-ProgressHash -Activity $activity}
+        'Computer' {$cmdLetProgress=Get-ProgressHash -Activity $activity -ComputerName $ComputerName}
+        'Session' {$cmdLetProgress=Get-ProgressHash -Activity $activity -Session $Session}
     }
-
+    
     if($Session -or $ComputerName)
     {
         $scriptSegments=@()
@@ -160,16 +180,15 @@ Function Invoke-CommandWrap {
         $ScriptBlock=$enhancedScriptBlock
     }
 
-
+    Write-Progress @cmdLetProgress -Status $BlockName
     if($Session)
     {
         Write-Debug "Targetting remote session $($session.ComputerName)"
         Write-Verbose "[$BlockName] Begin on $($session.ComputerName)"
         Invoke-Command -Session $Session -ScriptBlock $ScriptBlock -ArgumentList $ArgumentList
-        Write-Host "[$BlockName] Finish on $($session.ComputerName)"
-        return
+        Write-Host "[$BlockName] Finish on $($session.ComputerName)"        
     }
-    if($ComputerName)
+    elseif($ComputerName)
     {
         Write-Debug "Targetting remote computer $ComputerName"
         Write-Verbose "[$BlockName] Begin on $ComputerName"
@@ -182,10 +201,13 @@ Function Invoke-CommandWrap {
             Invoke-Command -ComputerName $ComputerName -ScriptBlock $ScriptBlock -ArgumentList $ArgumentList
         }
         Write-Host "[$BlockName] Finish on $ComputerName"
-        return
     }
-    Write-Debug "Targetting local"
-    Write-Verbose "[$BlockName] Begin local"
-    Invoke-Command -ScriptBlock $ScriptBlock -ArgumentList $ArgumentList
-    Write-Host "[$BlockName] Finish local"
+    else
+    {
+        Write-Debug "Targetting local"
+        Write-Verbose "[$BlockName] Begin local"
+        Invoke-Command -ScriptBlock $ScriptBlock -ArgumentList $ArgumentList
+        Write-Host "[$BlockName] Finish local"
+    }
+    Write-Progress @cmdLetProgress -Completed
 }

@@ -1,3 +1,19 @@
+<#
+# Copyright (c) 2014 All Rights Reserved by the SDL Group.
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#>
+
 if ($PSBoundParameters['Debug']) {
     $DebugPreference = 'Continue'
 }
@@ -19,8 +35,17 @@ if(-not $computerName)
 $osUserCredential=Get-ISHBootstrapperContextValue -ValuePath "OSUserCredentialExpression" -Invoke
 $ishVersion=Get-ISHBootstrapperContextValue -ValuePath "ISHVersion"
 $ishServerVersion=($ishVersion -split "\.")[0]
-$installOracle=Get-ISHBootstrapperContextValue -ValuePath "InstallOracle" -DefaultValue $false
 
+if(-not $computerName)
+{
+    Write-Warning "xISHServer will be imported from the repository"
+    Remove-Module -Name xISHServer.12 -ErrorAction SilentlyContinue
+    Remove-Module -Name xISHServer.13 -ErrorAction SilentlyContinue
+    Import-Module "$sourcePath\Modules\xISHServer\xISHServer.$ishServerVersion.psm1"
+}
+
+$installOracle=Get-ISHBootstrapperContextValue -ValuePath "InstallOracle" -DefaultValue $false
+$installMSXML=(($ishVersion -eq "12.0.0") -or ($ishVersion -eq "12.0.1"))
 $isSupported=& $scriptsPaths\xISHServer\Test-SupportedServer.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion
 if(-not $isSupported)
 {
@@ -55,7 +80,7 @@ if($ftp)
     & $scriptsPaths\xISHServer\Get-ISHServerPrerequisites.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -FTPHost $ftpHost -FTPCredential $ftpCredential -FTPFolder $ftpISHServerFolder
 }
 
-& $scriptsPaths\xISHServer\Install-ISHServerPrerequisites.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -InstallOracle:$installOracle
+& $scriptsPaths\xISHServer\Install-ISHServerPrerequisites.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -InstallOracle:$installOracle -InstallMSXML4:$installMSXML
 
 if($computerName)
 {
@@ -84,7 +109,62 @@ else
    & $scriptsPaths\xISHServer\Initialize-ISHServerOSUser.ps1 -ISHServerVersion $ishServerVersion -OSUser ($osUserCredential.UserName)
    Write-Warning "Cannot execute $scriptsPaths\xISHServer\Initialize-ISHServerOSUserRegion.ps1 locally."
 }
- & $scriptsPaths\IIS\New-IISSslBinding.ps1 -Computer $computerName -Credential $credential
+
+$webCertificate=Get-ISHBootstrapperContextValue -ValuePath "WebCertificate"
+if($webCertificate)
+{
+    $hash=@{
+        CertificateAuthority=$webCertificate.Authority
+    }
+    #TODO: Add logic for load ballanced environments
+    if($computerName)
+    {
+        $hash.Hostname=[System.Net.Dns]::GetHostByName($computerName)| FL HostName | Out-String | %{ "{0}" -f $_.Split(':')[1].Trim() }
+    }
+    else
+    {
+        $hash.Hostname=[System.Net.Dns]::GetHostByName($env:COMPUTERNAME)| FL HostName | Out-String | %{ "{0}" -f $_.Split(':')[1].Trim() }
+    }
+    if($webCertificate.OrganizationalUnit)
+    {
+        $hash.OrganizationalUnit=$webCertificate.OrganizationalUnit
+    }
+    if($webCertificate.Organization)
+    {
+        $hash.Organization=$webCertificate.Organization
+    }
+    if($webCertificate.Locality)
+    {
+        $hash.Locality=$webCertificate.Locality
+    }
+    if($webCertificate.State)
+    {
+        $hash.State=$webCertificate.State
+    }
+    if($webCertificate.Country)
+    {
+        $hash.Country=$webCertificate.Country
+    }
+
+    if($computerName)
+    {
+        if(Get-ISHBootstrapperContextValue -ValuePath "Domain")
+        {
+            $fqdn=[System.Net.Dns]::GetHostByName($computerName)| FL HostName | Out-String | %{ "{0}" -f $_.Split(':')[1].Trim() };
+            $certificate=& $scriptsPaths\Certificates\Install-Certificate.ps1 -Computer $fqdn -Credential $credential -CredSSP @hash
+        }
+        else
+        {
+             $certificate=& $scriptsPaths\Certificates\Install-Certificate.ps1 @hash
+        }
+    }
+
+    & $scriptsPaths\IIS\Set-IISSslBinding.ps1 -Computer $computerName -Credential $credential -Thumbprint $certificate.Thumbprint
+}
+else
+{
+    & $scriptsPaths\IIS\Set-IISSslBinding.ps1 -Computer $computerName -Credential $credential
+}
 
 if($unc)
 {
@@ -104,7 +184,7 @@ if($ftp)
 
 if($computerName)
 {
-    & $scriptsPaths\Helpers\Invoke-Restart.ps1 -Computer $computerName -Credential $credential
+    & $scriptsPaths\Helpers\Restart-Server.ps1 -Computer $computerName -Credential $credential
 }
 else
 {
