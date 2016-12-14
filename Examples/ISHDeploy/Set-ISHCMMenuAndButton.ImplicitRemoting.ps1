@@ -25,6 +25,8 @@ param (
     [string]$ISHVersion    
 )
 $ishBootStrapRootPath=Resolve-Path "$PSScriptRoot\..\.."
+$ishBootStrapRootPath="C:\GitHub\ISHBootstrap"
+
 $cmdletsPaths="$ishBootStrapRootPath\Source\Cmdlets"
 $scriptsPaths="$ishBootStrapRootPath\Source\Scripts"
 
@@ -52,17 +54,14 @@ try
         $remote=Add-ModuleFromRemote -ComputerName $Computer -Credential $Credential -Name $ishDelpoyModuleName
     }
 
-    # Create a new tab for CUSTOM event types
     $hash=@{
         Label="Custom Event"
         Description="Show all custom events"
         EventTypesFilter=@("CUSTOM1","CUSTOM2")
         UserRole=@("Administrator","Author")
     }
-    Set-ISHUIEventMonitorTab -ISHDeployment $DeploymentName @hash
-    Move-ISHUIEventMonitorTab -ISHDeployment $DeploymentName -Label $hash["Label"] -First
-    Write-Host "Event monitor tab created"
-
+    Set-ISHUIEventMonitorMenuBarItem -ISHDeployment $DeploymentName @hash
+    Move-ISHUIEventMonitorMenuBarItem -ISHDeployment $DeploymentName -Label $hash["Label"] -First
 }
 finally
 {

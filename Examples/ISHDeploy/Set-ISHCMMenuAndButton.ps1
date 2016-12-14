@@ -23,6 +23,8 @@ param (
     [string]$DeploymentName
 )
 $ishBootStrapRootPath=Resolve-Path "$PSScriptRoot\..\.."
+$ishBootStrapRootPath="C:\GitHub\ISHBootstrap"
+
 $cmdletsPaths="$ishBootStrapRootPath\Source\Cmdlets"
 $scriptsPaths="$ishBootStrapRootPath\Source\Scripts"
 
@@ -43,25 +45,23 @@ if(-not (Get-Command Invoke-CommandWrap -ErrorAction SilentlyContinue))
 }        
 
 $setUIFeaturesScirptBlock= {
-    # Create a new tab for CUSTOM event types
     $hash=@{
         Label="Custom Event"
         Description="Show all custom events"
         EventTypesFilter=@("CUSTOM1","CUSTOM2")
         UserRole=@("Administrator","Author")
     }
-    Set-ISHUIEventMonitorTab -ISHDeployment $DeploymentName @hash
-    Move-ISHUIEventMonitorTab -ISHDeployment $DeploymentName -Label $hash["Label"] -First
-    Write-Host "Event monitor tab created"
+    Set-ISHUIEventMonitorMenuBarItem -ISHDeployment $DeploymentName @hash
+    Move-ISHUIEventMonitorMenuBarItem -ISHDeployment $DeploymentName -Label $hash["Label"] -First
 }
 
 
 #Install the packages
 try
 {
-    $blockName="Set UI Features on $DeploymentName"
+    $blockName="Setting UI Features on $DeploymentName"
     Write-Progress @scriptProgress -Status $blockName
-    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $setUIFeaturesScirptBlock -BlockName $blockName -UseParameters @("DeploymentName")
+    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $setUIFeaturesScirptBlock -BlockName "Set UI Features on $DeploymentName" -UseParameters @("DeploymentName")
 }
 finally
 {
