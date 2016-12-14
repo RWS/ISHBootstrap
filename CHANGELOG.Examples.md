@@ -9,6 +9,7 @@
 - When executing script `Initialize-ISHServer.ps1` locally, all **xISHServer.\*** loaded instances are removed and the correct **xISHServer.Y** is automatically imported.
 - Enhanced progress indicators in scripts.
 - Changes in the JSON structure regarding WinRM secure.
+- Enhanced script `Set-ISHCMMenuAndButton.ps1` and `Set-ISHCMMenuAndButton.ImplicitRemoting.ps1` to align with the recent changes of ISHDeploy modules.
 
 ## pre-release v0.3
 

@@ -28,7 +28,7 @@ function Initialize-ISHUser
     if(Get-Module "Microsoft.PowerShell.LocalAccounts" -ListAvailable)
     {
         # https://technet.microsoft.com/en-us/library/mt651690.aspx
-        if(-not (Get-LocalGroupMember -Name Administrators -Member $OSUser))
+        if(-not (Get-LocalGroupMember -Name Administrators -Member $OSUser -ErrorAction SilentlyContinue))
         {
             Add-LocalGroupMember -Group "Administrators" -Member $OSUser
         }

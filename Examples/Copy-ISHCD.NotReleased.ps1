@@ -26,7 +26,6 @@ $scriptsPaths="$sourcePath\Scripts"
 $computerName=Get-ISHBootstrapperContextValue -ValuePath "ComputerName" -DefaultValue $null
 $credential=Get-ISHBootstrapperContextValue -ValuePath "CredentialExpression" -Invoke
 $ishVersion=Get-ISHBootstrapperContextValue -ValuePath "ISHVersion"
-$ishServerVersion=($ishVersion -split "\.")[0]
 
 . "$cmdletsPaths\Helpers\Invoke-CommandWrap.ps1"
 
@@ -37,11 +36,11 @@ $copyBlock= {
     Write-Debug "targetPath=$targetPath"
 
     $cdObject=((Get-ChildItem $internalCDFolder |Where-Object{Test-Path $_.FullName -PathType Leaf}| Sort-Object FullName -Descending)[0])
-    Write-Debug "cdObject=$($cdObject.FullName)"
+    Write-Verbose "Found latest release $($cdObject.FullName)"
 
     Copy-Item $cdObject.FullName $env:TEMP
     $cdPath=Join-Path $env:TEMP $cdObject.Name
-    Write-Debug "Copied file $($cdObject.FullName) to $cdPath"
+    Write-Verbose "Copied file $($cdObject.FullName) to $cdPath"
 
     Write-Debug "targetPath=$targetPath"
     if(-not (Test-Path $targetPath))
@@ -51,6 +50,8 @@ $copyBlock= {
     Remove-Item "$targetPath\*" -Force -Recurse
     Write-Verbose "$targetPath is ready"
 
+    $ishServerVersion=($ishVersion -split "\.")[0]
+    Write-Debug "ishServerVersion=$ishServerVersion"
     if($ISHServerVersion -eq "12") 
     {
         $arguments=@("-d$targetPath","-s")
@@ -63,6 +64,7 @@ $copyBlock= {
             "-InstallPath=`"$($targetPath.Replace('\','\\'))`"" 
         )
     }
+    Write-Debug "arguments=$($arguments -join " ")"
 
     Write-Debug "Unzipping $cdPath in $targetPath"
     Start-Process $cdPath -ArgumentList $arguments -Wait
