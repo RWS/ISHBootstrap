@@ -48,7 +48,7 @@ try
     if($Computer)
     {
         $ishServerVersion=($ISHVersion -split "\.")[0]
-        $ishServerModuleName="xISHServer.$ishServerVersion"
+        $ishServerModuleName="ISHServer.$ishServerVersion"
         $ishDelpoyModuleName="ISHDeploy.$ISHVersion"
         $remote=Add-ModuleFromRemote -ComputerName $Computer -Credential $Credential -Name @($ishServerModuleName,$ishDelpoyModuleName)
     }

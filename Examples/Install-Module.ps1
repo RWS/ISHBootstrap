@@ -39,7 +39,8 @@ try
     $ishVersion=Get-ISHBootstrapperContextValue -ValuePath "ISHVersion"
     $ishServerVersion=($ishVersion -split "\.")[0]
 
-    $ishServerModuleName="xISHServer.$ishServerVersion"
+	$ishServerRepository=Get-ISHBootstrapperContextValue -ValuePath "ISHServerRepository" -DefaultValue PSGallery
+    $ishServerModuleName="ISHServer.$ishServerVersion"
 
     $ishDeployRepository=Get-ISHBootstrapperContextValue -ValuePath "ISHDeployRepository" -DefaultValue PSGallery
     $ishDeployModuleName="ISHDeploy.$ishVersion"
@@ -47,13 +48,8 @@ try
     $scope=Get-ISHBootstrapperContextValue -ValuePath "InstallModuleScope" -DefaultValue "AllUsers"
 
     & $scriptsPaths\PowerShellGet\Install-Module.ps1 -Computer $computerName -Credential $credential -ModuleName @("CertificatePS","PSFTP") -Repository PSGallery -Scope:$scope
+	& $scriptsPaths\PowerShellGet\Install-Module.ps1 -Computer $computerName -Credential $credential -ModuleName $ishServerModuleName -Repository $ishServerRepository -Scope:$scope
     & $scriptsPaths\PowerShellGet\Install-Module.ps1 -Computer $computerName -Credential $credential -ModuleName $ishDeployModuleName -Repository $ishDeployRepository -Scope:$scope
-
-    if($computerName)
-    {
-        $ishServerRepository=Get-ISHBootstrapperContextValue -ValuePath "xISHServerRepository"
-        & $scriptsPaths\PowerShellGet\Install-Module.ps1 -Computer $computerName -Credential $credential -ModuleName $ishServerModuleName -Repository $ishServerRepository
-    }
 }
 finally
 {

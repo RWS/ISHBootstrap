@@ -1,5 +1,9 @@
 # Change log
 
+## pre-release v0.5
+
+- Removed **xISHServer** module from this repository and moved to [ISHServer](https://github.com/Sarafian/ISHServer).
+
 ## pre-release v0.4
 
 - All source code has header based on SDL's open source policy.

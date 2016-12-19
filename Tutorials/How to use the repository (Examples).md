@@ -4,16 +4,15 @@ Starting from a clean server operating system this how you end up with a [SDL Kn
 
 # Acknowledgements
 
-- The target computer name is `SERVER01` and is initialized with **Windows Server 2012 R2** or **Windows Server 2016**. There are two variantions supported:
+- The target computer name is `SERVER01` and is initialized with **Windows Server 2012 R2** or **Windows Server 2016**. There are two variations supported:
   - Server is joined into a domain. We'll use a domain certificate server to issue certificates. This is similar to the *Create Domain Certificate...* in **Internet Information Services (IIS) Manager**.
   - Server is not in a domain. Web Server certificate must be available in the store as a pre-requisite. 
 - **osuser** and **ospassword** are the credentials used in the **Content Manager** installation input parameters to specify which user runs the services. The osuser must be member of the local administrator group.
 - Dependency to PowerShell modules on gallery
   - [CertificatePS](http://www.powershellgallery.com/packages/CertificatePS/). This is used to help with certificate templates. Read more about this [here](https://github.com/Sarafian/CertificatePS)
-  - [PSFTP](http://www.powershellgallery.com/packages/PSFTP/). This is used to download files from an ftp server
-  - [ISHDeploy.12.0.0](http://www.powershellgallery.com/packages/ISHDeploy.12.0.0/). This is used to download files from an ftp server
-- Dependency to PowerShell modules in this repository. The following modules must be published to an internal NuGet server. The target server
-  - xISHServer.12. This module helps installs all *ISH* prerequisites as described in the online [documentation](http://docs.sdl.com/LiveContent/web/pub.xql?action=home&pub=SDL%20Knowledge%20Center%20full%20documentation-v2&lang=en-US#docid=GUID-2AB53FDA-E9CB-4D46-A393-EEE6CF256554&addHistory=true&query=&scope=&tid=&filename=&resource=&inner_id=&toc=false&eventType=lcContent.loadDocGUID-2AB53FDA-E9CB-4D46-A393-EEE6CF256554)
+  - [PSFTP](http://www.powershellgallery.com/packages/PSFTP/). This is used to download files from an ftp server.
+  - [ISHServer.12](http://www.powershellgallery.com/packages/ISHServer.12/). This is used to automate the prerequisites instalation.
+  - [ISHDeploy.12.0.0](http://www.powershellgallery.com/packages/ISHDeploy.12.0.0/). This is used to download files from an ftp server.
 
 To quickly host an internal NuGet server follow the instructions in this [article](https://docs.nuget.org/create/hosting-your-own-nuget-feeds). 
 Once the server is up you need to register the repository on your system while specifying the both the `-SourceLocation` and `PublishLocation` parameters. 
@@ -30,20 +29,11 @@ The process depends on scripts in the examples directory. To help run these scri
   1. Register a repository for `mymachine`.
 1. Install all modules
 1. Enable the CredSSP authentication for PSSession. 
-1. Install the server prerequisites using module **xISHServer.12**.
+1. Install the server prerequisites using module [ISHServer.12](http://www.powershellgallery.com/packages/ISHServer.12/).
 1. Seed the server with a Content Manager CD.
 1. Install a deployment.
 1. Apply code as configuration scripts using PowerShell module [ISHDeploy.12.0.1](www.powershellgallery.com/packages/ISHDeploy.12.0.1/). Other module variants are also possible
 1. Run Pester tests
-
-## Publish the modules to the internal Nuget Server repository
-
-```powershell
-& .\Source\Modules\Publish-xISHServer.ps1 -ModuleName xISHServer.12 -Repository mymachine -APIKey mykey -BuildNumber -TimeStamp
-```
-
-Because the repository is internal we force a very detailed build number on the module version using `-BuildNumber` and `-TimeStamp`. 
-This allows a repetitive publish as ofter as we want.
 
 ## Load the data container json file
 
@@ -106,8 +96,6 @@ An obfuscated file for remote execution looks like this
   "ISHVersion": "12.0.1",
   "ComputerName": "Server",
   "CredentialExpression": "New-Credential -Message \"Remote Administrator\"",
-  "ISHDeployRepository": "PSGallery",
-  "xISHServerRepository": "mymachine",
   "PSRepository": [
     {
       "Name": "mymachine",
@@ -176,9 +164,7 @@ As part of this step, [ProcessExplorer](https://technet.microsoft.com/en-us/sysi
 & .\Examples\Install-Module.ps1
 ```
 
-This step uses the `xISHServerRepository`,`` and `ISHDeployRepository` to install the modules from the matching repository name. In this example the internal repository is specified by `asarafian` name in `PSRepository`.
-
-Note that when executing the scripts locally, the script will load **xISHServer** from their respected paths.
+Installs all required modules.
 
 ## Enable the CredSSP authentication for PSSession 
 
@@ -233,11 +219,11 @@ To force the installation add the following into the json file
 Some of the installed components require a restart on the VM. 
 The script will take care of that when the target is a remote server.
 
-This step uses the `PrerequisitesSourcePath` for the xISHServer 3rd party dependencies. The file are copies from this folder into the remote server. The required files are explained in [About xISHServer module](About xISHServer module.md) 
+This step uses the `FTP.*` for the ISHServer 3rd party dependencies. The file are copied from this folder into the remote server.
 The values of `CredentialForCredSSPExpression` and `OSUserCredentialExpression` are an abstraction to the credentials for a user that can establish a session with CredSSP and for the `osuser`.
 Behind the scenes the `Invoke-Expression` is used to execute the specified cmdlet. In my profile scripts I've made sure that cmdlets `New-MyCredential` and `New-InfoShareServiceUserCredential` are always available.
 
-Behind the scenes the scripts in folder `Source\Scripts\xISHServer` are executed. 
+Behind the scenes the scripts in folder `Source\Scripts\ISHServer` are executed. 
 The `Initialize-ISHServerOSUser.ps1` is the most tricky one because it needs to add the `osuser` to the local administrator group. 
 To do that the remote call needs to access the active directory and this is where the double hop issue appears. Read more on [About CredSSP authentication for PSSession](About CredSSP authentication for PSSession.md). 
 CredSSP requires secure SSL. That means that a session must be created using the Fully Qualified Domain Name of the computer because the certificate should have as Common Name (CN) the same. 
@@ -250,7 +236,7 @@ Import-Module $moduleName -PSSession $session -Force
 
 If you are unlucky and those `x(n)`are long then you might end up with this message
 
-> Import-Module : Failed to generate proxies for remote module 'xISHServer.12'.  The specified path, file name, or both are too long. The fully qualified file name must be less than 260 characters, and the directory name must be less than 248 characters.
+> Import-Module : Failed to generate proxies for remote module 'ISHServer.12'.  The specified path, file name, or both are too long. The fully qualified file name must be less than 260 characters, and the directory name must be less than 248 characters.
 
 There is not another way around this besides driving the session with the computer name.  
 Then ssl validation will fail with 

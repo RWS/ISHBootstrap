@@ -20,16 +20,10 @@ param (
     [Parameter(Mandatory=$false)]
     [pscredential]$Credential=$null,
     [Parameter(Mandatory=$true)]
+    [string]$PrerequisitesSourcePath,
+    [Parameter(Mandatory=$true)]
     [ValidateSet("12","13")]
-    [string]$ISHServerVersion,
-    [Parameter(Mandatory=$true,ParameterSetName="From FTP")]
-    [string]$FTPHost,
-    [Parameter(Mandatory=$true,ParameterSetName="From FTP")]
-    [pscredential]$FTPCredential,
-    [Parameter(Mandatory=$true,ParameterSetName="From FTP")]
-    [string]$FTPPath,
-    [Parameter(Mandatory=$true,ParameterSetName="From File")]
-    [string]$FilePath
+    [string]$ISHServerVersion
 )    
 $cmdletsPaths="$PSScriptRoot\..\..\Cmdlets"
 
@@ -50,23 +44,56 @@ try
 {
     if($Computer)
     {
-        $ishServerModuleName="xISHServer.$ISHServerVersion"
+        $ishServerModuleName="ISHServer.$ISHServerVersion"
         $remote=Add-ModuleFromRemote -ComputerName $Computer -Credential $Credential -Name $ishServerModuleName
     }
+    
+    $filesToCopy=Get-ISHPrerequisites -FileNames
 
-    Write-Progress @scriptProgress -Status "Copying Antenna House license"
-    switch ($PSCmdlet.ParameterSetName)
+    Write-Debug "filesToCopy=$filesToCopy"
+    $filePathToCopy=$filesToCopy|ForEach-Object{Join-Path $PrerequisitesSourcePath $_}
+    
+    if($Computer)
     {
-        'From FTP' {
-            Set-ISHToolAntennaHouseLicense -FTPHost $FTPHost -Credential $FTPCredential -FTPPath $FTPPath
-            break        
+        if($PSVersionTable.PSVersion.Major -ge 5)
+        {
+            $targetPath=Get-ISHServerFolderPath
         }
-        'From File' {
-            $license=Get-Content -Path $FilePath
-            Set-ISHToolAntennaHouseLicense -Content $license
-            break
+        else
+        {
+            # Need a unc path to copy to remote server from PowerShell v.4
+            $targetPath=Get-ISHServerFolderPath -UNC
         }
+    }    
+    else
+    {
+        $targetPath=Get-ISHServerFolderPath
     }
+
+    Write-Debug "targetPath=$targetPath"
+
+    if($Computer)
+    {
+        Write-Progress @scriptProgress -Status "Copying files to $Computer"
+
+        if($PSVersionTable.PSVersion.Major -ge 5)
+        {
+            Copy-Item -Path $filePathToCopy -Destination $targetPath -Force -ToSession $remote.Session
+        }
+        else
+        {
+            # Use the unc path
+            Copy-Item -Path $filePathToCopy -Destination $targetPath -Force
+        }
+    }    
+    else
+    {
+        Write-Progress @scriptProgress -Status "Copying files"
+
+        Copy-Item -Path $filePathToCopy -Destination $targetPath -Force
+    }
+
+    Write-Verbose "Uploaded files to $targetPath"
 }
 
 finally

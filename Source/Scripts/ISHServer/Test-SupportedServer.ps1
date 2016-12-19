@@ -21,11 +21,7 @@ param (
     [pscredential]$Credential=$null,
     [Parameter(Mandatory=$true)]
     [ValidateSet("12","13")]
-    [string]$ISHServerVersion,
-    [Parameter(Mandatory=$false)]
-    [switch]$InstallOracle=$false,
-    [Parameter(Mandatory=$false)]
-    [switch]$InstallMSXML4=$false
+    [string]$ISHServerVersion
 )    
 $cmdletsPaths="$PSScriptRoot\..\..\Cmdlets"
 
@@ -46,57 +42,17 @@ try
 {
     if($Computer)
     {
-        $ishServerModuleName="xISHServer.$ISHServerVersion"
+        $ishServerModuleName="ISHServer.$ISHServerVersion"
         $remote=Add-ModuleFromRemote -ComputerName $Computer -Credential $Credential -Name $ishServerModuleName
     }
-    $osInfo=Get-ISHOSInfo
 
-    Write-Progress @scriptProgress -Status "Installing windows features"
-    Install-ISHWindowsFeature
-    if($osInfo.IsCore)
+    Write-Progress @scriptProgress -Status "Testing server compliance"
+    $isSupported=Test-ISHServerCompliance
+    if(-not $isSupported)
     {
-        Install-ISHVisualBasicRuntime
+        throw "Not a compatible operating system"
     }
-    Write-Progress @scriptProgress -Status "Installing packages"
-    Install-ISHToolDotNET
-    Install-ISHToolVisualCPP
-    if(($ISHServerVersion -eq "12") -and ($InstallMSXML4))
-    {
-        Install-ISHToolMSXML4
-    }
-    Install-ISHToolJAVA
-    Install-ISHToolJavaHelp
-    Install-ISHToolHtmlHelp
-    Install-ISHToolAntennaHouse
-    if($InstallOracle)
-    {
-        Install-ISHToolOracleODAC
-    }
-
-    Write-Progress @scriptProgress -Status "Initializing"
-    Initialize-ISHLocale
-    Initialize-ISHIIS
-    Initialize-ISHRegionalDefault
-
-    if($ISHServerVersion -eq "12")
-    {
-        Initialize-ISHMSDTCTransactionTimeout
-        Initialize-ISHMSDTCSettings
-    }
-
-    Write-Progress @scriptProgress -Status "Configuring firewall"
-    Set-ISHFirewallNETBIOS
-    Set-ISHFirewallSMTP
-    Set-ISHFirewallSQLServer
-    if($InstallOracle)
-    {
-        Set-ISHFirewallOracle
-    }
-    Set-ISHFirewallHTTPS
-    if($ISHServerVersion -eq "12")
-    {
-        Set-ISHFirewallMSDTC
-    }
+    $isSupported
 }
 
 finally

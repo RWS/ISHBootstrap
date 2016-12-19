@@ -15,19 +15,13 @@
 #>
 
 param (
-    [Parameter(Mandatory=$false)]
-    [string]$Computer=$null,
-    [Parameter(Mandatory=$false)]
-    [pscredential]$Credential=$null,
+    [Parameter(Mandatory=$true)]
+    [string]$Computer,
+    [Parameter(Mandatory=$true)]
+    [PSCredential]$OSUserCredential,
     [Parameter(Mandatory=$true)]
     [ValidateSet("12","13")]
-    [string]$ISHServerVersion,
-    [Parameter(Mandatory=$true,ParameterSetName="From FTP")]
-    [string]$FTPHost,
-    [Parameter(Mandatory=$true,ParameterSetName="From FTP")]
-    [pscredential]$FTPCredential,
-    [Parameter(Mandatory=$true,ParameterSetName="From FTP")]
-    [string]$FTPFolder
+    [string]$ISHServerVersion
 )    
 $cmdletsPaths="$PSScriptRoot\..\..\Cmdlets"
 
@@ -44,15 +38,18 @@ if($Computer)
     . $cmdletsPaths\Helpers\Remove-ModuleFromRemote.ps1
 }
 
+
 try
 {
     if($Computer)
     {
-        $ishServerModuleName="xISHServer.$ISHServerVersion"
-        $remote=Add-ModuleFromRemote -ComputerName $Computer -Credential $Credential -Name $ishServerModuleName
+        $ishServerModuleName="ISHServer.$ISHServerVersion"
+        $session=New-PSSession -ComputerName $Computer -Credential $OSUserCredential
+        $remote=Add-ModuleFromRemote -Session $session -Name $ishServerModuleName
     }
-    Write-Progress @scriptProgress -Status "Downloading prerequisites"
-    Get-ISHPrerequisites -FTPHost $FTPHost -Credential $FTPCredential -FTPFolder $FTPFolder
+
+    Write-Progress @scriptProgress -Status "Initializing regional settings"
+    Initialize-ISHRegional
 }
 
 finally
@@ -60,6 +57,7 @@ finally
     if($Computer)
     {
         Remove-ModuleFromRemote -Remote $remote
+        $session|Remove-PSSession
     }
 }
 
