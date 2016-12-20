@@ -42,8 +42,7 @@ $testBlock = {
 $isAlive=$false
 for($i=0;$i -lt $Attempts;$i++)
 {
-    $secondsRemaining=($PauseSeconds*($Attempts-$i))
-    Write-Progress @scriptProgress -SecondsRemaining $secondsRemaining -Status "Waiting $Computer"
+    Write-Progress @scriptProgress -Status "Waiting $Computer"
     Start-Sleep -Seconds $PauseSeconds
     
     Write-Debug "Attempting $($i+1) connection with $Computer"
@@ -63,7 +62,7 @@ for($i=0;$i -lt $Attempts;$i++)
     }
     catch
     {
-        Write-Warning "Attempt $($i+1) failed for $Computer"
+        Write-Warning "Attempt $($i+1)/$Attempts failed for $Computer"
     }
 }
 

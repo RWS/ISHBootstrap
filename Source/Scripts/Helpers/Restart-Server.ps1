@@ -33,9 +33,9 @@ $scriptProgress=Get-ProgressHash -Invocation $MyInvocation
 Write-Verbose "Restarting $Computer"
 $blockName="Restarting $Computer"
 Write-Progress @scriptProgress -Status $blockName
-#Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock {Restart-Computer -Force} -BlockName $blockName -ErrorAction SilentlyContinue
-
+Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock {Restart-Computer -Force} -BlockName $blockName -ErrorAction SilentlyContinue
 Write-Verbose "Initiated $Computer restart"
+Start-Sleep -Seconds 20
 
 $null=& $PSScriptRoot\Test-Server.ps1 -Computer $Computer -Credential $Credential
 
