@@ -47,7 +47,7 @@ try
 {
     if($Computer)
     {
-        $ishServerModuleName="xISHServer.$ISHServerVersion"
+        $ishServerModuleName="ISHServer.$ISHServerVersion"
         if($CredSSP)
         {
             if($SessionOptions)

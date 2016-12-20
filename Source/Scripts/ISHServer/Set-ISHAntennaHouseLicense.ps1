@@ -21,7 +21,15 @@ param (
     [pscredential]$Credential=$null,
     [Parameter(Mandatory=$true)]
     [ValidateSet("12","13")]
-    [string]$ISHServerVersion
+    [string]$ISHServerVersion,
+    [Parameter(Mandatory=$true,ParameterSetName="From FTP")]
+    [string]$FTPHost,
+    [Parameter(Mandatory=$true,ParameterSetName="From FTP")]
+    [pscredential]$FTPCredential,
+    [Parameter(Mandatory=$true,ParameterSetName="From FTP")]
+    [string]$FTPPath,
+    [Parameter(Mandatory=$true,ParameterSetName="From File")]
+    [string]$FilePath
 )    
 $cmdletsPaths="$PSScriptRoot\..\..\Cmdlets"
 
@@ -42,17 +50,23 @@ try
 {
     if($Computer)
     {
-        $ishServerModuleName="xISHServer.$ISHServerVersion"
+        $ishServerModuleName="ISHServer.$ISHServerVersion"
         $remote=Add-ModuleFromRemote -ComputerName $Computer -Credential $Credential -Name $ishServerModuleName
     }
 
-    Write-Progress @scriptProgress -Status "Testing server compliance"
-    $isSupported=Test-ISHServerCompliance
-    if(-not $isSupported)
+    Write-Progress @scriptProgress -Status "Copying Antenna House license"
+    switch ($PSCmdlet.ParameterSetName)
     {
-        throw "Not a compatible operating system"
+        'From FTP' {
+            Set-ISHToolAntennaHouseLicense -FTPHost $FTPHost -Credential $FTPCredential -FTPPath $FTPPath
+            break        
+        }
+        'From File' {
+            $license=Get-Content -Path $FilePath
+            Set-ISHToolAntennaHouseLicense -Content $license
+            break
+        }
     }
-    $isSupported
 }
 
 finally

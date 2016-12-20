@@ -40,14 +40,14 @@ $cleanBlock= {
     $ishDeployProgramDataPath=Join-Path "C:\ProgramData" "ISHDeploy.$ishVersion"
     Write-Debug "ishDeployProgramDataPath=$ishDeployProgramDataPath"
 
-    $ishServerProgramDataPath=Join-Path "C:\ProgramData" "xISHServer.$ishServerVersion"
+    $ishServerProgramDataPath=Join-Path "C:\ProgramData" "ISHServer.$ishServerVersion"
     Write-Debug "ishServerProgramDataPath=$ishServerProgramDataPath"
 
     $ishDeployModuleName="ISHDeploy.$ishVersion"
     Write-Debug "ishDeployModuleName=$ishDeployModuleName"
-    $ishServerModuleName="xISHServer.$ishServerVersion"
+    $ishServerModuleName="ISHServer.$ishServerVersion"
     Write-Debug "ishServerModuleName=$ishServerModuleName"
-    $ishAutomationModuleName="xISHServer.$ishServerVersion"
+    $ishAutomationModuleName="ISHServer.$ishServerVersion"
     Write-Debug "ishServerModuleName=$ishServerModuleName"
 
     Uninstall-Module $ishDeployModuleName -Force

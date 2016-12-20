@@ -36,17 +36,9 @@ $osUserCredential=Get-ISHBootstrapperContextValue -ValuePath "OSUserCredentialEx
 $ishVersion=Get-ISHBootstrapperContextValue -ValuePath "ISHVersion"
 $ishServerVersion=($ishVersion -split "\.")[0]
 
-if(-not $computerName)
-{
-    Write-Warning "xISHServer will be imported from the repository"
-    Remove-Module -Name xISHServer.12 -ErrorAction SilentlyContinue
-    Remove-Module -Name xISHServer.13 -ErrorAction SilentlyContinue
-    Import-Module "$sourcePath\Modules\xISHServer\xISHServer.$ishServerVersion.psm1"
-}
-
 $installOracle=Get-ISHBootstrapperContextValue -ValuePath "InstallOracle" -DefaultValue $false
 $installMSXML=(($ishVersion -eq "12.0.0") -or ($ishVersion -eq "12.0.1"))
-$isSupported=& $scriptsPaths\xISHServer\Test-SupportedServer.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion
+$isSupported=& $scriptsPaths\ISHServer\Test-SupportedServer.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion
 if(-not $isSupported)
 {
     return
@@ -73,14 +65,14 @@ if($ftp)
 if($unc)
 {
     $prerequisitesSourcePath=$unc.ISHServerFolder
-    & $scriptsPaths\xISHServer\Upload-ISHServerPrerequisites.ps1 -Computer $computerName -Credential $credential -PrerequisitesSourcePath $prerequisitesSourcePath -ISHServerVersion $ishServerVersion
+    & $scriptsPaths\ISHServer\Upload-ISHServerPrerequisites.ps1 -Computer $computerName -Credential $credential -PrerequisitesSourcePath $prerequisitesSourcePath -ISHServerVersion $ishServerVersion
 }
 if($ftp)
 {
-    & $scriptsPaths\xISHServer\Get-ISHServerPrerequisites.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -FTPHost $ftpHost -FTPCredential $ftpCredential -FTPFolder $ftpISHServerFolder
+    & $scriptsPaths\ISHServer\Get-ISHServerPrerequisites.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -FTPHost $ftpHost -FTPCredential $ftpCredential -FTPFolder $ftpISHServerFolder
 }
 
-& $scriptsPaths\xISHServer\Install-ISHServerPrerequisites.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -InstallOracle:$installOracle -InstallMSXML4:$installMSXML
+& $scriptsPaths\ISHServer\Install-ISHServerPrerequisites.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -InstallOracle:$installOracle -InstallMSXML4:$installMSXML
 
 if($computerName)
 {
@@ -90,24 +82,24 @@ if($computerName)
         if($useFQDNWithCredSSP)
         {
             $fqdn=[System.Net.Dns]::GetHostByName($computerName)| FL HostName | Out-String | %{ "{0}" -f $_.Split(':')[1].Trim() };
-             & $scriptsPaths\xISHServer\Initialize-ISHServerOSUser.ps1 -Computer $fqdn -Credential $credential -ISHServerVersion $ishServerVersion -OSUser ($osUserCredential.UserName) -CredSSP
+             & $scriptsPaths\ISHServer\Initialize-ISHServerOSUser.ps1 -Computer $fqdn -Credential $credential -ISHServerVersion $ishServerVersion -OSUser ($osUserCredential.UserName) -CredSSP
         }
         else
         {
             $sessionOptionsWithCredSSP=Get-ISHBootstrapperContextValue -ValuePath "SessionOptionsWithCredSSPExpression" -Invoke
-             & $scriptsPaths\xISHServer\Initialize-ISHServerOSUser.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -SessionOptions $sessionOptionsWithCredSSP -OSUser ($osUserCredential.UserName) -CredSSP
+             & $scriptsPaths\ISHServer\Initialize-ISHServerOSUser.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -SessionOptions $sessionOptionsWithCredSSP -OSUser ($osUserCredential.UserName) -CredSSP
         }
     }
     else
     {
-         & $scriptsPaths\xISHServer\Initialize-ISHServerOSUser.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -OSUser ($osUserCredential.UserName)
+         & $scriptsPaths\ISHServer\Initialize-ISHServerOSUser.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -OSUser ($osUserCredential.UserName)
     }
-     & $scriptsPaths\xISHServer\Initialize-ISHServerOSUserRegion.ps1 -Computer $computerName -OSUserCredential $osUserCredential -ISHServerVersion $ishServerVersion
+     & $scriptsPaths\ISHServer\Initialize-ISHServerOSUserRegion.ps1 -Computer $computerName -OSUserCredential $osUserCredential -ISHServerVersion $ishServerVersion
 }
 else
 {
-   & $scriptsPaths\xISHServer\Initialize-ISHServerOSUser.ps1 -ISHServerVersion $ishServerVersion -OSUser ($osUserCredential.UserName)
-   Write-Warning "Cannot execute $scriptsPaths\xISHServer\Initialize-ISHServerOSUserRegion.ps1 locally."
+   & $scriptsPaths\ISHServer\Initialize-ISHServerOSUser.ps1 -ISHServerVersion $ishServerVersion -OSUser ($osUserCredential.UserName)
+   Write-Warning "Cannot execute $scriptsPaths\ISHServer\Initialize-ISHServerOSUserRegion.ps1 locally."
 }
 
 $webCertificate=Get-ISHBootstrapperContextValue -ValuePath "WebCertificate"
@@ -170,14 +162,14 @@ if($unc)
 {
     if($unc.AntennaHouseLicensePath)
     {
-        & $scriptsPaths\xISHServer\Set-ISHAntennaHouseLicense.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -FilePath $unc.AntennaHouseLicensePath
+        & $scriptsPaths\ISHServer\Set-ISHAntennaHouseLicense.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -FilePath $unc.AntennaHouseLicensePath
     }
 }
 if($ftp)
 {
     if($ftp.AntennaHouseLicensePath)
     {
-        & $scriptsPaths\xISHServer\Set-ISHAntennaHouseLicense.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -FTPHost $ftpHost -FTPCredential $ftpCredential -FTPPath $ftp.AntennaHouseLicensePath
+        & $scriptsPaths\ISHServer\Set-ISHAntennaHouseLicense.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -FTPHost $ftpHost -FTPCredential $ftpCredential -FTPPath $ftp.AntennaHouseLicensePath
     }
 }
 
