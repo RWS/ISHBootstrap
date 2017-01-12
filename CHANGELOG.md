@@ -1,5 +1,9 @@
 # Change log
 
+## pre-release v0.6
+
+- Removed supported for alternative ftp host. This was a hidden feature for internal SDL development.
+
 ## pre-release v0.5
 
 - Removed **xISHServer** module from this repository and moved to [ISHServer](https://github.com/Sarafian/ISHServer).

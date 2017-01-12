@@ -50,16 +50,6 @@ if($ftp)
     $ftpHost=$ftp.Host
     $ftpCredential=Get-ISHBootstrapperContextValue -ValuePath "FTP.CredentialExpression" -Invoke
     $ftpISHServerFolder=$ftp.ISHServerFolder
-    $testHostBlock={
-        Test-Connection $ftpHost -Quiet
-    }
-    $testHost=Invoke-CommandWrap -ComputerName $computerName -Credential $credential -ScriptBlock $testHostBlock -BlockName "Test $ftpHost" -UseParameters @("ftpHost")
-    if(-not $testHost)
-    {
-        $ftpAlternateHost=$ftp.AlternativeHost
-        Write-Warning "Using alternate host $ftpAlternateHost instead of $ftpHost"
-        $ftpHost=$ftpAlternateHost
-    }
 }
 
 if($unc)

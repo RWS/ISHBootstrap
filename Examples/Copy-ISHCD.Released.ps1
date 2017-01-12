@@ -32,7 +32,6 @@ $ishVersion=Get-ISHBootstrapperContextValue -ValuePath "ISHVersion"
 $ftp=Get-ISHBootstrapperContextValue -ValuePath "FTP" -DefaultValue $null
 $ftpHost=$ftp.Host
 $ftpCredential=Get-ISHBootstrapperContextValue -ValuePath "FTP.CredentialExpression" -Invoke
-$ftpAlternateHost=$ftp.AlternativeHost
 $ftpCDFolder=$ftp.ISHCDFolder
 $ftpCDFileName=$ftp.ISHCDFileName
 
@@ -40,12 +39,6 @@ $copyBlock= {
     $targetPath="C:\IshCD\$ishVersion"
     Write-Debug "targetPath=$targetPath"
     Import-Module PSFTP -ErrorAction Stop
-
-    if(-not (Test-Connection $ftpHost -Quiet))
-    {
-        Write-Warning "Using alternate host $ftpAlternateHost instead of $ftpHost"
-        $ftpHost=$ftpAlternateHost
-    }
 
     Set-FTPConnection -Server $ftpHost -Credentials $ftpCredential -UseBinary -KeepAlive -UsePassive | Out-Null
     $ftpUrl="$ftpCDFolder$ftpCDFileName"
@@ -80,7 +73,7 @@ try
         & "$scriptsPaths\Helpers\Test-Administrator.ps1"
     }
 
-    Invoke-CommandWrap -ComputerName $computerName -Credential $credential -ScriptBlock $copyBlock -BlockName "Copy and Extract ISH.$ishVersion" -UseParameters @("ishVersion","ftpHost","ftpAlternateHost","ftpCredential","ftpCDFolder","ftpCDFileName")
+    Invoke-CommandWrap -ComputerName $computerName -Credential $credential -ScriptBlock $copyBlock -BlockName "Copy and Extract ISH.$ishVersion" -UseParameters @("ishVersion","ftpHost","ftpCredential","ftpCDFolder","ftpCDFileName")
 }
 finally
 {
