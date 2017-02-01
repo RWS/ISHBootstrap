@@ -49,6 +49,7 @@ $installScriptBlock={
         {
             $latestModule=Find-Module -Name $name |Where-Object {$_.Name -eq $name}
         }
+        $latestModule=$latestModule|Sort-Object -Property Version -Descending|Select-Object -First 1
 
         if(-not $latestModule)
         {
@@ -57,9 +58,30 @@ $installScriptBlock={
         }
         Write-Verbose "Found module $name with version $($latestModule.Version)"
 
-        $latestModule|Install-Module -Scope $Scope -Force|Out-Null
+        $currentModule=Get-Module -Name $name -ListAvailable
+        $skipInstall=$true
+        
+        if(-not $currentModule)
+        {
+            $skipInstall=$false
+        }
+        else
+        {
+            if($currentModule.Version -lt $latestModule.Version)
+            {
+                $skipInstall=$false
+            }
+        }
+        if(-not $skipInstall)
+        {
+            $latestModule|Install-Module -Scope $Scope -Force|Out-Null
+            Write-Host "Installed module $name with version $($latestModule.Version)"
+        }
+        else
+        {
+            Write-Warning "Module $name is available with version $($currentModule.Version). Skipping..."
+        }
    
-        Write-Host "Installed module $name with version $($latestModule.Version)"
     }
 }
 

@@ -1,5 +1,9 @@
 # Change log
 
+## pre-release v0.7
+
+- Added support for AWS S3 buckets. Requires [ISHServer](https://github.com/Sarafian/ISHServer) version 1.1
+
 ## pre-release v0.6
 
 - Removed supported for alternative ftp host. This was a hidden feature for internal SDL development.
