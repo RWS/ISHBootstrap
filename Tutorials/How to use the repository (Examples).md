@@ -60,61 +60,15 @@ An obfuscated file for local execution looks like this
     "ISHCDFileName": "20160815.CD.InfoShare.12.0.3215.1.Trisoft-DITA-OT.exe",
     "AntennaHouseLicensePath": "License/AntennaHouse/AHFormatter.lic"
   },
-  "OSUserCredentialExpression": "New-Credential -Message \"OSUser\"",
-  "Configuration": [
-    {
-      "XOPUS": [
-        {
-          "LisenceKey": "license",
-          "Domain": "domain"
-        }
-      ],
-      "ExternalID": "username",
-      "ADFSComputerName": "adfs.example.com"
-    }
-  ],
-  "ISHDeployment": [
-    {
-      "Name": "InfoShare",
-      "IsOracle": false,
-      "ConnectionString": "",
-      "LucenePort": 9010,
-      "UseRelativePaths": false,
-      "Scripts": [
-        "ISHDeploy\\Set-ISHCMComponents.ps1",
-        "ISHDeploy\\Set-ISHCMMenuAndButton.ps1",
-        "ISHDeploy\\Set-ADFSIntegration.ps1"
-      ]
-    }
-  ]
-}
-```
-
-An obfuscated file for remote execution looks like this
-```json
-{
-  "ISHVersion": "12.0.1",
-  "ComputerName": "Server",
-  "CredentialExpression": "New-Credential -Message \"Remote Administrator\"",
-  "PSRepository": [
-    {
-      "Name": "mymachine",
-      "SourceLocation": "http://mymachine/MiniNuGetServer/nuget/",
-      "InstallationPolicy": "Trusted"
-    }
-  ],
-  "WebCertificate": {
-    "Authority": "Authority",
-    "OrganizationalUnit": "OrganizationUnit",
-    "Organization": "Organization"
-  },
-  "FTP": {
-    "Host": "host",
-    "CredentialExpression": "New-Credential -Message \"FTP\"",
-    "ISHServerFolder": "Download/InfoShare120/ISHServer/",
-    "ISHCDFolder": "Download/InfoShare120/SP1/",
+  "AWSS3": {
+    "BucketName": "bucketname",
+    "ProfileName": "profilename",
+    "AccessKey": "accesskey",
+    "SecretKey": "secretkey",
+    "ISHServerFolderKey": "InfoShare/12.0/PreRequisites",
+    "ISHCDFolderKey": "InfoShare/12.0/",
     "ISHCDFileName": "20160815.CD.InfoShare.12.0.3215.1.Trisoft-DITA-OT.exe",
-    "AntennaHouseLicensePath": "License/AntennaHouse/AHFormatter.lic"
+    "AntennaHouseLicenseKey": "Licenses/AntennaHouse/AHFormatter.lic"
   },
   "OSUserCredentialExpression": "New-Credential -Message \"OSUser\"",
   "Configuration": [
@@ -146,8 +100,9 @@ An obfuscated file for remote execution looks like this
 }
 ```
 
-Please note that if you are already a customer of SDL Knowledge Center, the above FTP paths will not be available. 
-This is an example of how I currently envision this, without changing the structure much and verified against my very own ftp.
+Please note:
+- The `FTP` and `AWSS3` properties are exclusive. **Define only one**.
+- If you are already a customer of SDL Knowledge Center, the above FTP paths will not be available. Ask your SDL contact to prepare the files for you account.
 
 ## Initialize PowerShellGet on remote server
 
@@ -253,23 +208,10 @@ To not use the lengthy FQDN and bypass the certificate common name validation ad
 ## Seed the server with a Content Manager CD
 
 ```powershell
-& .\Examples\Copy-ISHCD.Released.ps1
+& .\Examples\Copy-ISHCD.ps1
 ```
 
-This step uses the values in 
-
-```json
-  "FTP": {
-    "Host": "host",
-    "CredentialExpression": "New-Credential -Message \"FTP\"",
-    "ISHServerFolder": "Download/InfoShare120/ISHServer/",
-    "ISHCDFolder": "Download/InfoShare120/SP1/",
-    "ISHCDFileName": "20160815.CD.InfoShare.12.0.3215.1.Trisoft-DITA-OT.exe",
-    "AntennaHouseLicensePath": "License/AntennaHouse/AHFormatter.lic"
-  }
-```
-
-If you have access to a Content Manager CD then you already know what these values are. At the end an ftp url like `ftp://user:host/path/filename` will be formed.
+This step uses the values of the `FTP` or `AWSS3` properties
 
 ## Install a deployment
 

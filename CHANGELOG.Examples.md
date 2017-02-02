@@ -1,5 +1,9 @@
 # Examples Change log
 
+## pre-release v0.7
+
+- Adjusted based on changes to match to match the main codebase.
+
 ## pre-release v0.4
 
 - Support for json property `InstallModuleScope` as `CurrentUser` or `AllUsers` to drive the `-Scope` parameter for `Install-Module`. 

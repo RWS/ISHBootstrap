@@ -30,17 +30,6 @@ $ishVersion=Get-ISHBootstrapperContextValue -ValuePath "ISHVersion"
 . "$cmdletsPaths\Helpers\Invoke-CommandWrap.ps1"
 
 
-$cdPathBlock= {
-    $rootPath="C:\IshCD\$ishVersion"
-    Write-Debug "rootPath=$rootPath"
-    $cdPath=(Get-ChildItem $rootPath |Where-Object{Test-Path $_.FullName -PathType Container}| Sort-Object FullName -Descending)[0]|Select-Object -ExpandProperty FullName
-    Write-Debug "cdPath=$cdPath"
-    if(-not $cdPath)
-    {
-        Write-Warning "C:\ISHCD\$ishVersion does not contain a cd."
-    }
-    $cdPath
-}
 $getDeploymentsBlock= {
     $ishDeployModuleName="ISHDeploy.$ishVersion"
     if(Get-Module $ishDeployModuleName -ListAvailable)
@@ -74,18 +63,13 @@ try
         & "$scriptsPaths\Helpers\Test-Administrator.ps1"
     }
 
-    $cdPath=Invoke-CommandWrap -ComputerName $computerName -Credential $credential -ScriptBlock $cdPathBlock -BlockName "CDPath" -UseParameters @("ishVersion")
-    if(-not $cdPath)
-    {
-        return
-    }
     $ishDeploymentNames=Invoke-CommandWrap -ComputerName $computerName -Credential $credential -ScriptBlock $getDeploymentsBlock -BlockName "Get ISHDeployment Names" -UseParameters @("ishVersion")
     if($ishDeploymentNames)
     {
         foreach($ishDeploymentName in $ishDeploymentNames)
         {
             Write-Debug "Uninstalling $ishDeploymentName from $cdPath"
-            & $scriptsPaths\Install\Uninstall-ISHDeployment.ps1 -Computer $computerName -Credential $credential -CDPath $cdPath -Name $ishDeploymentName
+            & $scriptsPaths\Install\Uninstall-ISHDeployment.ps1 -Computer $computerName -Credential $credential -ISHVersion $ishVersion -Name $ishDeploymentName
             Write-Verbose "Uninstalled $ishDeploymentName from $cdPath"
         }
     }
