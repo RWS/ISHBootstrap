@@ -64,7 +64,12 @@ Function Get-ISHBootstrapperContextSource
                 return
             }
             $hash.BucketName=$awsS3Data.BucketName
-            if($awsS3Data.ProfileName)
+            if($awsS3Data.AccessKey -and $awsS3Data.SecretKey)
+            {
+                $hash.AccessKey=$awsS3Data.AccessKey
+                $hash.SecretKey=$awsS3Data.SecretKey
+            }
+            elseif($awsS3Data.ProfileName)
             {
                 $awsCredentials=Get-AWSCredentials -ProfileName $awsS3Data.ProfileName
                 $hash.AccessKey=$awsCredentials.GetCredentials().AccessKey

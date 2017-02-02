@@ -102,6 +102,9 @@ An obfuscated file for local execution looks like this
 
 Please note:
 - The `FTP` and `AWSS3` properties are exclusive. **Define only one**.
+- Within `AWSS3`
+  -  The `ProfileName`,`AccessKey` and `SecretKey` are optional.
+  -  The `ProfileName` is exclusive to the `AccessKey` and `SecretKey`.  **Define only one**.
 - If you are already a customer of SDL Knowledge Center, the above FTP paths will not be available. Ask your SDL contact to prepare the files for you account.
 
 ## Initialize PowerShellGet on remote server
