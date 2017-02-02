@@ -83,7 +83,7 @@ try
             Get-ISHCD -BucketName $BucketName -Key $Key -Expand -AccessKey $AccessKey -ProfileName $ProfileName -ProfileLocation $ProfileLocation -Region $Region -SecretKey $SecretKey -SessionToken $SessionToken
             break        
         }
-        'From File' {
+        'From UNC' {
             if($Computer)
             {
                 if($PSVersionTable.PSVersion.Major -ge 5)

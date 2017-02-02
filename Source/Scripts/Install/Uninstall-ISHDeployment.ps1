@@ -20,7 +20,7 @@ param (
     [Parameter(Mandatory=$false)]
     [pscredential]$Credential=$null,
     [Parameter(Mandatory=$true)]
-    $CDPath,
+    [string]$ISHVersion,
     [Parameter(Mandatory=$false)]
     $Name="InfoShare"
 )
@@ -34,9 +34,28 @@ $scriptProgress=Get-ProgressHash -Invocation $MyInvocation
 
 . "$cmdletsPaths\Helpers\Invoke-CommandWrap.ps1"
 
+$findCDPath={
+    $major=($ISHVersion -split '\.')[0]
+    $revision=($ISHVersion -split '\.')[2]
+    $expandedCDs=Get-ISHCD -ListAvailable|Where-Object -Property IsExpanded -EQ $true
+    $matchingVersionCDs=$expandedCDs|Where-Object -Property Major -EQ $major | Where-Object -Property Revision -EQ $revision
+    $availableCD=$matchingVersionCDs|Sort-Object -Descending -Property Build
+    if(-not $availableCD)
+    {
+        throw "No matching CD found"
+        return
+    }
+    if($availableCD.Count -gt 1)
+    {
+        $availableCD=$availableCD[0]
+        Write-Warning "Found more than one cd. Using $($availableCD.Name)"
+    }
+    $availableCD.ExpandedPath
+}
+
 $scriptBlock={
     & taskkill /im DllHost.exe /f
-    $installToolPath=Join-Path $CDPath "__InstallTool\InstallTool.exe"
+    $installToolPath=Join-Path $cdPath "__InstallTool\InstallTool.exe"
     $installToolArgs=@("-Uninstall",
         "-project",$Name
         )
@@ -45,9 +64,13 @@ $scriptBlock={
 
 try
 {
+    $blockName="Finding CD for $ISHVersion"
+    Write-Progress @scriptProgress -Status $blockName
+    $cdPath=Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $findCDPath -BlockName $blockName -UseParameters @("ISHVersion")
+
     $blockName="Uninstalling $Name"
     Write-Progress @scriptProgress -Status $blockName
-    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $scriptBlock -BlockName $blockName -UseParameters @("CDPath","Name")
+    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $scriptBlock -BlockName $blockName -UseParameters @("cdPath","Name")
 }
 catch
 {
