@@ -27,7 +27,25 @@ param (
     [Parameter(Mandatory=$true,ParameterSetName="From FTP")]
     [pscredential]$FTPCredential,
     [Parameter(Mandatory=$true,ParameterSetName="From FTP")]
+        [ValidatePattern(".*AHFormatter\.lic")]
     [string]$FTPPath,
+    [Parameter(Mandatory=$true,ParameterSetName="From AWS S3")]
+    [string]$BucketName,
+    [Parameter(Mandatory=$true,ParameterSetName="From AWS S3")]
+    [ValidatePattern(".*AHFormatter\.lic")]
+    [string]$Key,
+    [Parameter(Mandatory=$false,ParameterSetName="From AWS S3")]
+    [string]$AccessKey,
+    [Parameter(Mandatory=$false,ParameterSetName="From AWS S3")]
+    [string]$ProfileName,
+    [Parameter(Mandatory=$false,ParameterSetName="From AWS S3")]
+    [string]$ProfileLocation,
+    [Parameter(Mandatory=$false,ParameterSetName="From AWS S3")]
+    [string]$Region,
+    [Parameter(Mandatory=$false,ParameterSetName="From AWS S3")]
+    [string]$SecretKey,
+    [Parameter(Mandatory=$false,ParameterSetName="From AWS S3")]
+    [string]$SessionToken,
     [Parameter(Mandatory=$true,ParameterSetName="From File")]
     [string]$FilePath
 )    
@@ -59,6 +77,10 @@ try
     {
         'From FTP' {
             Set-ISHToolAntennaHouseLicense -FTPHost $FTPHost -Credential $FTPCredential -FTPPath $FTPPath
+            break        
+        }
+        'From AWS S3' {
+            Set-ISHToolAntennaHouseLicense -BucketName $BucketName -Key $Key -AccessKey $AccessKey -ProfileName $ProfileName -ProfileLocation $ProfileLocation -Region $Region -SecretKey $SecretKey -SessionToken $SessionToken
             break        
         }
         'From File' {

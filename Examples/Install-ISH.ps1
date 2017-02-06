@@ -33,35 +33,16 @@ $ishVersion=Get-ISHBootstrapperContextValue -ValuePath "ISHVersion"
 $ishDeployments=Get-ISHBootstrapperContextValue -ValuePath "ISHDeployment"
 $osUserCredential=Get-ISHBootstrapperContextValue -ValuePath "OSUserCredentialExpression" -Invoke
 
-$cdPathBlock= {
-    $rootPath="C:\IshCD\$ishVersion"
-    Write-Debug "rootPath=$rootPath"
-    $cdPath=(Get-ChildItem $rootPath |Where-Object{Test-Path $_.FullName -PathType Container}| Sort-Object FullName -Descending)[0]|Select-Object -ExpandProperty FullName
-    Write-Debug "cdPath=$cdPath"
-    if(-not $cdPath)
-    {
-        Write-Warning "C:\ISHCD\$ishVersion does not contain a cd."
-    }
-    $cdPath
-}
-
 try
 {
     if(-not $computerName)
     {
         & "$scriptsPaths\Helpers\Test-Administrator.ps1"
     }
-    $cdPath=Invoke-CommandWrap -ComputerName $computerName -Credential $credential -ScriptBlock $cdPathBlock -BlockName "CDPath" -UseParameters @("ishVersion")
-    Write-Debug "cdPath=$cdPath"
-    if(-not $cdPath)
-    {
-        return
-    }
     foreach($ishDeployment in $ishDeployments)
     {
         $hash=@{
-            CDPath=$cdPath
-            Version=$ishVersion
+            ISHVersion=$ishVersion
             OSUserCredential=$osUserCredential
             ConnectionString=$ishDeployment.ConnectionString
             IsOracle=$ishDeployment.IsOracle

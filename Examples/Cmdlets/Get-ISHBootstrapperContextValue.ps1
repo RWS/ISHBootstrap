@@ -23,7 +23,7 @@ Function Get-ISHBootstrapperContextValue
         [Parameter(Mandatory=$false,ParameterSetName="Default")]
         $DefaultValue=$null,
         [Parameter(Mandatory=$true,ParameterSetName="Expression")]
-        [switch]$Invoke
+        [switch]$Invoke=$false
     ) 
     $variableName="__ISHBootstrapper_Data__"
 

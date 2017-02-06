@@ -20,9 +20,7 @@ param (
     [Parameter(Mandatory=$false)]
     [pscredential]$Credential=$null,
     [Parameter(Mandatory=$true)]
-    $CDPath,
-    [Parameter(Mandatory=$true)]
-    $Version,
+    [string]$ISHVersion,
     [Parameter(Mandatory=$true)]
     [pscredential]$OSUserCredential,
     [Parameter(Mandatory=$true)]
@@ -33,7 +31,7 @@ param (
     [ValidatePattern("(?# Name doesn't start with InfoShare)InfoShare.*")]
     $Name="InfoShare",
     [Parameter(Mandatory=$false)]
-    $RootPath="C:\InfoShare\$Version",
+    $RootPath="C:\InfoShare\$ISHVersion",
     [Parameter(Mandatory=$false)]
     [int]$LucenePort="8080",
     [Parameter(Mandatory=$false)]
@@ -48,6 +46,26 @@ Write-Separator -Invocation $MyInvocation -Header
 $scriptProgress=Get-ProgressHash -Invocation $MyInvocation
 
 . "$cmdletsPaths\Helpers\Invoke-CommandWrap.ps1"
+
+$findCDPath={
+    $major=($ISHVersion -split '\.')[0]
+    $revision=($ISHVersion -split '\.')[2]
+    $expandedCDs=Get-ISHCD -ListAvailable|Where-Object -Property IsExpanded -EQ $true
+    $matchingVersionCDs=$expandedCDs|Where-Object -Property Major -EQ $major |Where-Object -Property Revision -EQ $revision
+    $availableCD=$matchingVersionCDs|Sort-Object -Descending -Property Build
+    if(-not $availableCD)
+    {
+        throw "No matching CD found"
+        return
+    }
+    if($availableCD.Count -gt 1)
+    {
+        $availableCD=$availableCD[0]
+        Write-Warning "Found more than one cd. Using $($availableCD.Name)"
+    }
+    $availableCD.ExpandedPath
+}
+
 
 $newParameterScriptBlock={
 
@@ -217,13 +235,17 @@ $installScriptBlock={
 
 try
 {
+    $blockName="Finding CD for $ISHVersion"
+    Write-Progress @scriptProgress -Status $blockName
+    $cdPath=Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $findCDPath -BlockName $blockName -UseParameters @("ISHVersion")
+
     $blockName="Creating new deployment parameters for $Name"
     Write-Progress @scriptProgress -Status $blockName
-    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $newParameterScriptBlock -BlockName $blockName -UseParameters @("CDPath","Version","OSUserCredential","ConnectionString","IsOracle","Name","RootPath","LucenePort","UseRelativePaths")
+    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $newParameterScriptBlock -BlockName $blockName -UseParameters @("cdPath","ISHVersion","OSUserCredential","ConnectionString","IsOracle","Name","RootPath","LucenePort","UseRelativePaths")
     
     $blockName="Installing $Name"
     Write-Progress @scriptProgress -Status $blockName
-    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $installScriptBlock -BlockName $blockName -UseParameters @("CDPath","Name")
+    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $installScriptBlock -BlockName $blockName -UseParameters @("cdPath","Name")
 }
 catch
 {
