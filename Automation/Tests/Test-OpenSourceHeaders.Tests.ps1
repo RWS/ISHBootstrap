@@ -20,7 +20,7 @@ $modulePath=Resolve-Path "$PSScriptRoot\..\Modules"
 Import-Module "$modulePath\SDLDevTools" -Force
 
 $reportToValidate=@()
-Test-SDLOpenSourceHeader -FolderPath $repositoryPath -PassThru | ForEach-Object {
+Test-SDLOpenSourceHeader -ExcludeFolder ".git" -FolderPath $repositoryPath -PassThru | ForEach-Object {
     $hash=@{}
     $hash.FilePath=$_.FilePath
     $hash.Format=$_.Format

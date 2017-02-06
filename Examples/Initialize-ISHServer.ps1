@@ -23,6 +23,7 @@ $cmdletsPaths="$sourcePath\Cmdlets"
 $scriptsPaths="$sourcePath\Scripts"
 
 . "$PSScriptRoot\Cmdlets\Get-ISHBootstrapperContextValue.ps1"
+. "$PSScriptRoot\Cmdlets\Get-ISHBootstrapperContextSource.ps1"
 . "$cmdletsPaths\Helpers\Invoke-CommandWrap.ps1"
 
 $computerName=Get-ISHBootstrapperContextValue -ValuePath "ComputerName" -DefaultValue $null
@@ -43,33 +44,21 @@ if(-not $isSupported)
 {
     return
 }
-$unc=Get-ISHBootstrapperContextValue -ValuePath "UNC" -DefaultValue $null
-$ftp=Get-ISHBootstrapperContextValue -ValuePath "FTP" -DefaultValue $null
-if($ftp)
-{
-    $ftpHost=$ftp.Host
-    $ftpCredential=Get-ISHBootstrapperContextValue -ValuePath "FTP.CredentialExpression" -Invoke
-    $ftpISHServerFolder=$ftp.ISHServerFolder
-    $testHostBlock={
-        Test-Connection $ftpHost -Quiet
-    }
-    $testHost=Invoke-CommandWrap -ComputerName $computerName -Credential $credential -ScriptBlock $testHostBlock -BlockName "Test $ftpHost" -UseParameters @("ftpHost")
-    if(-not $testHost)
-    {
-        $ftpAlternateHost=$ftp.AlternativeHost
-        Write-Warning "Using alternate host $ftpAlternateHost instead of $ftpHost"
-        $ftpHost=$ftpAlternateHost
-    }
-}
+$unc=Get-ISHBootstrapperContextSource -UNC
+$ftp=Get-ISHBootstrapperContextSource -FTP
+$awss3=Get-ISHBootstrapperContextSource -AWSS3
 
 if($unc)
 {
-    $prerequisitesSourcePath=$unc.ISHServerFolder
-    & $scriptsPaths\ISHServer\Upload-ISHServerPrerequisites.ps1 -Computer $computerName -Credential $credential -PrerequisitesSourcePath $prerequisitesSourcePath -ISHServerVersion $ishServerVersion
+    & $scriptsPaths\ISHServer\Upload-ISHServerPrerequisites.ps1 -Computer $computerName -Credential $credential -PrerequisitesSourcePath $unc.ISHServerFolder -ISHServerVersion $ishServerVersion
 }
 if($ftp)
 {
-    & $scriptsPaths\ISHServer\Get-ISHServerPrerequisites.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -FTPHost $ftpHost -FTPCredential $ftpCredential -FTPFolder $ftpISHServerFolder
+    & $scriptsPaths\ISHServer\Get-ISHServerPrerequisites.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -FTPHost $ftp.Host -FTPCredential $ftp.Credential -FTPFolder $ftp.ISHServerFolder
+}
+if($awss3)
+{
+    & $scriptsPaths\ISHServer\Get-ISHServerPrerequisites.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -BucketName $awss3.BucketName -FolderKey $awss3.ISHServerFolderKey -AccessKey $awss3.AccessKey -SecretKey $awss3.SecretKey
 }
 
 & $scriptsPaths\ISHServer\Install-ISHServerPrerequisites.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -InstallOracle:$installOracle -InstallMSXML4:$installMSXML
@@ -169,10 +158,17 @@ if($ftp)
 {
     if($ftp.AntennaHouseLicensePath)
     {
-        & $scriptsPaths\ISHServer\Set-ISHAntennaHouseLicense.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -FTPHost $ftpHost -FTPCredential $ftpCredential -FTPPath $ftp.AntennaHouseLicensePath
+        & $scriptsPaths\ISHServer\Set-ISHAntennaHouseLicense.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -FTPHost $ftp.Host -FTPCredential $ftp.Credential -FTPPath $ftp.AntennaHouseLicensePath
     }
 }
 
+if($awss3)
+{
+    if($awss3.AntennaHouseLicenseKey)
+    {
+        & $scriptsPaths\ISHServer\Set-ISHAntennaHouseLicense.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion  -BucketName $awss3.BucketName -Key $awss3.AntennaHouseLicenseKey -AccessKey $awss3.AccessKey -SecretKey $awss3.SecretKey
+    }
+}
 
 if($computerName)
 {

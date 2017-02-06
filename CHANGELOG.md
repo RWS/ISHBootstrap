@@ -1,5 +1,14 @@
 # Change log
 
+## pre-release v0.7
+
+- Added support for AWS S3 buckets. Requires [ISHServer](https://github.com/Sarafian/ISHServer) version 1.1
+- [ISHServer](https://github.com/Sarafian/ISHServer) version 1.1 ISHCD provisioning is available. `Install-ISHDeployment.ps1` and `Uninstall-ISHDeployment.ps1` will calculate the cd's path.
+
+## pre-release v0.6
+
+- Removed supported for alternative ftp host. This was a hidden feature for internal SDL development.
+
 ## pre-release v0.5
 
 - Removed **xISHServer** module from this repository and moved to [ISHServer](https://github.com/Sarafian/ISHServer).

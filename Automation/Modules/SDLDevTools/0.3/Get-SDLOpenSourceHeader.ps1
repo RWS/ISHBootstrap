@@ -35,7 +35,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-"@ 
+"@  
     $output=$null
     switch ($Format)
     {
@@ -44,8 +44,16 @@ limitations under the License.
         }
         'CSharp' {
             $output=@("/*")
-            $output+=$header -split [System.Environment]::NewLine |ForEach-Object {"* $_"}
-            $output+=("*/")
+            $output+=$header -split [System.Environment]::NewLine |ForEach-Object {
+                    if([string]::IsNullOrEmpty($_.ToString())) {
+#                    if([string]::IsNullOrEmpty($_.ToString().Trim())) {
+                        " *"
+                    }
+                    else {
+                        " * $_"
+                    }
+                }
+            $output+=(" */")
             $output+=""
         }
         'PowerShell' {
