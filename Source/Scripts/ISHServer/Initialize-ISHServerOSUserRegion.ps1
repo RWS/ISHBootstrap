@@ -47,6 +47,10 @@ try
         $session=New-PSSession -ComputerName $Computer -Credential $OSUserCredential
         $remote=Add-ModuleFromRemote -Session $session -Name $ishServerModuleName
     }
+    else
+    {
+        $session=$null
+    }
 
     Write-Progress @scriptProgress -Status "Initializing regional settings"
     Initialize-ISHRegional
