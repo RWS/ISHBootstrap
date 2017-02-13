@@ -22,7 +22,11 @@ Function Get-ISHBootstrapperContextSource
         [Parameter(Mandatory=$false,ParameterSetName="FTP")]
         [switch]$FTP,
         [Parameter(Mandatory=$false,ParameterSetName="AWS-S3")]
-        [switch]$AWSS3
+        [switch]$AWSS3,
+        [Parameter(Mandatory=$false,ParameterSetName="Azure-FileStorage")]
+        [switch]$AzureFileStorage,
+        [Parameter(Mandatory=$false,ParameterSetName="Azure-BlobStorage")]
+        [switch]$AzureBlobStorage
     ) 
     . "$PSScriptRoot\Get-ISHBootstrapperContextValue.ps1"
 
@@ -84,6 +88,60 @@ Function Get-ISHBootstrapperContextSource
             $hash.ISHCDFolderKey=$awsS3Data.ISHCDFolderKey
             $hash.ISHCDFileName=$awsS3Data.ISHCDFileName
             $hash.AntennaHouseLicenseKey=$awsS3Data.AntennaHouseLicenseKey
+            break        
+        }
+        'Azure-FileStorage' {
+            $azureFileStorageData=Get-ISHBootstrapperContextValue -ValuePath "AzureFileStorage" -DefaultValue $null
+            if(-not $azureFileStorageData)
+            {
+                return
+            }
+            $hash.ShareName=$azureFileStorageData.ShareName
+            if($azureFileStorageData.StorageAccountName -and $azureFileStorageData.StorageAccountKey)
+            {
+                $hash.StorageAccountName=$azureFileStorageData.StorageAccountName
+                $hash.StorageAccountKey=$azureFileStorageData.StorageAccountKey
+            }
+            elseif($azureFileStorageData.Context)
+            {
+                $hash.Context=$azureFileStorageData.Context
+            }
+            else
+            {
+                $hash.StorageAccountName=$null
+                $hash.StorageAccountKey=$null
+            }
+            $hash.ISHServerFolderPath=$azureFileStorageData.ISHServerFolderPath
+            $hash.ISHCDFolderPath=$azureFileStorageData.ISHCDFolderPath
+            $hash.ISHCDFileName=$azureFileStorageData.ISHCDFileName
+            $hash.AntennaHouseLicensePath=$azureFileStorageData.AntennaHouseLicensePath
+            break        
+        }
+        'Azure-BlobStorage' {
+            $azureBlobStorageData=Get-ISHBootstrapperContextValue -ValuePath "AzureBlobStorage" -DefaultValue $null
+            if(-not $azureBlobStorageData)
+            {
+                return
+            }
+            $hash.ContainerName=$azureBlobStorageData.ContainerName
+            if($azureBlobStorageData.StorageAccountName -and $azureBlobStorageData.StorageAccountKey)
+            {
+                $hash.StorageAccountName=$azureBlobStorageData.StorageAccountName
+                $hash.StorageAccountKey=$azureBlobStorageData.StorageAccountKey
+            }
+            elseif($azureBlobStorageData.Context)
+            {
+                $hash.Context=$azureBlobStorageData.Context
+            }
+            else
+            {
+                $hash.StorageAccountName=$null
+                $hash.StorageAccountKey=$null
+            }
+            $hash.ISHServerFolderPath=$azureBlobStorageData.ISHServerFolderPath
+            $hash.ISHCDFolderPath=$azureBlobStorageData.ISHCDFolderPath
+            $hash.ISHCDFileName=$azureBlobStorageData.ISHCDFileName
+            $hash.AntennaHouseLicensePath=$azureBlobStorageData.AntennaHouseLicensePath
             break        
         }
     }
