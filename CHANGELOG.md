@@ -1,5 +1,10 @@
 # Change log
 
+## pre-release v0.8
+
+- Verified and improved scripts for strict mode execution.
+- Script `Initialize-ISHServerOSUserRegion.ps1` will now initialize the regional settings for the osuser even for local execution.
+
 ## pre-release v0.7
 
 - Added support for AWS S3 buckets. Requires [ISHServer](https://github.com/Sarafian/ISHServer) version 1.1

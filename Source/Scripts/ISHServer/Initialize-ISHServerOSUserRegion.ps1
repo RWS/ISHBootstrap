@@ -46,14 +46,25 @@ try
         $ishServerModuleName="ISHServer.$ISHServerVersion"
         $session=New-PSSession -ComputerName $Computer -Credential $OSUserCredential
         $remote=Add-ModuleFromRemote -Session $session -Name $ishServerModuleName
+
+        Write-Progress @scriptProgress -Status "Initializing regional settings"
+        Initialize-ISHRegional
     }
     else
     {
         $session=$null
+
+        Write-Progress @scriptProgress -Status "Initializing regional settings"
+        # Initialize-ISHRegional needs to execute from the osuser's context.
+        $arguments=@(
+            "-Command"
+            "Initialize-ISHRegional"
+        )
+        $powerShellPath=& C:\Windows\System32\where.exe powershell
+
+        Start-Process -FilePath $powerShellPath -ArgumentList $arguments -Credential $OSUserCredential -LoadUserProfile -NoNewWindow  -Wait
     }
 
-    Write-Progress @scriptProgress -Status "Initializing regional settings"
-    Initialize-ISHRegional
 }
 
 finally
