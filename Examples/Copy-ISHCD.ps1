@@ -61,24 +61,10 @@ if($awss3)
 if($azurefilestorage)
 {
     $path="$($azurefilestorage.ISHCDFolderPath)$($azurefilestorage.ISHCDFileName)"
-    if($azurefilestorage.Context)
-    {
-        & $scriptsPaths\ISHServer\Copy-ISHCD.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -ShareName $azurefilestorage.ShareName -Path $path -Context $azurefilestorage.Context
-    }
-    else 
-    {
-        & $scriptsPaths\ISHServer\Copy-ISHCD.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -ShareName $azurefilestorage.ShareName -Path $path -StorageAccountName $azurefilestorage.StorageAccountName -StorageAccountKey $azurefilestorage.StorageAccountKey
-    }
+    & $scriptsPaths\ISHServer\Copy-ISHCD.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -ShareName $azurefilestorage.ShareName -Path $path -StorageAccountName $azurefilestorage.StorageAccountName -StorageAccountKey $azurefilestorage.StorageAccountKey -Context $azurefilestorage.Context
 }
 if($azureblobstorage)
 {
     $path="$($azureblobstorage.ISHCDFolderPath)$($azureblobstorage.ISHCDFileName)"
-    if($azureblobstorage.Context)
-    {
-        & $scriptsPaths\ISHServer\Copy-ISHCD.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -ContainerName $azureblobstorage.ContainerName -Path $path -Context $azureblobstorage.Context
-    }
-    else
-    {
-        & $scriptsPaths\ISHServer\Copy-ISHCD.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -ContainerName $azureblobstorage.ContainerName -BlobName $path -StorageAccountName $azureblobstorage.StorageAccountName -StorageAccountKey $azureblobstorage.StorageAccountKey
-    }
+    & $scriptsPaths\ISHServer\Copy-ISHCD.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -ContainerName $azureblobstorage.ContainerName -BlobName $path -StorageAccountName $azureblobstorage.StorageAccountName -StorageAccountKey $azureblobstorage.StorageAccountKey -Context $azureblobstorage.Context
 }
