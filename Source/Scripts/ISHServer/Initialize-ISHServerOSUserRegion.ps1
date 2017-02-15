@@ -15,7 +15,7 @@
 #>
 
 param (
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory=$false)]
     [string]$Computer,
     [Parameter(Mandatory=$true)]
     [PSCredential]$OSUserCredential,
