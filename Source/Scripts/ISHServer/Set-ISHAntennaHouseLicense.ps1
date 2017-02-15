@@ -62,9 +62,6 @@ param (
     [Parameter(Mandatory=$false,ParameterSetName="From Azure FileStorage")]
     [parameter(ParameterSetName="From Azure BlobStorage")]
     [string]$StorageAccountKey,
-    [Parameter(Mandatory=$false,ParameterSetName="From Azure FileStorage")]
-    [Parameter(Mandatory=$false,ParameterSetName="From Azure BlobStorage")]
-    [Object]$Context,
     [Parameter(Mandatory=$true,ParameterSetName="From File")]
     [string]$FilePath
 )    
@@ -103,11 +100,11 @@ try
             break        
         }
         'From Azure FileStorage' {
-            Set-ISHToolAntennaHouseLicense -ShareName $ShareName -Path $Path -Expand -StorageAccountName $StorageAccountName -StorageAccountKey $StorageAccountKey -Context $Context
+            Set-ISHToolAntennaHouseLicense -ShareName $ShareName -Path $Path -Expand -StorageAccountName $StorageAccountName -StorageAccountKey $StorageAccountKey
             break        
         }
         'From Azure BlobStorage' {
-            Set-ISHToolAntennaHouseLicense -ContainerName $ContainerName -BlobName $BlobName -Expand -StorageAccountName $StorageAccountName -StorageAccountKey $StorageAccountKey -Context $Context
+            Set-ISHToolAntennaHouseLicense -ContainerName $ContainerName -BlobName $BlobName -Expand -StorageAccountName $StorageAccountName -StorageAccountKey $StorageAccountKey
             break        
         }
         'From File' {

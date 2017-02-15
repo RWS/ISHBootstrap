@@ -61,10 +61,10 @@ if($awss3)
 if($azurefilestorage)
 {
     $path="$($azurefilestorage.ISHCDFolderPath)$($azurefilestorage.ISHCDFileName)"
-    & $scriptsPaths\ISHServer\Copy-ISHCD.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -ShareName $azurefilestorage.ShareName -Path $path -StorageAccountName $azurefilestorage.StorageAccountName -StorageAccountKey $azurefilestorage.StorageAccountKey -Context $azurefilestorage.Context
+    & $scriptsPaths\ISHServer\Copy-ISHCD.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -ShareName $azurefilestorage.ShareName -Path $path -StorageAccountName $azurefilestorage.StorageAccountName -StorageAccountKey $azurefilestorage.StorageAccountKey
 }
 if($azureblobstorage)
 {
     $path="$($azureblobstorage.ISHCDFolderPath)$($azureblobstorage.ISHCDFileName)"
-    & $scriptsPaths\ISHServer\Copy-ISHCD.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -ContainerName $azureblobstorage.ContainerName -BlobName $path -StorageAccountName $azureblobstorage.StorageAccountName -StorageAccountKey $azureblobstorage.StorageAccountKey -Context $azureblobstorage.Context
+    & $scriptsPaths\ISHServer\Copy-ISHCD.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -ContainerName $azureblobstorage.ContainerName -BlobName $path -StorageAccountName $azureblobstorage.StorageAccountName -StorageAccountKey $azureblobstorage.StorageAccountKey
 }

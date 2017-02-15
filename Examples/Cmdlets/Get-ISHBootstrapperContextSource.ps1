@@ -102,10 +102,6 @@ Function Get-ISHBootstrapperContextSource
                 $hash.StorageAccountName=$azureFileStorageData.StorageAccountName
                 $hash.StorageAccountKey=$azureFileStorageData.StorageAccountKey
             }
-            elseif($azureFileStorageData.Context)
-            {
-                $hash.Context=$azureFileStorageData.Context
-            }
             else
             {
                 $hash.StorageAccountName=$null
@@ -128,10 +124,6 @@ Function Get-ISHBootstrapperContextSource
             {
                 $hash.StorageAccountName=$azureBlobStorageData.StorageAccountName
                 $hash.StorageAccountKey=$azureBlobStorageData.StorageAccountKey
-            }
-            elseif($azureBlobStorageData.Context)
-            {
-                $hash.Context=$azureBlobStorageData.Context
             }
             else
             {

@@ -56,10 +56,7 @@ param (
     [string]$StorageAccountName,
     [Parameter(Mandatory=$false,ParameterSetName="From Azure FileStorage")]
     [Parameter(Mandatory=$false,ParameterSetName="From Azure BlobStorage")]
-    [string]$StorageAccountKey,
-    [Parameter(Mandatory=$false,ParameterSetName="From Azure FileStorage")]
-    [Parameter(Mandatory=$false,ParameterSetName="From Azure BlobStorage")]
-    [Object]$Context
+    [string]$StorageAccountKey
 )    
 $cmdletsPaths="$PSScriptRoot\..\..\Cmdlets"
 
@@ -95,11 +92,11 @@ try
             break        
         }
         'From Azure FileStorage' {
-            Get-ISHPrerequisites -ShareName $ShareName -FolderPath $FolderPath -StorageAccountName $StorageAccountName -StorageAccountKey $StorageAccountKey -Context $Context
+            Get-ISHPrerequisites -ShareName $ShareName -FolderPath $FolderPath -StorageAccountName $StorageAccountName -StorageAccountKey $StorageAccountKey
             break        
         }
         'From Azure BlobStorage' {
-            Get-ISHPrerequisites -ContainerName $ContainerName -FolderPath $FolderPath -StorageAccountName $StorageAccountName -StorageAccountKey $StorageAccountKey -Context $Context
+            Get-ISHPrerequisites -ContainerName $ContainerName -FolderPath $FolderPath -StorageAccountName $StorageAccountName -StorageAccountKey $StorageAccountKey
             break        
         }
     }
