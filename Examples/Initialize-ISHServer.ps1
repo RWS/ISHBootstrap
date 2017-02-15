@@ -88,7 +88,7 @@ if($computerName)
 else
 {
    & $scriptsPaths\ISHServer\Initialize-ISHServerOSUser.ps1 -ISHServerVersion $ishServerVersion -OSUser ($osUserCredential.UserName)
-   Write-Warning "Cannot execute $scriptsPaths\ISHServer\Initialize-ISHServerOSUserRegion.ps1 locally."
+   & $scriptsPaths\ISHServer\Initialize-ISHServerOSUserRegion.ps1 -OSUserCredential $osUserCredential -ISHServerVersion $ishServerVersion
 }
 
 $webCertificate=Get-ISHBootstrapperContextValue -ValuePath "WebCertificate"
