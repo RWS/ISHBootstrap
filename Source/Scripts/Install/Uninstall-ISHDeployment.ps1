@@ -45,7 +45,7 @@ $findCDPath={
         throw "No matching CD found"
         return
     }
-    if($availableCD.Count -gt 1)
+    if($availableCD -is [array])
     {
         $availableCD=$availableCD[0]
         Write-Warning "Found more than one cd. Using $($availableCD.Name)"
