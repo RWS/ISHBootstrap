@@ -4,6 +4,7 @@
 
 - Verified and improved scripts for strict mode execution.
 - Script `Initialize-ISHServerOSUserRegion.ps1` will now initialize the regional settings for the osuser even for local execution.
+- Added support for Azure file and blob storage. Requires [ISHServer](https://github.com/Sarafian/ISHServer) version 1.2
 
 ## pre-release v0.7
 
