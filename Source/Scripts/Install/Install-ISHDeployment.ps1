@@ -35,7 +35,13 @@ param (
     [Parameter(Mandatory=$false)]
     [int]$LucenePort="8080",
     [Parameter(Mandatory=$false)]
-    [switch]$UseRelativePaths=$false
+    [switch]$UseRelativePaths=$false,
+    [Parameter(Mandatory=$false)]
+    [string]$HostName=$null,
+    [Parameter(Mandatory=$false)]
+    [string]$LocalServiceHostName=$null,
+    [Parameter(Mandatory=$false)]
+    [string]$MachineName=$null
 )
 
 $cmdletsPaths="$PSScriptRoot\..\..\Cmdlets"
@@ -78,9 +84,16 @@ $newParameterScriptBlock={
     $serviceCertificateThumbprint=(Get-WebBinding 'Default Web Site' -Protocol "https").certificateHash
 
     $serviceCertificate=Get-ChildItem -path "cert:\LocalMachine\My" | Where-Object {$_.Thumbprint -eq $serviceCertificateThumbprint}
-    #Take the fqdn from the web site's attached certificate or from the Service Certificate thumbprint
-    $fqdn=(($serviceCertificate.Subject -split ', ')[0] -split '=')[1];
-    $baseUrl="https://$fqdn".ToLower()
+    if($HostName)
+    {
+        $baseUrl="https://$HostName"
+    }
+    else
+    {
+        #Take the fqdn from the web site's attached certificate or from the Service Certificate thumbprint
+        $fqdn=(($serviceCertificate.Subject -split ', ')[0] -split '=')[1];
+        $baseUrl="https://$fqdn".ToLower()
+    }
 
     $osUserNetworkCredential=$OSUserCredential.GetNetworkCredential()
     if($osUserNetworkCredential.Domain -and ($osUserNetworkCredential.Domain -ne ""))
@@ -110,7 +123,14 @@ $newParameterScriptBlock={
     }
     $inputParameters["projectsuffix"]=$suffix
     $inputParameters["baseurl"]=$baseUrl
-    $inputParameters["localservicehostname"]="$computerName"
+    if($LocalServiceHostName)
+    {
+        $inputParameters["localservicehostname"]="$LocalServiceHostName"
+    }
+    else
+    {
+        $inputParameters["localservicehostname"]="$computerName"
+    }
     $inputParameters["apppath"]=$RootPath
     $inputParameters["datapath"]=$RootPath
     $inputParameters["webpath"]=$RootPath
@@ -143,6 +163,11 @@ $newParameterScriptBlock={
     $inputParameters["issuerwstrustmexurl"]="$baseurl/$infosharestswebappname/issue/wstrust/mex"
     $inputParameters["issuerwstrustendpointurl"]="$baseurl/$infosharestswebappname/issue/wstrust/mixed/$ishSTSType"
     $inputParameters["issuercertificatethumbprint"]=$inputParameters["servicecertificatethumbprint"]
+
+    if($MachineName)
+    {
+        $inputParameters["machinename"]=$MachineName
+    }
 
     $inputParametersPath=Join-Path $CDPath "__InstallTool\inputparameters.xml"
     [xml]$xml=Get-Content $inputParametersPath
