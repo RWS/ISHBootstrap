@@ -43,7 +43,20 @@ param (
     [Parameter(Mandatory=$false,ParameterSetName="From AWS S3")]
     [string]$SecretKey,
     [Parameter(Mandatory=$false,ParameterSetName="From AWS S3")]
-    [string]$SessionToken
+    [string]$SessionToken,
+    [Parameter(Mandatory=$true,ParameterSetName="From Azure FileStorage")]
+    [string]$ShareName,
+    [Parameter(Mandatory=$true,ParameterSetName="From Azure BlobStorage")]
+    [string]$ContainerName,
+    [Parameter(Mandatory=$true,ParameterSetName="From Azure FileStorage")]
+    [Parameter(Mandatory=$true,ParameterSetName="From Azure BlobStorage")]
+    [string]$FolderPath,
+    [Parameter(Mandatory=$false,ParameterSetName="From Azure FileStorage")]
+    [Parameter(Mandatory=$false,ParameterSetName="From Azure BlobStorage")]
+    [string]$StorageAccountName,
+    [Parameter(Mandatory=$false,ParameterSetName="From Azure FileStorage")]
+    [Parameter(Mandatory=$false,ParameterSetName="From Azure BlobStorage")]
+    [string]$StorageAccountKey
 )    
 $cmdletsPaths="$PSScriptRoot\..\..\Cmdlets"
 
@@ -76,6 +89,14 @@ try
         }
         'From AWS S3' {
             Get-ISHPrerequisites -BucketName $BucketName -FolderKey $FolderKey -AccessKey $AccessKey -ProfileName $ProfileName -ProfileLocation $ProfileLocation -Region $Region -SecretKey $SecretKey -SessionToken $SessionToken
+            break        
+        }
+        'From Azure FileStorage' {
+            Get-ISHPrerequisites -ShareName $ShareName -FolderPath $FolderPath -StorageAccountName $StorageAccountName -StorageAccountKey $StorageAccountKey
+            break        
+        }
+        'From Azure BlobStorage' {
+            Get-ISHPrerequisites -ContainerName $ContainerName -FolderPath $FolderPath -StorageAccountName $StorageAccountName -StorageAccountKey $StorageAccountKey
             break        
         }
     }

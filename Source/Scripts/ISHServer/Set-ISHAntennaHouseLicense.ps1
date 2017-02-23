@@ -27,7 +27,7 @@ param (
     [Parameter(Mandatory=$true,ParameterSetName="From FTP")]
     [pscredential]$FTPCredential,
     [Parameter(Mandatory=$true,ParameterSetName="From FTP")]
-        [ValidatePattern(".*AHFormatter\.lic")]
+    [ValidatePattern(".*AHFormatter\.lic")]
     [string]$FTPPath,
     [Parameter(Mandatory=$true,ParameterSetName="From AWS S3")]
     [string]$BucketName,
@@ -46,6 +46,22 @@ param (
     [string]$SecretKey,
     [Parameter(Mandatory=$false,ParameterSetName="From AWS S3")]
     [string]$SessionToken,
+    [Parameter(Mandatory=$true,ParameterSetName="From Azure FileStorage")]
+    [string]$ShareName,
+    [Parameter(Mandatory=$true,ParameterSetName="From Azure FileStorage")]
+    [ValidatePattern(".*AHFormatter\.lic")]
+    [string]$Path,
+    [Parameter(Mandatory=$true,ParameterSetName="From Azure BlobStorage")]
+    [string]$ContainerName,
+    [Parameter(Mandatory=$true,ParameterSetName="From Azure BlobStorage")]
+    [ValidatePattern(".*AHFormatter\.lic")]
+    [string]$BlobName,
+    [Parameter(Mandatory=$false,ParameterSetName="From Azure FileStorage")]
+    [Parameter(Mandatory=$false,ParameterSetName="From Azure BlobStorage")]
+    [string]$StorageAccountName,
+    [Parameter(Mandatory=$false,ParameterSetName="From Azure FileStorage")]
+    [parameter(ParameterSetName="From Azure BlobStorage")]
+    [string]$StorageAccountKey,
     [Parameter(Mandatory=$true,ParameterSetName="From File")]
     [string]$FilePath
 )    
@@ -81,6 +97,14 @@ try
         }
         'From AWS S3' {
             Set-ISHToolAntennaHouseLicense -BucketName $BucketName -Key $Key -AccessKey $AccessKey -ProfileName $ProfileName -ProfileLocation $ProfileLocation -Region $Region -SecretKey $SecretKey -SessionToken $SessionToken
+            break        
+        }
+        'From Azure FileStorage' {
+            Set-ISHToolAntennaHouseLicense -ShareName $ShareName -Path $Path -Expand -StorageAccountName $StorageAccountName -StorageAccountKey $StorageAccountKey
+            break        
+        }
+        'From Azure BlobStorage' {
+            Set-ISHToolAntennaHouseLicense -ContainerName $ContainerName -BlobName $BlobName -Expand -StorageAccountName $StorageAccountName -StorageAccountKey $StorageAccountKey
             break        
         }
         'From File' {
