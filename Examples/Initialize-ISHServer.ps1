@@ -47,6 +47,8 @@ if(-not $isSupported)
 $unc=Get-ISHBootstrapperContextSource -UNC
 $ftp=Get-ISHBootstrapperContextSource -FTP
 $awss3=Get-ISHBootstrapperContextSource -AWSS3
+$azurefilestorage=Get-ISHBootstrapperContextSource -AzureFileStorage
+$azureblobstorage=Get-ISHBootstrapperContextSource -AzureBlobStorage
 
 if($unc)
 {
@@ -59,6 +61,14 @@ if($ftp)
 if($awss3)
 {
     & $scriptsPaths\ISHServer\Get-ISHServerPrerequisites.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -BucketName $awss3.BucketName -FolderKey $awss3.ISHServerFolderKey -AccessKey $awss3.AccessKey -SecretKey $awss3.SecretKey
+}
+if($azurefilestorage)
+{
+    & $scriptsPaths\ISHServer\Get-ISHServerPrerequisites.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -ShareName $azurefilestorage.ShareName -FolderPath $azurefilestorage.ISHServerFolderPath  -StorageAccountName $azurefilestorage.StorageAccountName -StorageAccountKey $azurefilestorage.StorageAccountKey
+}
+if($azureblobstorage)
+{
+    & $scriptsPaths\ISHServer\Get-ISHServerPrerequisites.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -ContainerName $azureblobstorage.ContainerName -FolderPath $azureblobstorage.ISHServerFolderPath  -StorageAccountName $azureblobstorage.StorageAccountName -StorageAccountKey $azureblobstorage.StorageAccountKey
 }
 
 & $scriptsPaths\ISHServer\Install-ISHServerPrerequisites.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -InstallOracle:$installOracle -InstallMSXML4:$installMSXML
@@ -169,6 +179,23 @@ if($awss3)
         & $scriptsPaths\ISHServer\Set-ISHAntennaHouseLicense.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion  -BucketName $awss3.BucketName -Key $awss3.AntennaHouseLicenseKey -AccessKey $awss3.AccessKey -SecretKey $awss3.SecretKey
     }
 }
+
+if($azurefilestorage)
+{
+    if($azurefilestorage.AntennaHouseLicenseKey)
+    {
+        & $scriptsPaths\ISHServer\Set-ISHAntennaHouseLicense.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -ShareName $azurefilestorage.ShareName -Path $azureblobstorage.AntennaHouseLicenseKey -StorageAccountName $azurefilestorage.StorageAccountName -StorageAccountKey $azurefilestorage.StorageAccountKey
+    }
+}
+
+if($azureblobstorage)
+{
+    if($azureblobstorage.AntennaHouseLicenseKey)
+    {
+        & $scriptsPaths\ISHServer\Set-ISHAntennaHouseLicense.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -ContainerName $azureblobstorage.ContainerName -BlobName $azureblobstorage.AntennaHouseLicenseKey -StorageAccountName $azureblobstorage.StorageAccountName -StorageAccountKey $azureblobstorage.StorageAccountKey
+    }
+}
+
 
 if($computerName)
 {
