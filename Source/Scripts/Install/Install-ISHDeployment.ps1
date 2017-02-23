@@ -172,6 +172,8 @@ $newParameterScriptBlock={
     $inputParametersPath=Join-Path $CDPath "__InstallTool\inputparameters.xml"
     [xml]$xml=Get-Content $inputParametersPath
     
+    #region Add the missing xml elements
+
     if($suffix -ne "")
     {
         $node=$xml | Select-Xml -XPath "//param[@name='projectsuffix']"
@@ -196,6 +198,81 @@ $newParameterScriptBlock={
             $xml.inputconfig.AppendChild($param) |Out-Null
         }
     }
+
+    if($HostName)
+    {
+        $node=$xml | Select-Xml -XPath "//param[@name='baseurl']"
+        if(-not $node)
+        {
+            $param = $xml.CreateElement('param')
+            $param.SetAttribute('name','baseurl') |Out-Null
+            
+            $currentValue = $xml.CreateElement('currentvalue')
+            $currentValue.InnerText=$inputParameters["baseurl"]
+            $param.AppendChild($currentValue) |Out-Null
+
+            $defaultvalue = $xml.CreateElement('defaultvalue')
+            $param.AppendChild($defaultvalue) |Out-Null
+
+            $description = $xml.CreateElement('description')
+            $param.AppendChild($description) |Out-Null
+
+            $validate = $xml.CreateElement('validate')
+            $param.AppendChild($validate) |Out-Null
+
+            $xml.inputconfig.AppendChild($param) |Out-Null
+        }
+    }
+    if($LocalServiceHostName)
+    {
+        $node=$xml | Select-Xml -XPath "//param[@name='localservicehostname']"
+        if(-not $node)
+        {
+            $param = $xml.CreateElement('param')
+            $param.SetAttribute('name','localservicehostname') |Out-Null
+            
+            $currentValue = $xml.CreateElement('currentvalue')
+            $currentValue.InnerText=$inputParameters["localservicehostname"]
+            $param.AppendChild($currentValue) |Out-Null
+
+            $defaultvalue = $xml.CreateElement('defaultvalue')
+            $param.AppendChild($defaultvalue) |Out-Null
+
+            $description = $xml.CreateElement('description')
+            $param.AppendChild($description) |Out-Null
+
+            $validate = $xml.CreateElement('validate')
+            $param.AppendChild($validate) |Out-Null
+
+            $xml.inputconfig.AppendChild($param) |Out-Null
+        }
+    }
+    if($MachineName)
+    {
+        $node=$xml | Select-Xml -XPath "//param[@name='machinename']"
+        if(-not $node)
+        {
+            $param = $xml.CreateElement('param')
+            $param.SetAttribute('name','machinename') |Out-Null
+            
+            $currentValue = $xml.CreateElement('currentvalue')
+            $currentValue.InnerText=$inputParameters["machinename"]
+            $param.AppendChild($currentValue) |Out-Null
+
+            $defaultvalue = $xml.CreateElement('defaultvalue')
+            $param.AppendChild($defaultvalue) |Out-Null
+
+            $description = $xml.CreateElement('description')
+            $param.AppendChild($description) |Out-Null
+
+            $validate = $xml.CreateElement('validate')
+            $param.AppendChild($validate) |Out-Null
+
+            $xml.inputconfig.AppendChild($param) |Out-Null
+        }
+    }
+
+    #endregion
 
     foreach($key in $inputParameters.Keys)
     {
