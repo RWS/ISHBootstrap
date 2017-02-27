@@ -1,5 +1,7 @@
 # Change log
 
+## pre-release v0.9
+
 ## pre-release v0.8
 
 - GH-44: ISHBootstrap is not Set-StrictMode combatible.
