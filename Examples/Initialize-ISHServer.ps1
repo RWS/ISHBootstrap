@@ -20,7 +20,7 @@ if ($PSBoundParameters['Debug']) {
 
 $sourcePath=Resolve-Path "$PSScriptRoot\..\Source"
 $cmdletsPaths="$sourcePath\Cmdlets"
-$scriptsPaths="$sourcePath\Scripts"
+$serverScriptsPaths="$sourcePath\Server"
 
 . "$PSScriptRoot\Cmdlets\Get-ISHBootstrapperContextValue.ps1"
 . "$PSScriptRoot\Cmdlets\Get-ISHBootstrapperContextSource.ps1"
@@ -30,7 +30,7 @@ $computerName=Get-ISHBootstrapperContextValue -ValuePath "ComputerName" -Default
 $credential=Get-ISHBootstrapperContextValue -ValuePath "CredentialExpression" -Invoke
 if(-not $computerName)
 {
-    & "$scriptsPaths\Helpers\Test-Administrator.ps1"
+    & "$serverScriptsPaths\Helpers\Test-Administrator.ps1"
 }
 
 $osUserCredential=Get-ISHBootstrapperContextValue -ValuePath "OSUserCredentialExpression" -Invoke
@@ -39,7 +39,7 @@ $ishServerVersion=($ishVersion -split "\.")[0]
 
 $installOracle=Get-ISHBootstrapperContextValue -ValuePath "InstallOracle" -DefaultValue $false
 $installMSXML=(($ishVersion -eq "12.0.0") -or ($ishVersion -eq "12.0.1"))
-$isSupported=& $scriptsPaths\ISHServer\Test-SupportedServer.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion
+$isSupported=& $serverScriptsPaths\ISHServer\Test-SupportedServer.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion
 if(-not $isSupported)
 {
     return
@@ -52,26 +52,26 @@ $azureblobstorage=Get-ISHBootstrapperContextSource -AzureBlobStorage
 
 if($unc)
 {
-    & $scriptsPaths\ISHServer\Upload-ISHServerPrerequisites.ps1 -Computer $computerName -Credential $credential -PrerequisitesSourcePath $unc.ISHServerFolder -ISHServerVersion $ishServerVersion
+    & $serverScriptsPaths\ISHServer\Upload-ISHServerPrerequisites.ps1 -Computer $computerName -Credential $credential -PrerequisitesSourcePath $unc.ISHServerFolder -ISHServerVersion $ishServerVersion
 }
 if($ftp)
 {
-    & $scriptsPaths\ISHServer\Get-ISHServerPrerequisites.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -FTPHost $ftp.Host -FTPCredential $ftp.Credential -FTPFolder $ftp.ISHServerFolder
+    & $serverScriptsPaths\ISHServer\Get-ISHServerPrerequisites.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -FTPHost $ftp.Host -FTPCredential $ftp.Credential -FTPFolder $ftp.ISHServerFolder
 }
 if($awss3)
 {
-    & $scriptsPaths\ISHServer\Get-ISHServerPrerequisites.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -BucketName $awss3.BucketName -FolderKey $awss3.ISHServerFolderKey -AccessKey $awss3.AccessKey -SecretKey $awss3.SecretKey
+    & $serverScriptsPaths\ISHServer\Get-ISHServerPrerequisites.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -BucketName $awss3.BucketName -FolderKey $awss3.ISHServerFolderKey -AccessKey $awss3.AccessKey -SecretKey $awss3.SecretKey
 }
 if($azurefilestorage)
 {
-    & $scriptsPaths\ISHServer\Get-ISHServerPrerequisites.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -ShareName $azurefilestorage.ShareName -FolderPath $azurefilestorage.ISHServerFolderPath  -StorageAccountName $azurefilestorage.StorageAccountName -StorageAccountKey $azurefilestorage.StorageAccountKey
+    & $serverScriptsPaths\ISHServer\Get-ISHServerPrerequisites.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -ShareName $azurefilestorage.ShareName -FolderPath $azurefilestorage.ISHServerFolderPath  -StorageAccountName $azurefilestorage.StorageAccountName -StorageAccountKey $azurefilestorage.StorageAccountKey
 }
 if($azureblobstorage)
 {
-    & $scriptsPaths\ISHServer\Get-ISHServerPrerequisites.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -ContainerName $azureblobstorage.ContainerName -FolderPath $azureblobstorage.ISHServerFolderPath  -StorageAccountName $azureblobstorage.StorageAccountName -StorageAccountKey $azureblobstorage.StorageAccountKey
+    & $serverScriptsPaths\ISHServer\Get-ISHServerPrerequisites.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -ContainerName $azureblobstorage.ContainerName -FolderPath $azureblobstorage.ISHServerFolderPath  -StorageAccountName $azureblobstorage.StorageAccountName -StorageAccountKey $azureblobstorage.StorageAccountKey
 }
 
-& $scriptsPaths\ISHServer\Install-ISHServerPrerequisites.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -InstallOracle:$installOracle -InstallMSXML4:$installMSXML
+& $serverScriptsPaths\ISHServer\Install-ISHServerPrerequisites.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -InstallOracle:$installOracle -InstallMSXML4:$installMSXML
 
 if($computerName)
 {
@@ -81,24 +81,24 @@ if($computerName)
         if($useFQDNWithCredSSP)
         {
             $fqdn=[System.Net.Dns]::GetHostByName($computerName)| FL HostName | Out-String | %{ "{0}" -f $_.Split(':')[1].Trim() };
-             & $scriptsPaths\ISHServer\Initialize-ISHServerOSUser.ps1 -Computer $fqdn -Credential $credential -ISHServerVersion $ishServerVersion -OSUser ($osUserCredential.UserName) -CredSSP
+             & $serverScriptsPaths\ISHServer\Initialize-ISHServerOSUser.ps1 -Computer $fqdn -Credential $credential -ISHServerVersion $ishServerVersion -OSUser ($osUserCredential.UserName) -CredSSP
         }
         else
         {
             $sessionOptionsWithCredSSP=Get-ISHBootstrapperContextValue -ValuePath "SessionOptionsWithCredSSPExpression" -Invoke
-             & $scriptsPaths\ISHServer\Initialize-ISHServerOSUser.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -SessionOptions $sessionOptionsWithCredSSP -OSUser ($osUserCredential.UserName) -CredSSP
+             & $serverScriptsPaths\ISHServer\Initialize-ISHServerOSUser.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -SessionOptions $sessionOptionsWithCredSSP -OSUser ($osUserCredential.UserName) -CredSSP
         }
     }
     else
     {
-         & $scriptsPaths\ISHServer\Initialize-ISHServerOSUser.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -OSUser ($osUserCredential.UserName)
+         & $serverScriptsPaths\ISHServer\Initialize-ISHServerOSUser.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -OSUser ($osUserCredential.UserName)
     }
-     & $scriptsPaths\ISHServer\Initialize-ISHServerOSUserRegion.ps1 -Computer $computerName -OSUserCredential $osUserCredential -ISHServerVersion $ishServerVersion
+     & $serverScriptsPaths\ISHServer\Initialize-ISHServerOSUserRegion.ps1 -Computer $computerName -OSUserCredential $osUserCredential -ISHServerVersion $ishServerVersion
 }
 else
 {
-   & $scriptsPaths\ISHServer\Initialize-ISHServerOSUser.ps1 -ISHServerVersion $ishServerVersion -OSUser ($osUserCredential.UserName)
-   & $scriptsPaths\ISHServer\Initialize-ISHServerOSUserRegion.ps1 -OSUserCredential $osUserCredential -ISHServerVersion $ishServerVersion
+   & $serverScriptsPaths\ISHServer\Initialize-ISHServerOSUser.ps1 -ISHServerVersion $ishServerVersion -OSUser ($osUserCredential.UserName)
+   & $serverScriptsPaths\ISHServer\Initialize-ISHServerOSUserRegion.ps1 -OSUserCredential $osUserCredential -ISHServerVersion $ishServerVersion
 }
 
 $webCertificate=Get-ISHBootstrapperContextValue -ValuePath "WebCertificate"
@@ -142,33 +142,33 @@ if($webCertificate)
         if(Get-ISHBootstrapperContextValue -ValuePath "Domain")
         {
             $fqdn=[System.Net.Dns]::GetHostByName($computerName)| FL HostName | Out-String | %{ "{0}" -f $_.Split(':')[1].Trim() };
-            $certificate=& $scriptsPaths\Certificates\Install-Certificate.ps1 -Computer $fqdn -Credential $credential -CredSSP @hash
+            $certificate=& $serverScriptsPaths\Certificates\Install-Certificate.ps1 -Computer $fqdn -Credential $credential -CredSSP @hash
         }
         else
         {
-             $certificate=& $scriptsPaths\Certificates\Install-Certificate.ps1 @hash
+             $certificate=& $serverScriptsPaths\Certificates\Install-Certificate.ps1 @hash
         }
     }
 
-    & $scriptsPaths\IIS\Set-IISSslBinding.ps1 -Computer $computerName -Credential $credential -Thumbprint $certificate.Thumbprint
+    & $serverScriptsPaths\IIS\Set-IISSslBinding.ps1 -Computer $computerName -Credential $credential -Thumbprint $certificate.Thumbprint
 }
 else
 {
-    & $scriptsPaths\IIS\Set-IISSslBinding.ps1 -Computer $computerName -Credential $credential
+    & $serverScriptsPaths\IIS\Set-IISSslBinding.ps1 -Computer $computerName -Credential $credential
 }
 
 if($unc)
 {
     if($unc.AntennaHouseLicensePath)
     {
-        & $scriptsPaths\ISHServer\Set-ISHAntennaHouseLicense.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -FilePath $unc.AntennaHouseLicensePath
+        & $serverScriptsPaths\ISHServer\Set-ISHAntennaHouseLicense.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -FilePath $unc.AntennaHouseLicensePath
     }
 }
 if($ftp)
 {
     if($ftp.AntennaHouseLicensePath)
     {
-        & $scriptsPaths\ISHServer\Set-ISHAntennaHouseLicense.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -FTPHost $ftp.Host -FTPCredential $ftp.Credential -FTPPath $ftp.AntennaHouseLicensePath
+        & $serverScriptsPaths\ISHServer\Set-ISHAntennaHouseLicense.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -FTPHost $ftp.Host -FTPCredential $ftp.Credential -FTPPath $ftp.AntennaHouseLicensePath
     }
 }
 
@@ -176,7 +176,7 @@ if($awss3)
 {
     if($awss3.AntennaHouseLicenseKey)
     {
-        & $scriptsPaths\ISHServer\Set-ISHAntennaHouseLicense.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion  -BucketName $awss3.BucketName -Key $awss3.AntennaHouseLicenseKey -AccessKey $awss3.AccessKey -SecretKey $awss3.SecretKey
+        & $serverScriptsPaths\ISHServer\Set-ISHAntennaHouseLicense.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion  -BucketName $awss3.BucketName -Key $awss3.AntennaHouseLicenseKey -AccessKey $awss3.AccessKey -SecretKey $awss3.SecretKey
     }
 }
 
@@ -184,7 +184,7 @@ if($azurefilestorage)
 {
     if($azurefilestorage.AntennaHouseLicenseKey)
     {
-        & $scriptsPaths\ISHServer\Set-ISHAntennaHouseLicense.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -ShareName $azurefilestorage.ShareName -Path $azureblobstorage.AntennaHouseLicenseKey -StorageAccountName $azurefilestorage.StorageAccountName -StorageAccountKey $azurefilestorage.StorageAccountKey
+        & $serverScriptsPaths\ISHServer\Set-ISHAntennaHouseLicense.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -ShareName $azurefilestorage.ShareName -Path $azureblobstorage.AntennaHouseLicenseKey -StorageAccountName $azurefilestorage.StorageAccountName -StorageAccountKey $azurefilestorage.StorageAccountKey
     }
 }
 
@@ -192,14 +192,14 @@ if($azureblobstorage)
 {
     if($azureblobstorage.AntennaHouseLicenseKey)
     {
-        & $scriptsPaths\ISHServer\Set-ISHAntennaHouseLicense.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -ContainerName $azureblobstorage.ContainerName -BlobName $azureblobstorage.AntennaHouseLicenseKey -StorageAccountName $azureblobstorage.StorageAccountName -StorageAccountKey $azureblobstorage.StorageAccountKey
+        & $serverScriptsPaths\ISHServer\Set-ISHAntennaHouseLicense.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -ContainerName $azureblobstorage.ContainerName -BlobName $azureblobstorage.AntennaHouseLicenseKey -StorageAccountName $azureblobstorage.StorageAccountName -StorageAccountKey $azureblobstorage.StorageAccountKey
     }
 }
 
 
 if($computerName)
 {
-    & $scriptsPaths\Helpers\Restart-Server.ps1 -Computer $computerName -Credential $credential
+    & $serverScriptsPaths\Helpers\Restart-Server.ps1 -Computer $computerName -Credential $credential
 }
 else
 {

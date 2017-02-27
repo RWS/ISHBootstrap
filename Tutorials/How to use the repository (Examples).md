@@ -181,7 +181,7 @@ This step uses the `FTP.*` for the ISHServer 3rd party dependencies. The file ar
 The values of `CredentialForCredSSPExpression` and `OSUserCredentialExpression` are an abstraction to the credentials for a user that can establish a session with CredSSP and for the `osuser`.
 Behind the scenes the `Invoke-Expression` is used to execute the specified cmdlet. In my profile scripts I've made sure that cmdlets `New-MyCredential` and `New-InfoShareServiceUserCredential` are always available.
 
-Behind the scenes the scripts in folder `Source\Scripts\ISHServer` are executed. 
+Behind the scenes the scripts in folder `Source\Server\ISHServer` are executed. 
 The `Initialize-ISHServerOSUser.ps1` is the most tricky one because it needs to add the `osuser` to the local administrator group. 
 To do that the remote call needs to access the active directory and this is where the double hop issue appears. Read more on [About CredSSP authentication for PSSession](About CredSSP authentication for PSSession.md). 
 CredSSP requires secure SSL. That means that a session must be created using the Fully Qualified Domain Name of the computer because the certificate should have as Common Name (CN) the same. 

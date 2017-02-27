@@ -2,6 +2,8 @@
 
 ## pre-release v0.9
 
+- GH-50: Import ISHTemplate repository as a Builders folder. ISHBootstrap provides builder scripts for use with AWS EC2 AMI, Docker containers, Packer and Vagrant.
+
 ## pre-release v0.8
 
 - GH-44: ISHBootstrap is not Set-StrictMode combatible.

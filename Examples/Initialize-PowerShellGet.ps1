@@ -20,7 +20,7 @@ if ($PSBoundParameters['Debug']) {
 
 $sourcePath=Resolve-Path "$PSScriptRoot\..\Source"
 $cmdletsPaths="$sourcePath\Cmdlets"
-$scriptsPaths="$sourcePath\Scripts"
+$serverScriptsPaths="$sourcePath\Server"
 
 . "$PSScriptRoot\Cmdlets\Get-ISHBootstrapperContextValue.ps1"
 $computerName=Get-ISHBootstrapperContextValue -ValuePath "ComputerName" -DefaultValue $null
@@ -28,22 +28,22 @@ $credential=Get-ISHBootstrapperContextValue -ValuePath "CredentialExpression" -I
 
 if(-not $computerName)
 {
-    & "$scriptsPaths\Helpers\Test-Administrator.ps1"
+    & "$serverScriptsPaths\Helpers\Test-Administrator.ps1"
 }
 
-& $scriptsPaths\PackageManagement\Install-PackageManagement.ps1 -Computer $computerName -Credential $credential
-& $scriptsPaths\PackageManagement\Install-NugetPackageProvider.ps1 -Computer $computerName -Credential $credential
+& $serverScriptsPaths\PackageManagement\Install-PackageManagement.ps1 -Computer $computerName -Credential $credential
+& $serverScriptsPaths\PackageManagement\Install-NugetPackageProvider.ps1 -Computer $computerName -Credential $credential
 
 $psRepository=Get-ISHBootstrapperContextValue -ValuePath "PSRepository" -DefaultValue $null
 if($psRepository)
 {
     $psRepository |ForEach-Object {
-        & $scriptsPaths\PowerShellGet\Register-Repository.ps1 -Computer $computerName -Credential $credential -Name $_.Name -SourceLocation $_.SourceLocation -PublishLocation $_.PublishLocation -InstallationPolicy $_.InstallationPolicy
+        & $serverScriptsPaths\PowerShellGet\Register-Repository.ps1 -Computer $computerName -Credential $credential -Name $_.Name -SourceLocation $_.SourceLocation -PublishLocation $_.PublishLocation -InstallationPolicy $_.InstallationPolicy
     }
 }
 
 $installProcessExplorer=Get-ISHBootstrapperContextValue -ValuePath "InstallProcessExplorer" -DefaultValue $false
 if($installProcessExplorer)
 {
-    & $scriptsPaths\Helpers\Install-ProcessExplorer.ps1 -Computer $computerName -Credential $credential
+    & $serverScriptsPaths\Helpers\Install-ProcessExplorer.ps1 -Computer $computerName -Credential $credential
 }

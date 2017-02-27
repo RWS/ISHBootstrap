@@ -20,7 +20,7 @@ if ($PSBoundParameters['Debug']) {
 
 $sourcePath=Resolve-Path "$PSScriptRoot\..\Source"
 $cmdletsPaths="$sourcePath\Cmdlets"
-$scriptsPaths="$sourcePath\Scripts"
+$serverScriptsPaths="$sourcePath\Server"
 
 . "$PSScriptRoot\Cmdlets\Get-ISHBootstrapperContextValue.ps1"
 $computerName=Get-ISHBootstrapperContextValue -ValuePath "ComputerName" -DefaultValue $null
@@ -60,7 +60,7 @@ try
 
     if(-not $computerName)
     {
-        & "$scriptsPaths\Helpers\Test-Administrator.ps1"
+        & "$serverScriptsPaths\Helpers\Test-Administrator.ps1"
     }
 
     $ishDeploymentNames=Invoke-CommandWrap -ComputerName $computerName -Credential $credential -ScriptBlock $getDeploymentsBlock -BlockName "Get ISHDeployment Names" -UseParameters @("ishVersion")
@@ -69,7 +69,7 @@ try
         foreach($ishDeploymentName in $ishDeploymentNames)
         {
             Write-Debug "Uninstalling $ishDeploymentName from $cdPath"
-            & $scriptsPaths\Install\Uninstall-ISHDeployment.ps1 -Computer $computerName -Credential $credential -ISHVersion $ishVersion -Name $ishDeploymentName
+            & $serverScriptsPaths\Install\Uninstall-ISHDeployment.ps1 -Computer $computerName -Credential $credential -ISHVersion $ishVersion -Name $ishDeploymentName
             Write-Verbose "Uninstalled $ishDeploymentName from $cdPath"
         }
     }
