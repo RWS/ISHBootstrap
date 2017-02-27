@@ -28,11 +28,11 @@ param (
 )        
 $ishBootStrapRootPath=Resolve-Path "$PSScriptRoot\..\.."
 $cmdletsPaths="$ishBootStrapRootPath\Source\Cmdlets"
-$scriptsPaths="$ishBootStrapRootPath\Source\Scripts"
+$serverScriptsPaths="$ishBootStrapRootPath\Source\Server"
 
 if(-not $Computer)
 {
-    & "$scriptsPaths\Helpers\Test-Administrator.ps1"
+    & "$serverScriptsPaths\Helpers\Test-Administrator.ps1"
 }
 
 . $ishBootStrapRootPath\Examples\Cmdlets\Get-ISHBootstrapperContextValue.ps1

@@ -20,7 +20,7 @@ if ($PSBoundParameters['Debug']) {
 
 $sourcePath=Resolve-Path "$PSScriptRoot\..\Source"
 $cmdletsPaths="$sourcePath\Cmdlets"
-$scriptsPaths="$sourcePath\Scripts"
+$serverScriptsPaths="$sourcePath\Server"
 
 . "$PSScriptRoot\Cmdlets\Get-ISHBootstrapperContextValue.ps1"
 $computerName=Get-ISHBootstrapperContextValue -ValuePath "ComputerName" -DefaultValue $null
@@ -37,7 +37,7 @@ try
 {
     if(-not $computerName)
     {
-        & "$scriptsPaths\Helpers\Test-Administrator.ps1"
+        & "$serverScriptsPaths\Helpers\Test-Administrator.ps1"
     }
     foreach($ishDeployment in $ishDeployments)
     {
@@ -52,7 +52,7 @@ try
         }
 
         Write-Debug "Installing $($ishDeployment.Name) from $cdPath"
-        & $scriptsPaths\Install\Install-ISHDeployment.ps1 -Computer $computerName -Credential $credential @hash
+        & $serverScriptsPaths\Install\Install-ISHDeployment.ps1 -Computer $computerName -Credential $credential @hash
         Write-Verbose "Installed $($ishDeployment.Name) from $cdPath"
     }
 
