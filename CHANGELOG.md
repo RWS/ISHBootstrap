@@ -2,9 +2,9 @@
 
 ## pre-release v0.8
 
-- Verified and improved scripts for strict mode execution.
-- Script `Initialize-ISHServerOSUserRegion.ps1` will now initialize the regional settings for the osuser even for local execution.
-- Added support for Azure file and blob storage. Requires [ISHServer](https://github.com/Sarafian/ISHServer) version 1.2
+- GH-44: ISHBootstrap is not Set-StrictMode combatible.
+- GH-45 and GH-46: Azure file and blob storage support. (Requires [ISHServer](https://github.com/Sarafian/ISHServer) version 1.2)
+- GH-48: Allow override of input parameters when installing content manager.
 
 ## pre-release v0.7
 
