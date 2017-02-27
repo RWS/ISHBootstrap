@@ -65,6 +65,10 @@ try
         }
         $remote=Add-ModuleFromRemote -Session $session -Name $ishServerModuleName
     }
+    else
+    {
+        $session=$null
+    }
 
     Write-Progress @scriptProgress -Status "Initializing $OSUser"
     Initialize-ISHUser -OSUser $OSUser

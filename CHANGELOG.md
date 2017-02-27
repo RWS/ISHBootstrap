@@ -1,5 +1,11 @@
 # Change log
 
+## pre-release v0.8
+
+- GH-44: ISHBootstrap is not Set-StrictMode combatible.
+- GH-45 and GH-46: Azure file and blob storage support. (Requires [ISHServer](https://github.com/Sarafian/ISHServer) version 1.2)
+- GH-48: Allow override of input parameters when installing content manager.
+
 ## pre-release v0.7
 
 - Added support for AWS S3 buckets. Requires [ISHServer](https://github.com/Sarafian/ISHServer) version 1.1

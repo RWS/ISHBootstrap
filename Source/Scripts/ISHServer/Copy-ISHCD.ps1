@@ -46,6 +46,22 @@ param (
     [string]$SecretKey,
     [Parameter(Mandatory=$false,ParameterSetName="From AWS S3")]
     [string]$SessionToken,
+    [Parameter(Mandatory=$true,ParameterSetName="From Azure FileStorage")]
+    [string]$ShareName,
+    [Parameter(Mandatory=$true,ParameterSetName="From Azure FileStorage")]
+    [ValidatePattern(".+\.[0-9]+\.0\.[0-9]+\.[0-9]+.*\.exe")]
+    [string]$Path,
+    [Parameter(Mandatory=$true,ParameterSetName="From Azure BlobStorage")]
+    [string]$ContainerName,
+    [Parameter(Mandatory=$true,ParameterSetName="From Azure BlobStorage")]
+    [ValidatePattern(".+\.[0-9]+\.0\.[0-9]+\.[0-9]+.*\.exe")]
+    [string]$BlobName,
+    [Parameter(Mandatory=$false,ParameterSetName="From Azure FileStorage")]
+    [Parameter(Mandatory=$false,ParameterSetName="From Azure BlobStorage")]
+    [string]$StorageAccountName,
+    [Parameter(Mandatory=$false,ParameterSetName="From Azure FileStorage")]
+    [parameter(ParameterSetName="From Azure BlobStorage")]
+    [string]$StorageAccountKey,
     [Parameter(Mandatory=$true,ParameterSetName="From UNC")]
     [string]$FilePath
 )    
@@ -81,6 +97,14 @@ try
         }
         'From AWS S3' {
             Get-ISHCD -BucketName $BucketName -Key $Key -Expand -AccessKey $AccessKey -ProfileName $ProfileName -ProfileLocation $ProfileLocation -Region $Region -SecretKey $SecretKey -SessionToken $SessionToken
+            break        
+        }
+        'From Azure FileStorage' {
+            Get-ISHCD -ShareName $ShareName -Path $Path -Expand -StorageAccountName $StorageAccountName -StorageAccountKey $StorageAccountKey
+            break        
+        }
+        'From Azure BlobStorage' {
+            Get-ISHCD -ContainerName $ContainerName -BlobName $BlobName -Expand -StorageAccountName $StorageAccountName -StorageAccountKey $StorageAccountKey
             break        
         }
         'From UNC' {

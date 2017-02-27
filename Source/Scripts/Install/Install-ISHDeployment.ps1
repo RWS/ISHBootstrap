@@ -35,7 +35,13 @@ param (
     [Parameter(Mandatory=$false)]
     [int]$LucenePort="8080",
     [Parameter(Mandatory=$false)]
-    [switch]$UseRelativePaths=$false
+    [switch]$UseRelativePaths=$false,
+    [Parameter(Mandatory=$false)]
+    [string]$HostName=$null,
+    [Parameter(Mandatory=$false)]
+    [string]$LocalServiceHostName=$null,
+    [Parameter(Mandatory=$false)]
+    [string]$MachineName=$null
 )
 
 $cmdletsPaths="$PSScriptRoot\..\..\Cmdlets"
@@ -58,7 +64,7 @@ $findCDPath={
         throw "No matching CD found"
         return
     }
-    if($availableCD.Count -gt 1)
+    if($availableCD -is [array])
     {
         $availableCD=$availableCD[0]
         Write-Warning "Found more than one cd. Using $($availableCD.Name)"
@@ -78,9 +84,16 @@ $newParameterScriptBlock={
     $serviceCertificateThumbprint=(Get-WebBinding 'Default Web Site' -Protocol "https").certificateHash
 
     $serviceCertificate=Get-ChildItem -path "cert:\LocalMachine\My" | Where-Object {$_.Thumbprint -eq $serviceCertificateThumbprint}
-    #Take the fqdn from the web site's attached certificate or from the Service Certificate thumbprint
-    $fqdn=(($serviceCertificate.Subject -split ', ')[0] -split '=')[1];
-    $baseUrl="https://$fqdn".ToLower()
+    if($HostName)
+    {
+        $baseUrl="https://$HostName"
+    }
+    else
+    {
+        #Take the fqdn from the web site's attached certificate or from the Service Certificate thumbprint
+        $fqdn=(($serviceCertificate.Subject -split ', ')[0] -split '=')[1];
+        $baseUrl="https://$fqdn".ToLower()
+    }
 
     $osUserNetworkCredential=$OSUserCredential.GetNetworkCredential()
     if($osUserNetworkCredential.Domain -and ($osUserNetworkCredential.Domain -ne ""))
@@ -110,7 +123,14 @@ $newParameterScriptBlock={
     }
     $inputParameters["projectsuffix"]=$suffix
     $inputParameters["baseurl"]=$baseUrl
-    $inputParameters["localservicehostname"]="$computerName"
+    if($LocalServiceHostName)
+    {
+        $inputParameters["localservicehostname"]="$LocalServiceHostName"
+    }
+    else
+    {
+        $inputParameters["localservicehostname"]="$computerName"
+    }
     $inputParameters["apppath"]=$RootPath
     $inputParameters["datapath"]=$RootPath
     $inputParameters["webpath"]=$RootPath
@@ -144,9 +164,16 @@ $newParameterScriptBlock={
     $inputParameters["issuerwstrustendpointurl"]="$baseurl/$infosharestswebappname/issue/wstrust/mixed/$ishSTSType"
     $inputParameters["issuercertificatethumbprint"]=$inputParameters["servicecertificatethumbprint"]
 
+    if($MachineName)
+    {
+        $inputParameters["machinename"]=$MachineName
+    }
+
     $inputParametersPath=Join-Path $CDPath "__InstallTool\inputparameters.xml"
     [xml]$xml=Get-Content $inputParametersPath
     
+    #region Add the missing xml elements
+
     if($suffix -ne "")
     {
         $node=$xml | Select-Xml -XPath "//param[@name='projectsuffix']"
@@ -171,6 +198,81 @@ $newParameterScriptBlock={
             $xml.inputconfig.AppendChild($param) |Out-Null
         }
     }
+
+    if($HostName)
+    {
+        $node=$xml | Select-Xml -XPath "//param[@name='baseurl']"
+        if(-not $node)
+        {
+            $param = $xml.CreateElement('param')
+            $param.SetAttribute('name','baseurl') |Out-Null
+            
+            $currentValue = $xml.CreateElement('currentvalue')
+            $currentValue.InnerText=$inputParameters["baseurl"]
+            $param.AppendChild($currentValue) |Out-Null
+
+            $defaultvalue = $xml.CreateElement('defaultvalue')
+            $param.AppendChild($defaultvalue) |Out-Null
+
+            $description = $xml.CreateElement('description')
+            $param.AppendChild($description) |Out-Null
+
+            $validate = $xml.CreateElement('validate')
+            $param.AppendChild($validate) |Out-Null
+
+            $xml.inputconfig.AppendChild($param) |Out-Null
+        }
+    }
+    if($LocalServiceHostName)
+    {
+        $node=$xml | Select-Xml -XPath "//param[@name='localservicehostname']"
+        if(-not $node)
+        {
+            $param = $xml.CreateElement('param')
+            $param.SetAttribute('name','localservicehostname') |Out-Null
+            
+            $currentValue = $xml.CreateElement('currentvalue')
+            $currentValue.InnerText=$inputParameters["localservicehostname"]
+            $param.AppendChild($currentValue) |Out-Null
+
+            $defaultvalue = $xml.CreateElement('defaultvalue')
+            $param.AppendChild($defaultvalue) |Out-Null
+
+            $description = $xml.CreateElement('description')
+            $param.AppendChild($description) |Out-Null
+
+            $validate = $xml.CreateElement('validate')
+            $param.AppendChild($validate) |Out-Null
+
+            $xml.inputconfig.AppendChild($param) |Out-Null
+        }
+    }
+    if($MachineName)
+    {
+        $node=$xml | Select-Xml -XPath "//param[@name='machinename']"
+        if(-not $node)
+        {
+            $param = $xml.CreateElement('param')
+            $param.SetAttribute('name','machinename') |Out-Null
+            
+            $currentValue = $xml.CreateElement('currentvalue')
+            $currentValue.InnerText=$inputParameters["machinename"]
+            $param.AppendChild($currentValue) |Out-Null
+
+            $defaultvalue = $xml.CreateElement('defaultvalue')
+            $param.AppendChild($defaultvalue) |Out-Null
+
+            $description = $xml.CreateElement('description')
+            $param.AppendChild($description) |Out-Null
+
+            $validate = $xml.CreateElement('validate')
+            $param.AppendChild($validate) |Out-Null
+
+            $xml.inputconfig.AppendChild($param) |Out-Null
+        }
+    }
+
+    #endregion
 
     foreach($key in $inputParameters.Keys)
     {

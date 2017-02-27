@@ -1,5 +1,13 @@
 # Examples Change log
 
+## pre-release v0.8
+
+- GH-45 and GH-46: Azure file and blob storage support.
+
+## pre-release v0.7
+
+- Adjusted based on changes to match to match the main codebase.
+
 ## pre-release v0.7
 
 - Adjusted based on changes to match to match the main codebase.
