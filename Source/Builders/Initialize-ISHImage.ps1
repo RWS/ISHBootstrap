@@ -47,8 +47,6 @@ $scriptProgress=Get-ProgressHash -Invocation $MyInvocation
 
 $dbScriptsPath=Join-Path $PSScriptRoot Database
 $mockDatabase=-not $ConnectionString
-Write-Host "ConnectionString='$ConnectionString'"
-Write-Host "mockDatabase='$mockDatabase'"
 
 $ishServerVersion=($ISHVersion -split "\.")[0]
 $ishRevision=($ISHVersion -split "\.")[2]
@@ -204,6 +202,9 @@ $installHash=@{
     MachineName="MockMachineName"
     ConnectionString=$ConnectionString
 }
+
+#TODO: DELETE
+Get-PSDrive C | Select-Object Used,Free
 
 & $serverScriptsPath\Install\Install-ISHDeployment.ps1 @installHash
 #endregion

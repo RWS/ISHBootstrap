@@ -66,7 +66,7 @@ switch ($PSCmdlet.ParameterSetName) {
             {
                 Write-Host "Using Microsoft Windows Server 2012 R2 with SQL Server Express AMI ImageId for region $Region"
                 $SourceAMI=(Get-EC2ImageByName -Name WINDOWS_2012R2_SQL_SERVER_EXPRESS_2014 -Region $region).ImageId
-                $packerFileName="ish+mssql-amazon-ebs.json"
+                $packerFileName="mssql2014-ish-amazon-ebs.json"
             }
             Write-Host "Building with $SourceAMI image id"
         }

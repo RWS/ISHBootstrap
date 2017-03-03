@@ -80,6 +80,9 @@ try
 
     if($ISHServerVersion -eq "12")
     {
+        #TODO: DELETE
+        $freeMemory=(Get-Counter -Counter "\Memory\Available MBytes").CounterSamples[0].CookedValue
+        Write-Host "freeMemory=$freeMemory"
         Initialize-ISHMSDTCTransactionTimeout
         Initialize-ISHMSDTCSettings
     }
