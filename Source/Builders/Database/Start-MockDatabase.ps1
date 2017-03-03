@@ -8,12 +8,12 @@ $cmdletsPaths="$PSScriptRoot\..\..\Cmdlets"
 . "$cmdletsPaths\Helpers\Write-Separator.ps1"
 Write-Separator -Invocation $MyInvocation -Header
 
-Write-Information "Starting SQL Server service"
+Write-Host "Starting SQL Server service"
 
 $sqlExpressServiceName="MSSQL`$SQLEXPRESS"
 Start-Service -Name $sqlExpressServiceName
 
-Write-Information "Importing module SQLPS"    
+Write-Host "Importing module SQLPS"    
 if(-not (Get-Module SQLPS -ListAvailable))
 {
     $sqlServerItem=Get-ChildItem -Path "${env:ProgramFiles(x86)}\Microsoft SQL Server" -Filter "*0" |Sort-Object -Descending @{expression={[int]$_.Name}}| Select-Object -First 1
@@ -35,7 +35,7 @@ else
 {
     throw "Could not parse connection string"
 }
-Write-Information "[DEMO][SQL Server Express]:Configuring $OSUserSqlUser account"
+Write-Host "[DEMO][SQL Server Express]:Configuring $OSUserSqlUser account"
 
 $sqlCmd = @"
 USE [master]

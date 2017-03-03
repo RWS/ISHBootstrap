@@ -4,8 +4,6 @@ param(
     [Parameter(Mandatory=$false,ParameterSetName="Nuget")]
     [switch]$Nuget,
     [Parameter(Mandatory=$false,ParameterSetName="Separate")]
-    [hashtable[]]$Chocolatey=$null,
-    [Parameter(Mandatory=$false,ParameterSetName="Separate")]
     [hashtable[]]$PowerShellGetScripts=$null,
     [Parameter(Mandatory=$false,ParameterSetName="Separate")]
     [hashtable[]]$PowerShellGetModules=$null,
@@ -33,16 +31,12 @@ try
         'Nuget' {
             $blockName="Installing NuGet PackageProvider" 
             Write-Progress @scriptProgress -Status $blockName
-            Write-Information $blockName
+            Write-Host $blockName
 
             Get-PackageProvider -Name NuGet -ForceBootstrap | Out-Null
             return
         }
         'Grouped' {
-            if($Prerequisites.ContainsKey("Chocolatey"))
-            {
-                $Chocolatey=$Prerequisites.Chocolatey
-            }
             if($Prerequisites.ContainsKey("PowerShellGetScripts"))
             {
                 $PowerShellGetScripts=$Prerequisites.PowerShellGetScripts
@@ -81,67 +75,6 @@ try
 
     #endregion
 
-    #region Install Chocolatey
-    if($Chocolatey)
-    {
-
-        if(-not (Get-Module -Name ChocolateyProfile -ListAvailable))
-        {
-            $blockName="Installing Chocolatey"
-            Write-Progress @scriptProgress -Status $blockName
-            Write-Information $blockName
-
-            if(-not $WhatIf)
-            {
-                Write-Information "Installing Chocolatey"    
-                $output=iwr https://chocolatey.org/install.ps1 -UseBasicParsing | iex
-            }
-        }
-
-        $Chocolatey |ForEach-Object {
-            $arguments=@(
-                "install"
-                $_.Name
-                "-y"
-            )
-            if($_.ContainsKey("Version"))
-            {
-                $arguments+=@(
-                    "--version"
-                    $_.Version
-                )
-            }
-            if($_.ContainsKey("PackageParameters"))
-            {
-                $arguments+=@(
-                    "-packageParameters"
-                    $_.PackageParameters
-                )
-            }
-
-            $blockName="Installing Chocolatey package $($_.Name)"
-            Write-Progress @scriptProgress -Status $blockName
-            Write-Information $blockName
-
-            if(-not $WhatIf)
-            {
-                Write-Information "Installing Chocolatey package $($_.Name)"    
-                $output=& choco $arguments 2>&1
-            }
-        }
-
-        if($WhatIf)
-        {
-            Write-Information "What if: Performing action Update-SessionEnvironment"
-        }
-        else
-        {
-            Write-Information "Updating Chocolatey session environment"    
-            $output=& refreshenv 2>&1
-        }
-    }
-    #endregion
-
     #region PowerShellGet
     if($PowerShellGetScripts)
     {
@@ -151,7 +84,7 @@ try
 
             $blockName="Installing powershell script $($_.Name)"
             Write-Progress @scriptProgress -Status $blockName
-            Write-Information $blockName
+            Write-Host $blockName
 
             Install-Script @hash -Force -WhatIf:$WhatIf
         }
@@ -173,7 +106,7 @@ try
 
             $blockName="Installing powershell module $($_.Name)"
             Write-Progress @scriptProgress -Status $blockName
-            Write-Information $blockName
+            Write-Host $blockName
 
             Install-Module @hash -Force -WhatIf:$WhatIf
         }
@@ -188,11 +121,11 @@ try
         $GitHub |ForEach-Object {
             $blockName="Performing action Get-Github for repository $($_.User)/$($_.Repository)"
             Write-Progress @scriptProgress -Status $blockName
-            Write-Information $blockName
+            Write-Host $blockName
             if(-not $WhatIf)
             {
                 $hash=$_
-                Write-Information "Installing GitHub repository $($_.Repository)"
+                Write-Host "Installing GitHub repository $($_.Repository)"
                 $expandedPath=& $getGithubPath @hash -Expand|Select-Object -ExpandProperty FullName
                 New-Object -Type PSObject -Property ([ordered]@{
                     Name=$_.Repository

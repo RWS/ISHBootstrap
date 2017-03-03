@@ -9,7 +9,7 @@ $cmdletsPaths="$PSScriptRoot\..\..\Cmdlets"
 . "$cmdletsPaths\Helpers\Write-Separator.ps1"
 Write-Separator -Invocation $MyInvocation -Header
 
-Write-Information "[DEVELOPFRIENDLY][SQL Server Express]:Enabling Mixed mode authentication and TCP protocol for external connections"
+Write-Host "[DEVELOPFRIENDLY][SQL Server Express]:Enabling Mixed mode authentication and TCP protocol for external connections"
 
 $sqlExpressServiceName="MSSQL`$SQLEXPRESS"
 Stop-Service -Name $sqlExpressServiceName

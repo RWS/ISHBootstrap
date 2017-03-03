@@ -34,7 +34,7 @@ $useMockedDatabaseAsDemo=$PSCmdlet.ParameterSetName -eq "Demo Database"
 
 $blockName="Importing certificate"
 Write-Progress @scriptProgress -Status $blockName
-Write-Information $blockName
+Write-Host $blockName
 
 $certificate=Import-PfxCertificate -Password $PFXCertificatePassword -FilePath $PFXCertificatePath -Exportable -CertStoreLocation "Cert:\LocalMachine\My"
 Import-Module WebAdministration
@@ -48,7 +48,7 @@ Pop-Location -StackName "IIS"
 
 $blockName="Getting deployment information"
 Write-Progress @scriptProgress -Status $blockName
-Write-Information $blockName
+Write-Host $blockName
 
 $softwareVersion=Get-ISHDeployment |Select-Object -First 1 -ExpandProperty SoftwareVersion
 $ishVersion="$($softwareVersion.Major).0.$($softwareVersion.Revision)"
@@ -91,12 +91,24 @@ $trisoftInfoShareAuthorApplication=$applications|Where-Object -Property Name -EQ
 #region 4. Initialize OSUser
 $blockName="Initializing osuser"    
 Write-Progress @scriptProgress -Status $blockName
-Write-Information $blockName
+Write-Host $blockName
 
-if(-not (Get-LocalUser -Name $osUserName -ErrorAction SilentlyContinue))
+if(Get-Module Microsoft.PowerShell.LocalAccounts -ListAvailable)
 {
-    New-LocalUser -Name $osUserName -Password $OsUserCredentials.Password -AccountNeverExpires -PasswordNeverExpires
+    if(-not (Get-LocalUser -Name $osUserName -ErrorAction SilentlyContinue))
+    {
+        New-LocalUser -Name $osUserName -Password $OsUserCredentials.Password -AccountNeverExpires -PasswordNeverExpires
+    }
 }
+else
+{
+    NET USER $osUserName $osUserPassword /ADD
+    # Uncheck 'User must change password'
+    $user = [adsi]"WinNT://$env:computername/$osUserName"
+    $user.UserFlags.value = $user.UserFlags.value -bor 0x10000
+    $user.CommitChanges()    
+}
+
 $arguments=@(
     "-Command"
     "Initialize-ISHRegional"
@@ -121,7 +133,7 @@ if($useMockedDatabaseAsDemo)
 
 $blockName="Initializing process identity"    
 Write-Progress @scriptProgress -Status $blockName
-Write-Information $blockName
+Write-Host $blockName
 
 $ishAppPools|ForEach-Object {
     $_.ProcessModel.UserName = $osUserName
@@ -150,7 +162,7 @@ if(-not $useMockedDatabaseAsDemo)
 {
     $blockName="Setting database connection"  
     Write-Progress @scriptProgress -Status $blockName
-    Write-Information $blockName
+    Write-Host $blockName
 
     Set-ItemProperty -Path 'HKLM:\SOFTWARE\WOW6432Node\Trisoft\Tridk\TridkApp\InfoShareAuthor'-Name "Connect" -Value $ConnectionString
     Set-ItemProperty -Path 'HKLM:\SOFTWARE\WOW6432Node\Trisoft\Tridk\TridkApp\InfoShareAuthor'-Name "ComponentName" -Value $DbType
@@ -162,7 +174,7 @@ if(-not $useMockedDatabaseAsDemo)
 #region 7. Hard replace files
 $blockName="Replacing mock input parameters"
 Write-Progress @scriptProgress -Status $blockName
-Write-Information $blockName
+Write-Host $blockName
 
 if($HostName)
 {
@@ -245,7 +257,7 @@ Write-Verbose "Replacement matrix is:"
 $foldersToScan |ForEach-Object {
     $blockName="Replacing files in $_"
     Write-Progress @scriptProgress -Status $blockName
-    Write-Information $blockName
+    Write-Host $blockName
 
     $filePaths=Get-ChildItem -Path $_ -Include $extensions -Recurse -File|Select-Object -ExpandProperty FullName
     $filePaths|ForEach-Object {
@@ -418,7 +430,7 @@ C:\IshCD\12.0.1\20160815.CD.InfoShare.12.0.3215.1.Trisoft-DITA-OT\Websites\Autho
 
 $blockName="Starting IIS application pools"
 Write-Progress @scriptProgress -Status $blockName
-Write-Information $blockName
+Write-Host $blockName
 
 $ishAppPools| Start-WebAppPool
 #endregion

@@ -1,0 +1,78 @@
+{
+  "variables": {
+    "ishVersion": "",
+    "product_line_version": "",
+    "source_ami": "",
+    "instance_type": "t2.medium",
+	"iam_instance_profile": "",
+    "region": "",
+	"aws_access_key": "",
+    "aws_secret_key": "",
+	"ish_mock_connectionstring": ""
+  },
+  "builders": [{
+    "type": "amazon-ebs",
+    "region": "{{user `region`}}",
+    "instance_type": "{{user `instance_type`}}",
+    "source_ami": "{{user `source_ami`}}",
+    "ami_name": "packer-ish.{{user `ishVersion`}}-{{isotime \"2006-01-02\"}}",
+    "user_data_file": "bootstrap-aws.txt",
+	"iam_instance_profile": "{{user `iam_instance_profile`}}",
+    "communicator": "winrm",
+    "winrm_username": "Administrator",
+    "winrm_timeout": "4h",
+    "access_key": "{{user `aws_access_key`}}",
+    "secret_key": "{{user `aws_secret_key`}}",
+	"tags": {
+		"Name": "packer-dev.ish.{{user `ishVersion`}}-{{isotime \"2006-01-02\"}}",
+		"ProductLine": "Knowledge Center",
+		"ProductLineVersion": "{{user `product_line_version`}}",
+		"Product": "Content Manager",
+		"ProductVersion": "{{user `ishVersion`}}",
+		"Purpose": "AMI"
+	},
+	"snapshot_tags": {
+		"Name": "packer-dev.ish.{{user `ishVersion`}}-{{isotime \"2006-01-02\"}}",
+		"ProductLine": "Knowledge Center",
+		"ProductLineVersion": "{{user `product_line_version`}}",
+		"Product": "Content Manager",
+		"ProductVersion": "{{user `ishVersion`}}",
+		"Purpose": "AMIBuilder"
+	},
+	"run_volume_tags": {
+		"Name": "packer-dev.ish.{{user `ishVersion`}}-{{isotime \"2006-01-02\"}}",
+		"ProductLine": "Knowledge Center",
+		"ProductLineVersion": "{{user `product_line_version`}}",
+		"Product": "Content Manager",
+		"ProductVersion": "{{user `ishVersion`}}",
+		"Purpose": "AMIBuilder"
+	},
+	"run_tags": {
+		"Name": "packer-dev.ish.{{user `ishVersion`}}-{{isotime \"2006-01-02\"}}",
+		"ProductLine": "Knowledge Center",
+		"ProductLineVersion": "{{user `product_line_version`}}",
+		"Product": "Content Manager",
+		"ProductVersion": "{{user `ishVersion`}}",
+		"Purpose": "AMIBuilder"
+	}
+  }],
+  "provisioners": [
+  {
+    "type": "powershell",
+    "inline": [
+      "New-Item -Path C:/Provision/ISHBootstrap -ItemType Directory"
+	]
+  },
+  {
+    "type": "file",
+    "source": "../../Source/",
+    "destination": "C:/Provision/ISHBootstrap/Source"
+  },
+  {
+    "type": "powershell",
+    "inline": [
+	  "& C:/Provision/ISHBootstrap/Source/Bake-ISHFromAWSS3.ps1 -ISHVersion {{user `ishVersion`}} -MockConnectionString \"{{user `ish_mock_connectionstring`}}\" -ErrorAction Stop"
+	]
+  }]
+}}
+

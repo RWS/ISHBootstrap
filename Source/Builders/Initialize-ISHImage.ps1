@@ -47,6 +47,8 @@ $scriptProgress=Get-ProgressHash -Invocation $MyInvocation
 
 $dbScriptsPath=Join-Path $PSScriptRoot Database
 $mockDatabase=-not $ConnectionString
+Write-Host "ConnectionString='$ConnectionString'"
+Write-Host "mockDatabase='$mockDatabase'"
 
 $ishServerVersion=($ISHVersion -split "\.")[0]
 $ishRevision=($ISHVersion -split "\.")[2]
@@ -55,7 +57,9 @@ $ishRevision=($ISHVersion -split "\.")[2]
 
 $serverScriptsPath=Join-Path "$PSScriptRoot\.." "Server"
 
-$mockOSUserCredential=New-Object System.Management.Automation.PSCredential("MockOSUser",(ConvertTo-SecureString "Password123" -AsPlainText -Force))
+$mockOSUserName="MockOSUser"
+$mockOSUserPassword="Password123"
+$mockOSUserCredential=New-Object System.Management.Automation.PSCredential($mockOSUserName,(ConvertTo-SecureString $mockOSUserPassword -AsPlainText -Force))
 if($mockDatabase)
 {
     $ConnectionString=& $dbScriptsPath\Get-MockConnectionString.ps1
@@ -105,7 +109,7 @@ switch($PSCmdlet.ParameterSetName) {
 #region 1. Copy and Expand CD
 $blockName="Copying ISHCD"
 Write-Progress @scriptProgress -Status $blockName
-Write-Information $blockName
+Write-Host $blockName
 
 & $serverScriptsPath\ISHServer\Copy-ISHCD.ps1 -ISHServerVersion $ishServerVersion @ishCDHash
 #endregion
@@ -113,7 +117,7 @@ Write-Information $blockName
 #region 2. Download and install pre-requisites
 $blockName="Installing ISH prerequisities"
 Write-Progress @scriptProgress -Status $blockName
-Write-Information $blockName
+Write-Host $blockName
 
 & $serverScriptsPath\ISHServer\Get-ISHServerPrerequisites.ps1 -ISHServerVersion $ishServerVersion @ishServerPrerequisitesHash
 & $serverScriptsPath\ISHServer\Install-ISHServerPrerequisites.ps1 -ISHServerVersion $ishServerVersion #-InstallMSXML4:$installMSXML
@@ -122,12 +126,23 @@ Write-Information $blockName
 #region 3. Initial os user
 $blockName="Initializing mock user"
 Write-Progress @scriptProgress -Status $blockName
-Write-Information $blockName
+Write-Host $blockName
 
-if(-not (Get-LocalUser -Name $mockOSUserCredential.UserName -ErrorAction SilentlyContinue))
+if(Get-Module Microsoft.PowerShell.LocalAccounts -ListAvailable)
 {
-    Write-Information "Adding mock user"
-    New-LocalUser -Name $mockOSUserCredential.UserName -Password $mockOSUserCredential.Password -AccountNeverExpires -PasswordNeverExpires
+    if(-not (Get-LocalUser -Name $mockOSUserCredential.UserName -ErrorAction SilentlyContinue))
+    {
+        Write-Host "Adding mock user"
+        New-LocalUser -Name $mockOSUserCredential.UserName -Password $mockOSUserCredential.Password -AccountNeverExpires -PasswordNeverExpires
+    }
+}
+else
+{
+    NET USER $mockOSUserName $mockOSUserPassword /ADD
+    # Uncheck 'User must change password'
+    $user = [adsi]"WinNT://$env:computername/$mockOSUserName"
+    $user.UserFlags.value = $user.UserFlags.value -bor 0x10000
+    $user.CommitChanges()    
 }
 & $serverScriptsPath\ISHServer\Initialize-ISHServerOSUser.ps1 -ISHServerVersion $ishServerVersion -OSUser ($mockOSUserCredential.UserName)
 
@@ -136,12 +151,20 @@ if(-not (Get-LocalUser -Name $mockOSUserCredential.UserName -ErrorAction Silentl
 #region 4. Create Self Signed Certificate and Assign to IIS HTTPS Binding
 $blockName="Creating mock certificate"
 Write-Progress @scriptProgress -Status $blockName
-Write-Information $blockName
+Write-Host $blockName
 
 # Using this provider with the self-signed certificate is very important because otherwise the .net code in ishsts cannot use to encrypt.
 # INFO http://stackoverflow.com/questions/36295461/why-does-my-private-key-not-work-to-decrypt-a-key-encrypted-by-the-public-key
 $providerName="Microsoft Strong Cryptographic Provider"
-$certificate=New-SelfSignedCertificate -DnsName "mock-$($env:COMPUTERNAME)" -CertStoreLocation "cert:\LocalMachine\My" -Provider $providerName
+if($PSVersionTable.PSVersion.Major -ge 5)
+{
+    $certificate=New-SelfSignedCertificate -DnsName "mock-$($env:COMPUTERNAME)" -CertStoreLocation "cert:\LocalMachine\My" -Provider $providerName
+}
+else
+{
+    # -Parameter not supported on PowerShell v4 New-SelfSignedCertificate
+    $certificate=New-SelfSignedCertificate -DnsName "mock-$($env:COMPUTERNAME)" -CertStoreLocation "cert:\LocalMachine\My"
+}
 $rootStore = New-Object System.Security.Cryptography.X509Certificates.X509Store -ArgumentList Root, LocalMachine
 $rootStore.Open("MaxAllowed")
 $rootStore.Add($certificate)
@@ -164,15 +187,14 @@ if($DevelopFriendly)
 #region Mock database
 if($mockDatabase)
 {
-    & $dbScriptsPath\Install-MockDatabase.ps1 -ISHVersion $ishVersion
-    & $dbScriptsPath\Initialize-MockDatabase.ps1 -ISHVersion $ishVersion -DevelopFriendly:$developFriendly
+    & $dbScriptsPath\Restore-MockDatabase.ps1 -ISHVersion $ishVersion
 }
 #endregion
 
 #region Install ISH
 $blockName="Installing ISH"
 Write-Progress @scriptProgress -Status $blockName
-Write-Information $blockName
+Write-Host $blockName
 
 $installHash=@{
     ISHVersion=$ISHVersion
@@ -189,7 +211,7 @@ $installHash=@{
 #region Stopping all
 $blockName="Stopping processes"
 Write-Progress @scriptProgress -Status $blockName
-Write-Information $blockName
+Write-Host $blockName
 
 # Web Application pools
 Import-Module WebAdministration
@@ -208,24 +230,25 @@ $applications.populate()
 
 $comAdmin.ShutdownApplication("Trisoft-InfoShare-Author")
 
-# MockDatabase
-if($mockDatabase)
-{
-    & $dbScriptsPath\Stop-MockDatabase.ps1
-}
-
 #endregion
 
 #region Clean up 
 $blockName="Cleaning up"
 Write-Progress @scriptProgress -Status $blockName
 
-Write-Information "Removing mock user"
-$null=Remove-LocalUser -Name $mockOSUserCredential.UserName
-Write-Information "Removing mock certificate"
+Write-Host "Removing mock user"
+if(Get-Module Microsoft.PowerShell.LocalAccounts -ListAvailable)
+{
+    $null=Remove-LocalUser -Name $mockOSUserCredential.UserName
+}
+else
+{
+    NET USER $mockOSUserName /DELETE
+}
+Write-Host "Removing mock certificate"
 $null=Get-Item -Path Cert:\LocalMachine\My\$($certificate.Thumbprint)|Remove-Item -Force
 
-Write-Information "Removing temp files"
+Write-Host "Removing temp files"
 $null=Get-ChildItem -Path $env:Temp |Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
 #endregion
 

@@ -41,7 +41,7 @@ if(-not $DebugISHServer)
     $dependencies.PowerShellGetModules+=@{
         # https://www.powershellgallery.com/packages/ISHServer/
         Name="ISHServer.$ishServerVersion"
-        RequiredVersion="1.2"
+        RequiredVersion="1.3"
     }
 }
 
