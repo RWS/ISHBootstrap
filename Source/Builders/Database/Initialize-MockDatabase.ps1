@@ -8,10 +8,12 @@ $cmdletsPaths="$PSScriptRoot\..\..\Cmdlets"
 . "$cmdletsPaths\Helpers\Write-Separator.ps1"
 Write-Separator -Invocation $MyInvocation -Header
 
-Write-Host "Starting SQL Server service"
 
-$sqlExpressServiceName="MSSQL`$SQLEXPRESS"
-Start-Service -Name $sqlExpressServiceName
+$sqlServerItem=Get-ChildItem -Path "${env:ProgramFiles(x86)}\Microsoft SQL Server" -Filter "*0" |Sort-Object -Descending @{expression={[int]$_.Name}}| Select-Object -First 1
+$sqlServerPath=$sqlServerItem |Select-Object -ExpandProperty FullName
+$sqlServerMajorVersion=$sqlServerItem.Name.Substring(0,$sqlServerItem.Name.Length-1)
+
+Push-Location -StackName "SQL"
 
 Write-Host "Importing module SQLPS"    
 if(-not (Get-Module SQLPS -ListAvailable))
@@ -56,8 +58,7 @@ ALTER ROLE [db_owner] ADD MEMBER [$OSUserSqlUser]
 GO
 "@
 
-Invoke-Sqlcmd -Query $sqlCmd -ServerInstance ".\SQLEXPRESS" 
-Set-Location c:
-Write-Warning "[DEMO][SQL Server Express]:Configured $osUserSqlUser account"
+Invoke-Sqlcmd -Query $sqlCmd
+Pop-Location -StackName SQL
 
 Write-Separator -Invocation $MyInvocation -Footer

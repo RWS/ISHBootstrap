@@ -124,7 +124,7 @@ Start-Process -FilePath $powerShellPath -ArgumentList $arguments -Credential $Os
 if($useMockedDatabaseAsDemo)
 {
     $osUserSqlUser="$($env:COMPUTERNAME)\$($OsUserCredentials.UserName)"
-    & $dbScriptsPath\Start-MockDatabase.ps1 -OSUserSqlUser $osUserSqlUser
+    & $dbScriptsPath\Initialize-MockDatabase.ps1 -OSUserSqlUser $osUserSqlUser
 }
 
 #endregion
