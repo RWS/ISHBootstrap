@@ -27,18 +27,18 @@ $dockerArgs=@(
 
 switch ($PSCmdlet.ParameterSetName) {
     'WindowsServerCore' {
-            $tagPrefix="ish"
+            $imageName="ish"
             $dockerFileName="ISH.dockerfile"
         }
     'MSSQLExpress' {
-            $tagPrefix="ishmssql"
+            $imageName="ishmssql"
             $dockerFileName="ISH.MSSQL.dockerfile"
         }
 }
 
 $dockerArgs+=@(
     "-t"
-    "sarafian/$($tagPrefix):$ISHVersion"
+    "asarafian/$($imageName):$ISHVersion"
     "-f"
     "$dockerFileName"
     "--build-arg"
