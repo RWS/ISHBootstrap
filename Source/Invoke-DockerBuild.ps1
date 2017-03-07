@@ -1,3 +1,5 @@
+#requires -runasadministrator
+
 param(
     [Parameter(Mandatory=$true,ParameterSetName="WindowsServerCore")]
     [Parameter(Mandatory=$true,ParameterSetName="MSSQLExpress")]

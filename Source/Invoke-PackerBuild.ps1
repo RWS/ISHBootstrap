@@ -33,6 +33,11 @@ if ($PSBoundParameters['Debug']) {
     $DebugPreference = 'Continue'
 }
 
+if($PSCmdlet.ParameterSetName -eq "Vagrant Hyper-V")
+{
+    & $PSScriptRoot\Server\Helpers\Test-Administrator.ps1
+}
+
 $cmdletsPaths="$PSScriptRoot\Cmdlets"
 
 . "$cmdletsPaths\Helpers\Write-Separator.ps1"

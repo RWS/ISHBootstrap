@@ -23,6 +23,6 @@ RUN & C:/Provision/ISHBootstrap/Source/Bake-ISHFromAWSS3.ps1" -ISHVersion 12.0.3
 # This instruction tells the container to listen on port 80. 
 EXPOSE 443
 
-HEALTHCHECK [ "./Provision/ISHBootstrap/Source/Docker/ISH.HealthCheck.ps1", "-IncludeMSSQL" ]
+HEALTHCHECK CMD [ "powershell", "-File", "./Provision/ISHBootstrap/Source/Docker/ISH.HealthCheck.ps1", "-IncludeMSSQL" ]
 
-CMD ./Provision/ISHBootstrap/Source/Docker/ISH.Cmd.ps1 -OsUserName $Env:OsUserName -OsUserPassword $Env:OsUserPassword -PFXCertificatePath $Env:PFXCertificatePath -PFXCertificatePassword $Env:PFXCertificatePassword -HostName $Env:HostName -sa_password $env:sa_password -ACCEPT_EULA $env:ACCEPT_EULA
+CMD ./Provision/ISHBootstrap/Source/Docker/ISH.Cmd.ps1 -OsUserName $Env:OsUserName -OsUserPassword $Env:OsUserPassword -PFXCertificatePath $Env:PFXCertificatePath -PFXCertificatePassword $Env:PFXCertificatePassword -HostName $Env:HostName -sa_password $env:sa_password -ACCEPT_EULA $env:ACCEPT_EULA -Loop

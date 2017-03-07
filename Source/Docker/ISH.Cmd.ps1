@@ -22,7 +22,10 @@ param(
     [Parameter(Mandatory=$false,ParameterSet="Internal Database")]
     [string]$sa_password,
     [Parameter(Mandatory=$false,ParameterSet="Internal Database")]
-    [string]$ACCEPT_EULA
+    [string]$ACCEPT_EULA,
+    [Parameter(Mandatory=$false,ParameterSet="External Database")]
+    [Parameter(Mandatory=$false,ParameterSet="Internal Database")]
+    [switch]$Loop=$false
 )
 
 if ($PSBoundParameters['Debug']) {
@@ -83,15 +86,18 @@ if($PSCmdlet.ParameterSetName -eq "Internal Database")
 
 & $buildersPath\Initialize-ISH.Instance.ps1 @hash
 
-$lastCheck = (Get-Date).AddSeconds(-2) 
-while ($true) { 
-    if($PSCmdlet.ParameterSetName -eq "Internal Database")
-    {
-        Get-EventLog -LogName Application -Source "MSSQL*" -After $lastCheck | Select-Object TimeGenerated, EntryType, Message	 
-    }
-    # TODO: Figure out ISH event log source
-    Get-EventLog -LogName Application -Source "Trisoft*" -After $lastCheck | Select-Object TimeGenerated, EntryType, Message	 
+if($Loop)
+{
+    $lastCheck = (Get-Date).AddSeconds(-2) 
+    while ($true) { 
+        if($PSCmdlet.ParameterSetName -eq "Internal Database")
+        {
+            Get-EventLog -LogName Application -Source "MSSQL*" -After $lastCheck | Select-Object TimeGenerated, EntryType, Message	 
+        }
+        # TODO: Figure out ISH event log source
+        Get-EventLog -LogName Application -Source "Trisoft*" -After $lastCheck | Select-Object TimeGenerated, EntryType, Message	 
 
-    $lastCheck = Get-Date 
-    Start-Sleep -Seconds 2 
+        $lastCheck = Get-Date 
+        Start-Sleep -Seconds 2 
+    }
 }
