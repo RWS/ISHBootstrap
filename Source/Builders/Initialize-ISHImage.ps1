@@ -203,9 +203,6 @@ $installHash=@{
     ConnectionString=$ConnectionString
 }
 
-#TODO: DELETE
-Get-PSDrive C | Select-Object Used,Free
-
 & $serverScriptsPath\Install\Install-ISHDeployment.ps1 @installHash
 #endregion
 
