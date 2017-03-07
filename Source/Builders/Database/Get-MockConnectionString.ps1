@@ -8,9 +8,6 @@ $cmdletsPaths="$PSScriptRoot\..\..\Cmdlets"
 Write-Separator -Invocation $MyInvocation -Header
 $scriptProgress=Get-ProgressHash -Invocation $MyInvocation
 
-$ishServerVersion=($ISHVersion -split "\.")[0]
-$ishRevision=($ISHVersion -split "\.")[2]
-
 $sqlServerItem=Get-ChildItem -Path "${env:ProgramFiles(x86)}\Microsoft SQL Server" -Filter "*0" |Sort-Object -Descending @{expression={[int]$_.Name}}| Select-Object -First 1
 $sqlServerPath=$sqlServerItem |Select-Object -ExpandProperty FullName
 $sqlServerMajorVersion=$sqlServerItem.Name.Substring(0,$sqlServerItem.Name.Length-1)

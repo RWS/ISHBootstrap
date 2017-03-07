@@ -125,6 +125,7 @@ if($useMockedDatabaseAsDemo)
 {
     $osUserSqlUser="$($env:COMPUTERNAME)\$($OsUserCredentials.UserName)"
     & $dbScriptsPath\Initialize-MockDatabase.ps1 -OSUserSqlUser $osUserSqlUser
+    $ConnectionString=& $dbScriptsPath\Get-MockConnectionString.ps1
 }
 
 #endregion
@@ -158,16 +159,23 @@ $applications.SaveChanges();
 #endregion
 
 #region 6. Change the database connection
+$blockName="Setting database connection"  
+Write-Progress @scriptProgress -Status $blockName
+Write-Host $blockName
+
 if(-not $useMockedDatabaseAsDemo)
 {
-    $blockName="Setting database connection"  
-    Write-Progress @scriptProgress -Status $blockName
-    Write-Host $blockName
 
     Set-ItemProperty -Path 'HKLM:\SOFTWARE\WOW6432Node\Trisoft\Tridk\TridkApp\InfoShareAuthor'-Name "Connect" -Value $ConnectionString
     Set-ItemProperty -Path 'HKLM:\SOFTWARE\WOW6432Node\Trisoft\Tridk\TridkApp\InfoShareAuthor'-Name "ComponentName" -Value $DbType
     Set-ItemProperty -Path 'HKLM:\SOFTWARE\WOW6432Node\Trisoft\Tridk\TridkApp\InfoShareBuilders'-Name "Connect" -Value $ConnectionString
     Set-ItemProperty -Path 'HKLM:\SOFTWARE\WOW6432Node\Trisoft\Tridk\TridkApp\InfoShareBuilders'-Name "ComponentName" -Value $DbType
+}
+else
+{
+    # This is because the computer name can change
+    Set-ItemProperty -Path 'HKLM:\SOFTWARE\WOW6432Node\Trisoft\Tridk\TridkApp\InfoShareAuthor'-Name "Connect" -Value $ConnectionString
+    Set-ItemProperty -Path 'HKLM:\SOFTWARE\WOW6432Node\Trisoft\Tridk\TridkApp\InfoShareBuilders'-Name "Connect" -Value $ConnectionString
 }
 #endregion
 
@@ -249,6 +257,18 @@ $replacementMatrix=@(
     @{
         CurrentValue=$deploymentParameters|Where-Object -Property Name -EQ machinename|Select-Object -ExpandProperty Value
         NewValue=$env:COMPUTERNAME
+    }
+    
+    #TODO: Still need to check other files that connectstring and databasetype are found and add them to the extentions list
+    # connectstring. Change all derived parameters from machinename
+    @{
+        CurrentValue=$deploymentParameters|Where-Object -Property Name -EQ connectstring|Select-Object -ExpandProperty Value
+        NewValue=$ConnectionString
+    }
+    # databasetype. Change all derived parameters from machinename
+    @{
+        CurrentValue=$deploymentParameters|Where-Object -Property Name -EQ databasetype|Select-Object -ExpandProperty Value
+        NewValue=$DbType
     }
 )
 
