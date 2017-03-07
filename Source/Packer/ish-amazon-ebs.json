@@ -73,6 +73,12 @@
     "inline": [
 	  "& C:/Provision/ISHBootstrap/Source/Bake-ISHFromAWSS3.ps1 -ISHVersion {{user `ishVersion`}} -MockConnectionString \"{{user `ish_mock_connectionstring`}}\" -ErrorAction Stop"
 	]
+  },
+  {
+    "type": "powershell",
+    "inline": [
+      "& C:/Provision/ISHBootstrap/Source/Packer/AWSScripts/Set-EC2Config.ps1"
+	]
   }]
 }}
 
