@@ -57,6 +57,27 @@ if($PSCmdlet.ParameterSetName -eq "WindowsServerCore")
     )
 }
 
+$caption=(Get-CimInstance Win32_OperatingSystem).Caption
+$regex="Microsoft Windows (?<Server>(Server) )?((?<Version>[0-9]+( R[0-9]?)?) )?(?<Type>.+)"
+if($caption -match $regex)
+{
+    $isWindowsClient=$Matches["Server"] -eq $null
+}
+else
+{
+    throw "Could not determine if the operating system is client of not"
+}
+
+if($isWindowsClient)
+{
+    $memory="2GB"
+    Write-Warning "Client operating system detected. Container will run with Hyper-V isolation. Increasing the memory size to $memory"
+    $dockerArgs+=@(
+        "-m"
+        "2GB"
+    )
+}
+
 $dockerArgs+=@(
     "."
 )
