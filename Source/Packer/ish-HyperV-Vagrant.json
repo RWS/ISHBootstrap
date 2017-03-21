@@ -5,39 +5,42 @@
     "iso_checksum_type": "SHA1",
     "iso_checksum": "",
     "hyperv_switchname": "External Virtual Switch",
-	"aws_access_key": "",
+    "aws_access_key": "",
     "aws_secret_key": "",
-	"output_box_path":"",
+    "output_box_path": "",
+    "autounattend_xml_filepath": "./answer_files/2016/Autounattend.xml",
+    "ish_mock_connectionstring": ""
   },
   "builders": [
     {
-      "vm_name":"ISH.1203-Packer",
+      "vm_name": "ISH.{{user `ishVersion`}}-Packer",
       "type": "hyperv-iso",
       "disk_size": 41440,
       "boot_wait": "0s",
-      "guest_additions_mode":"disable",
+      "guest_additions_mode": "disable",
       "iso_url": "{{user `iso_url`}}",
       "iso_checksum_type": "{{user `iso_checksum_type`}}",
       "iso_checksum": "{{user `iso_checksum`}}",
       "floppy_files": [
-        "./answer_files/2016/Autounattend.xml",
+        "{{user `autounattend_xml_filepath`}}",
         "./floppy/WindowsPowershell.lnk",
         "./floppy/PinTo10.exe",
         "./scripts/disable-screensaver.ps1",
         "./scripts/disable-winrm.ps1",
         "./scripts/enable-winrm.ps1",
         "./scripts/microsoft-updates.bat",
-        "./scripts/win-updates.ps1"
+        "./scripts/win-updates.ps1",
+        "./scripts/sqlexpress.ps1"
       ],
-      "communicator":"winrm",
+      "communicator": "winrm",
       "winrm_username": "vagrant",
       "winrm_password": "vagrant",
-      "winrm_timeout" : "4h",
+      "winrm_timeout": "4h",
       "shutdown_command": "shutdown /s /t 10 /f /d p:4:1 /c \"Packer Shutdown\"",
       "ram_size": 2048,
       "cpu": 2,
-      "switch_name":"{{user `hyperv_switchname`}}",
-      "enable_secure_boot":true
+      "switch_name": "{{user `hyperv_switchname`}}",
+      "enable_secure_boot": true
     }
   ],
   "provisioners": [
@@ -69,25 +72,23 @@
         "./scripts/compact.bat"
       ]
     },
-	{
-		"type": "powershell",
-		"inline": [
-		  "New-Item -Path C:/Provision/ISHBootstrap -ItemType Directory"
-		]
-	},
-	{
-		"type": "file",
-		"source": "../../Source/",
-		"destination": "C:/Provision/ISHBootstrap/Source"
-	},
-	{
-		"type": "powershell",
-		"inline": [
-		  "Start-Transcript -Path C:/Provision/Bake-ISHFromAWSS3.ps1.txt -IncludeInvocationHeader",
-		  "& C:/Provision/ISHBootstrap/Source/Builders/Bake-ISHFromAWSS3.ps1 -ISHVersion {{user `ishVersion`}} -AccessKey {{user `aws_access_key`}} -SecretKey {{user `aws_secret_key`}} -ErrorAction Stop",
-		  "Stop-Transcript"
-		]
-	}
+    {
+      "type": "powershell",
+      "inline": [
+        "New-Item -Path C:/Provision/ISHBootstrap -ItemType Directory"
+      ]
+    },
+    {
+      "type": "file",
+      "source": "../../Source/",
+      "destination": "C:/Provision/ISHBootstrap/Source"
+    },
+    {
+      "type": "powershell",
+      "inline": [
+        "& C:/Provision/ISHBootstrap/Source/Bake-ISHFromAWSS3.ps1 -ISHVersion {{user `ishVersion`}} -MockConnectionString \"{{user `ish_mock_connectionstring`}}\" -AccessKey {{user `aws_access_key`}} -SecretKey {{user `aws_secret_key`}} -ErrorAction Stop"
+      ]
+    }
   ],
   "post-processors": [
     {

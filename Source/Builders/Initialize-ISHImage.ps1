@@ -60,6 +60,7 @@ $mockOSUserPassword="Password123"
 $mockOSUserCredential=New-Object System.Management.Automation.PSCredential($mockOSUserName,(ConvertTo-SecureString $mockOSUserPassword -AsPlainText -Force))
 if($mockDatabase)
 {
+    & $dbScriptsPath\Install-MockDatabase.ps1 -ISHVersion $ishVersion
     $ConnectionString=& $dbScriptsPath\Get-MockConnectionString.ps1
 }
 #endregion

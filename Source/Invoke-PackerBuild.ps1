@@ -26,7 +26,11 @@ param(
     [Parameter(Mandatory=$false,ParameterSetName="Vagrant Hyper-V")]
     [string]$SwitchName="External Virtual Switch",
     [Parameter(Mandatory=$false,ParameterSetName="Vagrant Hyper-V")]
-    [string]$BoxPath="$($env:TEMP)\ISH.$ISHVersion-hyperv-iso.box"
+    [string]$BoxPath="$($env:TEMP)\ISH.$ISHVersion-hyperv-iso.box",
+    [Parameter(Mandatory=$false,ParameterSetName="Vagrant Hyper-V")]
+    [switch]$NoWindowsUpdates,
+    [Parameter(Mandatory=$false,ParameterSetName="Vagrant Hyper-V")]
+    [switch]$ServerCore
 )
 
 if ($PSBoundParameters['Debug']) {
@@ -111,6 +115,19 @@ switch ($PSCmdlet.ParameterSetName) {
         $logRegExSource="amazon-ebs"
     }
     'Vagrant Hyper-V' {
+        $autounattendFilePath="./answer_files/2016"
+        if ($ServerCore.IsPresent)
+        {
+            $autounattendFilePath="{0}_{1}" -f $autounattendFilePath, "core"
+        }
+		
+        if ($NoWindowsUpdates.IsPresent)
+        {
+            $autounattendFilePath="{0}_{1}" -f $autounattendFilePath, "no_windows_updates"
+        }
+	
+        $autounattendFilePath="{0}/{1}" -f $autounattendFilePath, "Autounattend.xml"
+	
         $packerArgs+=@(
             "-var"
             "iso_url=$ISOUrl"
@@ -126,8 +143,23 @@ switch ($PSCmdlet.ParameterSetName) {
             "aws_secret_key=$SecretKey"
             "-var"
             "output_box_path=$BoxPath"
+            "-var"
+            "autounattend_xml_filepath=$autounattendFilePath"
         )
 
+        if($MockConnectionString)
+        {
+            Write-Host "No need to install SQL Express"
+            $packerArgs+=@(
+                "-var"
+                "ish_mock_connectionstring=$MockConnectionString"
+	    )
+        }
+        else
+        {
+            Write-Host "TODO: NEED to install SQL Express"
+            Write-Host "The connections string will be calculated."
+        }
 
         $packerFileNameName="ish-HyperV-Vagrant.json"
     }
