@@ -24,36 +24,16 @@
     "access_key": "{{user `aws_access_key`}}",
     "secret_key": "{{user `aws_secret_key`}}",
 	"tags": {
-		"Name": "packer-dev.ish.{{user `ishVersion`}}-{{isotime \"2006-01-02\"}}",
-		"ProductLine": "Knowledge Center",
-		"ProductLineVersion": "{{user `product_line_version`}}",
-		"Product": "Content Manager",
-		"ProductVersion": "{{user `ishVersion`}}",
-		"Purpose": "AMI"
+		"Name": "packer-ishbootstrap.mssql.ish.{{user `ishVersion`}}-{{isotime \"2006-01-02\"}}"
 	},
 	"snapshot_tags": {
-		"Name": "packer-dev.ish.{{user `ishVersion`}}-{{isotime \"2006-01-02\"}}",
-		"ProductLine": "Knowledge Center",
-		"ProductLineVersion": "{{user `product_line_version`}}",
-		"Product": "Content Manager",
-		"ProductVersion": "{{user `ishVersion`}}",
-		"Purpose": "AMIBuilder"
+		"Name": "packer-ishbootstrap.mssql.ish.{{user `ishVersion`}}-{{isotime \"2006-01-02\"}}"
 	},
 	"run_volume_tags": {
-		"Name": "packer-dev.ish.{{user `ishVersion`}}-{{isotime \"2006-01-02\"}}",
-		"ProductLine": "Knowledge Center",
-		"ProductLineVersion": "{{user `product_line_version`}}",
-		"Product": "Content Manager",
-		"ProductVersion": "{{user `ishVersion`}}",
-		"Purpose": "AMIBuilder"
+		"Name": "packer-ishbootstrap.mssql.ish.{{user `ishVersion`}}-{{isotime \"2006-01-02\"}}"
 	},
 	"run_tags": {
-		"Name": "packer-dev.ish.{{user `ishVersion`}}-{{isotime \"2006-01-02\"}}",
-		"ProductLine": "Knowledge Center",
-		"ProductLineVersion": "{{user `product_line_version`}}",
-		"Product": "Content Manager",
-		"ProductVersion": "{{user `ishVersion`}}",
-		"Purpose": "AMIBuilder"
+		"Name": "packer-ishbootstrap.mssql.ish.{{user `ishVersion`}}-{{isotime \"2006-01-02\"}}"
 	}
   }],
   "provisioners": [
@@ -88,7 +68,14 @@
   {
     "type": "powershell",
     "inline": [
-	  "& C:/Provision/ISHBootstrap/Source/Bake-ISHFromAWSS3.ps1 -ISHVersion {{user `ishVersion`}} -MockConnectionString \"{{user `ish_mock_connectionstring`}}\" -ErrorAction Stop"
+		"& C:/Provision/ISHBootstrap/Source/Builders/Default/Install-ISHBootstrapPrerequisites.ps1 -ISHVersion {{user `ishVersion`}}"
+	]
+  },
+  {
+    "type": "powershell",
+    "inline": [
+	  "$aws=& C:/Provision/ISHBootstrap/Source/Builders/Default/New-ISHBootstrapAWSReferences.ps1 -ISHVersion {{user `ishVersion`}}",
+	  "& C:/Provision/ISHBootstrap/Source/Bake-ISHFromAWSS3.ps1 -ISHVersion {{user `ishVersion`}} -MockConnectionString \"{{user `ish_mock_connectionstring`}}\" -BucketName $aws.BucketName -ISHServerFolder $aws.ISHServerFolder -ISHCDFolder $aws.ISHCDFolder -ISHCDFileName $aws.ISHCDFileName -ErrorAction Stop"
 	]
   },
   {

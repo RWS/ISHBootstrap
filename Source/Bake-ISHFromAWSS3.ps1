@@ -1,16 +1,28 @@
 #requires -runasadministrator
 
 param(
-    [Parameter(Mandatory=$true,ParameterSetName="Default")]
-    [Parameter(Mandatory=$true,ParameterSetName="AWS Credential")]
+    [Parameter(Mandatory=$true,ParameterSetName="Default Authorization")]
+    [Parameter(Mandatory=$true,ParameterSetName="Custom Authorization")]
     [ValidateSet("12.0.3","12.0.4","13.0.0")]
     [string]$ISHVersion,
-    [Parameter(Mandatory=$false,ParameterSetName="Default")]
-    [Parameter(Mandatory=$false,ParameterSetName="AWS Credential")]
+    [Parameter(Mandatory=$false,ParameterSetName="Default Authorization")]
+    [Parameter(Mandatory=$false,ParameterSetName="Custom Authorization")]
     [string]$MockConnectionString=$null,
-    [Parameter(Mandatory=$true,ParameterSetName="AWS Credential")]
+    [Parameter(Mandatory=$true,ParameterSetName="Default Authorization")]
+    [Parameter(Mandatory=$true,ParameterSetName="Custom Authorization")]
+    [string]$BucketName,
+    [Parameter(Mandatory=$true,ParameterSetName="Default Authorization")]
+    [Parameter(Mandatory=$true,ParameterSetName="Custom Authorization")]
+    [string]$ISHServerFolder,
+    [Parameter(Mandatory=$true,ParameterSetName="Default Authorization")]
+    [Parameter(Mandatory=$true,ParameterSetName="Custom Authorization")]
+    [string]$ISHCDFolder,
+    [Parameter(Mandatory=$true,ParameterSetName="Default Authorization")]
+    [Parameter(Mandatory=$true,ParameterSetName="Custom Authorization")]
+    [string]$ISHCDFileName,
+    [Parameter(Mandatory=$true,ParameterSetName="Custom Authorization")]
     [string]$AccessKey,
-    [Parameter(Mandatory=$true,ParameterSetName="AWS Credential")]
+    [Parameter(Mandatory=$true,ParameterSetName="Custom Authorization")]
     [string]$SecretKey
 )
 
@@ -25,44 +37,20 @@ if($MockConnectionString -eq "")
 
 $buildersPath=Join-Path $PSScriptRoot Builders
 
-switch($ISHVersion) {
-    '12.0.3' {
-        $hash=@{
-            BucketName="sct-released"
-            ISHServerFolder="InfoShare/12.0/PreRequisites"
-            ISHCDFolder="InfoShare/12.0/"
-            ISHCDFileName="20170125.CD.InfoShare.12.0.3725.3.Trisoft-DITA-OT.exe"
-        }
-    }
-    '12.0.4' {
-        $hash=@{
-            BucketName="sct-released"
-            ISHServerFolder="InfoShare/12.0/PreRequisites"
-            ISHCDFolder="InfoShare/12.0/"
-            ISHCDFileName="20170302.CD.InfoShare.12.0.3902.4.Prod.Trisoft-DITA-OT.exe"
-        }
-    }
-    '13.0.0' {
-        $hash=@{
-            BucketName="sct-notreleased"
-            ISHServerFolder="InfoShare/13.0/PreRequisites"
-            ISHCDFolder="InfoShare/13.0/"
-            ISHCDFileName="20170202.CD.InfoShare.13.0.2602.0.Test.Trisoft-DITA-OT.exe"
-        }
-    }
+$hash=@{
+    BucketName=$BucketName
+    ISHServerFolder=$ISHServerFolder
+    ISHCDFolder=$ISHCDFolder
+    ISHCDFileName=$ISHCDFileName
 }
 
-if($PSCmdlet.ParameterSetName -eq "AWS Credential")
+if($PSCmdlet.ParameterSetName -eq "Custom Authorization")
 {
     $hash.AccessKey=$AccessKey
     $hash.SecretKey=$SecretKey
 }
 
 $hash.ConnectionString=$MockConnectionString
-
-& $buildersPath\Prerequisites\Install-Prerequisites.ps1 -NuGet
-$prerequisites=& $buildersPath\Prerequisites\New-PrerequisitesList.ps1 -ISHVersion $ishVersion -AWS
-& $buildersPath\Prerequisites\Install-Prerequisites.ps1 -Prerequisites $prerequisites
 
 & $buildersPath\Initialize-ISHImage.ps1 @hash -ISHVersion $ishVersion
 

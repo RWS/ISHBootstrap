@@ -83,8 +83,15 @@
 	{
 		"type": "powershell",
 		"inline": [
+			"& C:/Provision/ISHBootstrap/Source/Builders/Default/Install-ISHBootstrapPrerequisites.ps1 -ISHVersion {{user `ishVersion`}} -AWS"
+		]
+	},
+	{
+		"type": "powershell",
+		"inline": [
 		  "Start-Transcript -Path C:/Provision/Bake-ISHFromAWSS3.ps1.txt -IncludeInvocationHeader",
-		  "& C:/Provision/ISHBootstrap/Source/Builders/Bake-ISHFromAWSS3.ps1 -ISHVersion {{user `ishVersion`}} -AccessKey {{user `aws_access_key`}} -SecretKey {{user `aws_secret_key`}} -ErrorAction Stop",
+		  "$aws=& C:/Provision/ISHBootstrap/Source/Builders/Default/New-ISHBootstrapAWSReferences.ps1 -ISHVersion {{user `ishVersion`}}",
+		  "& C:/Provision/ISHBootstrap/Source/Builders/Bake-ISHFromAWSS3.ps1 -ISHVersion {{user `ishVersion`}} -BucketName $aws.BucketName -ISHServerFolder $aws.ISHServerFolder -ISHCDFolder $aws.ISHCDFolder -ISHCDFileName $aws.ISHCDFileName -AccessKey {{user `aws_access_key`}} -SecretKey {{user `aws_secret_key`}} -ErrorAction Stop",
 		  "Stop-Transcript"
 		]
 	}
