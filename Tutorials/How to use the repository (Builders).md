@@ -29,9 +29,7 @@ $awsISH1203=@{
     SecretKey="secretkey"
 }
 
-$prerequisites=& $buildersPath\Prerequisites\New-PrerequisitesList.ps1 -ISHVersion $ishVersion -AWS
-#& $buildersPath\Prerequisites\Install-Prerequisites.ps1 -NuGet
-& $buildersPath\Prerequisites\Install-Prerequisites.ps1 -Prerequisites $prerequisites
+& $buildersPath\Default\Install-ISHBootstrapPrerequisites.ps1-Prerequisites -ISHVersion $ishVersion
 
 & $buildersPath\Initialize-ISHImage.ps1 @awsISH1203 -ISHVersion $ishVersion -InformationAction Continue -ErrorAction Stop
 ```
