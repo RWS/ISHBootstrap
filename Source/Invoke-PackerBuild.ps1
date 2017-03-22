@@ -66,6 +66,11 @@ switch ($PSCmdlet.ParameterSetName) {
                 Write-Host "Using Microsoft Windows Server 2016 Base  AMI ImageId for region $Region"
                 $SourceAMI=(Get-EC2ImageByName -Name WINDOWS_2016_BASE -Region $region).ImageId
                 $packerFileName="ish-amazon-ebs.json"
+
+                $packerArgs+=@(
+                    "-var"
+                    "ish_mock_connectionstring=$MockConnectionString"
+                )
             }
             else
             {
@@ -75,15 +80,8 @@ switch ($PSCmdlet.ParameterSetName) {
             }
             Write-Host "Building with $SourceAMI image id"
         }
-        switch($ISHVersion) {
-            '12.0.3'{$productLineVersion="2016 SP3"}
-            '12.0.4'{$productLineVersion="2016 SP4"}
-            '13.0.0'{$productLineVersion="2018"}
-        }
 
         $packerArgs+=@(
-            "-var"
-            "product_line_version=$productLineVersion"
             "-var"
             "source_ami=$SourceAMI"
             "-var"
