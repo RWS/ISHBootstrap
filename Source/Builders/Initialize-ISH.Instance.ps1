@@ -111,11 +111,47 @@ else
 
 $arguments=@(
     "-Command"
-    "Initialize-ISHRegional"
+    "' { Initialize-ISHRegional } '"
 )
 Initialize-ISHUser -OSUser $osUserName
 $powerShellPath=& C:\Windows\System32\where.exe powershell
-Start-Process -FilePath $powerShellPath -ArgumentList $arguments -Credential $OsUserCredentials -LoadUserProfile -NoNewWindow  -Wait
+
+if($PSSenderInfo)
+{
+    $useScheduledTask=$true
+}
+elseif($env:USERNAME -eq "NT AUTHORITY\SYSTEM")
+{
+    $useScheduledTask=$true
+}
+else
+{
+    $useScheduledTask=$false
+}
+
+if($useScheduledTask)
+{
+    Write-Warning "Using a scheduled task to initialize $osUserName"
+    Add-Privilege -AccountName $osUserName -Privilege SeBatchLogonRight
+    $argumentList=$arguments -join ' '
+    $command="Start-Process -FilePath powershell -LoadUserProfile -Wait -ArgumentList ""$argumentList"""
+    $action = New-ScheduledTaskAction -Execute $powerShellPath -Argument "-Command '& { $command }'"
+    $task = Register-ScheduledTask "Install Alex" -Action $action -User $osUserName -Password $osUserPassword
+    Start-ScheduledTask -InputObject $task
+
+    $state=($task|Get-ScheduledTask).State
+    while($state -eq "Ready")
+    {
+        Start-Sleep -Milliseconds 500
+        $state=($task|Get-ScheduledTask).State
+    }
+    $task|Unregister-ScheduledTask -Confirm:$false
+    Remove-Privilege -AccountName $osUserName -Privilege SeBatchLogonRight
+}
+else
+{
+    Start-Process -FilePath $powerShellPath -ArgumentList $arguments -Credential $OsUserCredentials -LoadUserProfile -NoNewWindow  -Wait
+}
 
 #endregion
 
