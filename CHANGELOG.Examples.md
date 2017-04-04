@@ -2,6 +2,8 @@
 
 ## pre-release v0.9
 
+- GH-58: Configure RequireSSL attribute for ISHCM and ISHSTS web applications. After installing the web applications are configured for the **RequireSSL**.
+
 ## pre-release v0.8
 
 - GH-45 and GH-46: Azure file and blob storage support.
