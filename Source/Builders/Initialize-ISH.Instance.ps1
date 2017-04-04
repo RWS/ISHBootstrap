@@ -124,6 +124,10 @@ elseif($env:USERNAME -eq "NT AUTHORITY\SYSTEM")
 {
     $useScheduledTask=$true
 }
+elseif($env:USERNAME -eq "$($env:computername)`$")
+{
+    $useScheduledTask=$true
+}
 else
 {
     $useScheduledTask=$false
