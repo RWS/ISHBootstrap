@@ -1,9 +1,9 @@
 {
   "variables": {
     "ishVersion": "",
-    "iso_url": "",
+    "iso_url": "G:/PROVISION/_ISO/en_windows_server_2016_x64_dvd_9327751.iso",
     "iso_checksum_type": "SHA1",
-    "iso_checksum": "",
+    "iso_checksum": "7E33DF150CB4D1FE3503E23433A1867DDD79A6EE",
     "hyperv_switchname": "External Virtual Switch",
     "aws_access_key": "",
     "aws_secret_key": "",
@@ -13,14 +13,23 @@
   },
   "builders": [
     {
-      "vm_name": "ISH.{{user `ishVersion`}}-Packer",
+      "vm_name": "ISH.{{user `ishVersion`}}-2016-Packer",
       "type": "hyperv-iso",
       "disk_size": 41440,
+      "ram_size": 2048,
+      "cpu": 2,
       "boot_wait": "0s",
+      "enable_secure_boot": true,
       "guest_additions_mode": "disable",
       "iso_url": "{{user `iso_url`}}",
       "iso_checksum_type": "{{user `iso_checksum_type`}}",
       "iso_checksum": "{{user `iso_checksum`}}",
+      "switch_name": "{{user `hyperv_switchname`}}",
+      "communicator": "winrm",
+      "winrm_username": "vagrant",
+      "winrm_password": "vagrant",
+      "winrm_timeout": "4h",
+      "shutdown_command": "shutdown /s /t 10 /f /d p:4:1 /c \"Packer Shutdown\"",
       "floppy_files": [
         "{{user `autounattend_xml_filepath`}}",
         "./floppy/WindowsPowershell.lnk",
@@ -31,16 +40,7 @@
         "./scripts/microsoft-updates.bat",
         "./scripts/win-updates.ps1",
         "./scripts/sqlexpress.ps1"
-      ],
-      "communicator": "winrm",
-      "winrm_username": "vagrant",
-      "winrm_password": "vagrant",
-      "winrm_timeout": "4h",
-      "shutdown_command": "shutdown /s /t 10 /f /d p:4:1 /c \"Packer Shutdown\"",
-      "ram_size": 2048,
-      "cpu": 2,
-      "switch_name": "{{user `hyperv_switchname`}}",
-      "enable_secure_boot": true
+      ]
     }
   ],
   "provisioners": [

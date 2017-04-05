@@ -27,6 +27,9 @@ param(
     [string]$SwitchName="External Virtual Switch",
     [Parameter(Mandatory=$false,ParameterSetName="Vagrant Hyper-V")]
     [string]$BoxPath="$($env:TEMP)\ISH.$ISHVersion-hyperv-iso.box",
+    [Parameter(Mandatory=$true,ParameterSetName="Vagrant Hyper-V")]
+	[ValidateSet('2012_r2', '2016')]
+    [string]$ServerVersion,
     [Parameter(Mandatory=$false,ParameterSetName="Vagrant Hyper-V")]
     [switch]$NoWindowsUpdates,
     [Parameter(Mandatory=$false,ParameterSetName="Vagrant Hyper-V")]
@@ -115,7 +118,7 @@ switch ($PSCmdlet.ParameterSetName) {
         $logRegExSource="amazon-ebs"
     }
     'Vagrant Hyper-V' {
-        $autounattendFilePath="./answer_files/2016"
+        $autounattendFilePath="./answer_files/{0}" -f $ServerVersion
         if ($ServerCore.IsPresent)
         {
             $autounattendFilePath="{0}_{1}" -f $autounattendFilePath, "core"
@@ -161,9 +164,11 @@ switch ($PSCmdlet.ParameterSetName) {
             Write-Host "The connections string will be calculated."
         }
 
-        $packerFileNameName="ish-HyperV-Vagrant.json"
+        $packerFileNameName="ish-HyperV-{0}-Vagrant.json" -f $ServerVersion
     }
 }
+
+Write-Host "Using $packerFileNameName"
 
 $packerArgs+=$packerFileNameName
 

@@ -1,0 +1,87 @@
+{
+  "variables": {
+    "ishVersion": "12.0.3",
+    "ServerVersion": "2012_r2",
+    "iso_url": "G:/PROVISION/_ISO/en_windows_server_2012_r2_with_update_x64_dvd_6052708.iso",
+    "iso_checksum_type": "SHA1",
+    "iso_checksum": "865494E969704BE1C4496D8614314361D025775E",
+    "hyperv_switchname": "Wireless Internal Shared Virtual Switch",
+    "aws_access_key": "AKIAJNV5MH3EF4YQZ52Q",
+    "aws_secret_key": "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",
+    "output_box_path": "G:/PROVISION/packer/boxes/ISH.12.0.3-2012r2-hyperv-iso.box",
+    "autounattend_xml_filepath": "./answer_files/2012_r2_no_windows_updates/Autounattend.xml",
+    "ish_mock_connectionstring": ""
+  },
+  "builders": [
+    {
+      "vm_name": "ISH.{{user `ishVersion`}}-2012_r2-Packer",
+      "type": "hyperv-iso",
+      "disk_size": 41440,
+      "ram_size": 2048,
+      "cpu": 2,
+      "boot_wait": "2m",
+      "generation": 1,
+	  "guest_additions_mode": "none",
+      "iso_url": "{{user `iso_url`}}",
+      "iso_checksum_type": "{{user `iso_checksum_type`}}",
+      "iso_checksum": "{{user `iso_checksum`}}",
+	  "switch_name": "{{user `hyperv_switchname`}}",
+      "communicator": "winrm",
+      "winrm_username": "vagrant",
+      "winrm_password": "vagrant",
+      "winrm_timeout": "4h",
+      "shutdown_command": "shutdown /s /t 10 /f /d p:4:1 /c \"Packer Shutdown\"",
+      "skip_compaction": true,
+      "floppy_files": [
+        "{{user `autounattend_xml_filepath`}}",
+        "./scripts/disable-winrm.ps1",
+        "./scripts/enable-winrm.ps1",
+        "./scripts/microsoft-updates.bat",
+        "./scripts/unattend.xml",
+        "./scripts/win-updates.ps1"
+      ]
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "windows-shell",
+      "scripts": [
+        "./scripts/vm-guest-tools.bat",
+        "./scripts/enable-rdp.bat",
+        "./scripts/compile-dotnet-assemblies.bat",
+        "./scripts/compact.bat"
+      ]
+    },
+    {
+      "type": "powershell",
+      "inline": [
+        "New-Item -Path C:/Provision/ISHBootstrap -ItemType Directory"
+      ]
+    },
+    {
+      "type": "file",
+      "source": "../../Source/",
+      "destination": "C:/Provision/ISHBootstrap/Source"
+    },
+    {
+      "type": "powershell",
+      "inline": [
+        "& C:/Provision/ISHBootstrap/Source/Server/PackageManagement/Install-PackageManagement.ps1"
+      ]
+    },
+    {
+      "type": "powershell",
+      "inline": [
+        "& C:/Provision/ISHBootstrap/Source/Bake-ISHFromAWSS3.ps1 -ISHVersion {{user `ishVersion`}} -MockConnectionString \"{{user `ish_mock_connectionstring`}}\" -AccessKey {{user `aws_access_key`}} -SecretKey {{user `aws_secret_key`}} -ErrorAction Stop"
+      ]
+    }
+  ],
+  "post-processors": [
+    {
+      "type": "vagrant",
+      "keep_input_artifact": false,
+      "output": "windows_2012_r2_{{.Provider}}.box",
+      "vagrantfile_template": "vagrantfile-windows_2012_r2.template"
+    }
+  ]
+}
