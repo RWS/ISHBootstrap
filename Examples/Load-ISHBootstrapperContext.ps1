@@ -34,6 +34,7 @@ try
     {
         $JSONPath="$PSScriptRoot\$JSONFile"
         $FolderPath=$PSScriptRoot
+        $JSON = Get-Content -Path $JSONPath | ConvertFrom-Json 
     }
     if($PSCmdlet.ParameterSetName -eq "Path")
     {
