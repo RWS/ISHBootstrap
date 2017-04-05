@@ -29,7 +29,7 @@ $awsISH1203=@{
     SecretKey="secretkey"
 }
 
-& $buildersPath\Default\Install-ISHBootstrapPrerequisites.ps1-Prerequisites -ISHVersion $ishVersion
+& $buildersPath\Default\Install-ISHBootstrapPrerequisites.ps1 -ISHVersion $ishVersion
 
 & $buildersPath\Initialize-ISHImage.ps1 @awsISH1203 -ISHVersion $ishVersion -InformationAction Continue -ErrorAction Stop
 ```

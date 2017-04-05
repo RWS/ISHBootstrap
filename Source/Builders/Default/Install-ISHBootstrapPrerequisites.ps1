@@ -36,6 +36,7 @@ Get-PackageProvider -Name NuGet -ForceBootstrap | Out-Null
 $moduleNames=@(
     "ISHDeploy.$ISHVersion"
     "CertificatePS"
+    "PoshPrivilege"
 )
 if(-not $DebugISHServer)
 {

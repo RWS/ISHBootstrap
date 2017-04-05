@@ -1,4 +1,4 @@
-﻿#reguires -runasadministrator
+﻿#requires -runasadministrator
 
 param(
     [Parameter(Mandatory=$true,ParameterSetName="External Database")]
@@ -102,13 +102,27 @@ if(Get-Module Microsoft.PowerShell.LocalAccounts -ListAvailable)
 }
 else
 {
-    NET USER $osUserName $osUserPassword /ADD
+    if($osUserName.StartsWith("$($env:computername)\"))
+    {
+        $tempUserName=$osUserName.Substring($osUserName.IndexOf('\')+1)
+        NET USER $tempUserName $osUserPassword /ADD
+        $user = [adsi]"WinNT://$env:computername/$tempUserName"
+    }
+    elseif($osUserName.StartsWith(".\"))
+    {
+        $tempUserName=$osUserName.Substring($osUserName.IndexOf('\')+1)
+        NET USER $tempUserName $osUserPassword /ADD
+        $user = [adsi]"WinNT://$env:computername/$tempUserName"
+    }
+    else
+    {
+        NET USER $osUserName $osUserPassword /ADD
+        $user = [adsi]"WinNT://$osUserName"
+    }
     # Uncheck 'User must change password'
-    $user = [adsi]"WinNT://$env:computername/$osUserName"
     $user.UserFlags.value = $user.UserFlags.value -bor 0x10000
     $user.CommitChanges()    
 }
-
 $arguments=@(
     "-Command"
     "' { Initialize-ISHRegional } '"
@@ -116,7 +130,7 @@ $arguments=@(
 Initialize-ISHUser -OSUser $osUserName
 $powerShellPath=& C:\Windows\System32\where.exe powershell
 
-if($PSSenderInfo)
+if(Test-Path -Path Variable:\PSSenderInfo)
 {
     $useScheduledTask=$true
 }
