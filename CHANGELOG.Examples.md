@@ -2,6 +2,9 @@
 
 ## pre-release v0.9
 
+- GH-58: Configure RequireSSL attribute for ISHCM and ISHSTS web applications. After installing the web applications are configured for the **RequireSSL**.
+- GH-57: Load-ISHBootstrapperContext.ps1 fails to load json file when using Name parameter set.
+
 ## pre-release v0.8
 
 - GH-45 and GH-46: Azure file and blob storage support.
