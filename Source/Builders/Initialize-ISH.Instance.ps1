@@ -54,12 +54,45 @@ $softwareVersion=Get-ISHDeployment |Select-Object -First 1 -ExpandProperty Softw
 $ishVersion="$($softwareVersion.Major).0.$($softwareVersion.Revision)"
 $ishServerVersion=($ishVersion -split "\.")[0]
 
+if($OsUserCredentials.UserName.StartsWith("$($env:computername)\"))
+{
+    $createLocalUser=$true
+}
+elseif($OsUserCredentials.UserName.StartsWith(".\"))
+{
+    Write-Host "Credentials normalization.Replaced .\ with $env:COMPUTERNAME"
+    $OsUserCredentials=New-Object System.Management.Automation.PSCredential($OsUserCredentials.UserName.Replace(".",$env:COMPUTERNAME),$OsUserCredentials.Password)
+    $createLocalUser=$true
+}
+elseif($OsUserCredentials.UserName.indexOf("\") -lt 0)
+{
+    Write-Host "Credentials normalization.Prefixed with $env:COMPUTERNAME"
+    $OsUserCredentials=New-Object System.Management.Automation.PSCredential("$env:COMPUTERNAME\$($OsUserCredentials.UserName)",$OsUserCredentials.Password)
+    $createLocalUser=$true
+}
+else
+{
+    $createLocalUser=$false
+}
+
+
 $osUserName=$OsUserCredentials.UserName
+Write-Host "osUserName=$osUserName"
+Write-Host "createLocalUser=$createLocalUser"
+if($createLocalUser)
+{
+    $localUserNameToAdd=$osUserName.Substring($osUserName.IndexOf('\')+1)
+    Write-Host "localUserNameToAdd=$localUserNameToAdd"
+}
 $osUserPassword=$OsUserCredentials.GetNetworkCredential().Password
 
 #endregion
 
 #region 3. Get all processes
+
+$blockName="Getting all processes"
+Write-Progress @scriptProgress -Status $blockName
+Write-Host $blockName
 
 # Web Application pools
 $ishAppPools=Get-ISHDeploymentParameters| Where-Object -Property Name -Like "infoshare*webappname"|ForEach-Object {
@@ -93,36 +126,26 @@ $blockName="Initializing osuser"
 Write-Progress @scriptProgress -Status $blockName
 Write-Host $blockName
 
-if(Get-Module Microsoft.PowerShell.LocalAccounts -ListAvailable)
+if($createLocalUser)
 {
-    if(-not (Get-LocalUser -Name $osUserName -ErrorAction SilentlyContinue))
+    Write-Debug "Adding $localUserNameToAdd local user"
+    if(Get-Module Microsoft.PowerShell.LocalAccounts -ListAvailable)
     {
-        New-LocalUser -Name $osUserName -Password $OsUserCredentials.Password -AccountNeverExpires -PasswordNeverExpires
-    }
-}
-else
-{
-    if($osUserName.StartsWith("$($env:computername)\"))
-    {
-        $tempUserName=$osUserName.Substring($osUserName.IndexOf('\')+1)
-        NET USER $tempUserName $osUserPassword /ADD
-        $user = [adsi]"WinNT://$env:computername/$tempUserName"
-    }
-    elseif($osUserName.StartsWith(".\"))
-    {
-        $tempUserName=$osUserName.Substring($osUserName.IndexOf('\')+1)
-        NET USER $tempUserName $osUserPassword /ADD
-        $user = [adsi]"WinNT://$env:computername/$tempUserName"
+        if(-not (Get-LocalUser -Name $localUserNameToAdd -ErrorAction SilentlyContinue))
+        {
+            New-LocalUser -Name $localUserNameToAdd -Password $OsUserCredentials.Password -AccountNeverExpires -PasswordNeverExpires
+        }
     }
     else
     {
-        NET USER $osUserName $osUserPassword /ADD
-        $user = [adsi]"WinNT://$osUserName"
+        NET USER $localUserNameToAdd $osUserPassword /ADD
+        $user = [adsi]"WinNT://$env:computername/$localUserNameToAdd"
+        $user.UserFlags.value = $user.UserFlags.value -bor 0x10000
+        $user.CommitChanges()    
     }
-    # Uncheck 'User must change password'
-    $user.UserFlags.value = $user.UserFlags.value -bor 0x10000
-    $user.CommitChanges()    
+    Write-Verbose "Added $localUserNameToAdd local user"
 }
+
 $arguments=@(
     "-Command"
     "' { Initialize-ISHRegional } '"
@@ -177,6 +200,10 @@ else
 
 if($useMockedDatabaseAsDemo)
 {
+    $blockName="Initializing Demo database"
+    Write-Progress @scriptProgress -Status $blockName
+    Write-Host $blockName
+
     $osUserSqlUser="$($env:COMPUTERNAME)\$($OsUserCredentials.UserName)"
     & $dbScriptsPath\Initialize-MockDatabase.ps1 -OSUserSqlUser $osUserSqlUser
     $ConnectionString=& $dbScriptsPath\Get-MockConnectionString.ps1
@@ -184,9 +211,9 @@ if($useMockedDatabaseAsDemo)
 
 #endregion
 
-#region 5. Setting process identiy
+#region 5. Setting process identities
 
-$blockName="Initializing process identity"    
+$blockName="Setting process identities"    
 Write-Progress @scriptProgress -Status $blockName
 Write-Host $blockName
 
