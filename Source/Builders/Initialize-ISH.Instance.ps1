@@ -204,8 +204,7 @@ if($useMockedDatabaseAsDemo)
     Write-Progress @scriptProgress -Status $blockName
     Write-Host $blockName
 
-    $osUserSqlUser="$($env:COMPUTERNAME)\$($OsUserCredentials.UserName)"
-    & $dbScriptsPath\Initialize-MockDatabase.ps1 -OSUserSqlUser $osUserSqlUser
+    & $dbScriptsPath\Initialize-MockDatabase.ps1 -OSUserSqlUser $osUserName
     $ConnectionString=& $dbScriptsPath\Get-MockConnectionString.ps1
 }
 
