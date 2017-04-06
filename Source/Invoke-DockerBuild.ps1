@@ -44,6 +44,8 @@ $dockerArgs+=@(
     "-f"
     "$dockerFileName"
     "--build-arg"
+    "ishVersion=$ISHVersion"
+    "--build-arg"
     "accessKey=$AccessKey"
     "--build-arg"
     "secretKey=$SecretKey"

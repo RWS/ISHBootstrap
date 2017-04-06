@@ -1,4 +1,4 @@
-﻿#reguires -runasadministrator
+﻿#requires -runasadministrator
 
 param(
     [Parameter(Mandatory=$true,ParameterSetName="External Database")]
@@ -54,12 +54,45 @@ $softwareVersion=Get-ISHDeployment |Select-Object -First 1 -ExpandProperty Softw
 $ishVersion="$($softwareVersion.Major).0.$($softwareVersion.Revision)"
 $ishServerVersion=($ishVersion -split "\.")[0]
 
+if($OsUserCredentials.UserName.StartsWith("$($env:computername)\"))
+{
+    $createLocalUser=$true
+}
+elseif($OsUserCredentials.UserName.StartsWith(".\"))
+{
+    Write-Host "Credentials normalization.Replaced .\ with $env:COMPUTERNAME"
+    $OsUserCredentials=New-Object System.Management.Automation.PSCredential($OsUserCredentials.UserName.Replace(".",$env:COMPUTERNAME),$OsUserCredentials.Password)
+    $createLocalUser=$true
+}
+elseif($OsUserCredentials.UserName.indexOf("\") -lt 0)
+{
+    Write-Host "Credentials normalization.Prefixed with $env:COMPUTERNAME"
+    $OsUserCredentials=New-Object System.Management.Automation.PSCredential("$env:COMPUTERNAME\$($OsUserCredentials.UserName)",$OsUserCredentials.Password)
+    $createLocalUser=$true
+}
+else
+{
+    $createLocalUser=$false
+}
+
+
 $osUserName=$OsUserCredentials.UserName
+Write-Host "osUserName=$osUserName"
+Write-Host "createLocalUser=$createLocalUser"
+if($createLocalUser)
+{
+    $localUserNameToAdd=$osUserName.Substring($osUserName.IndexOf('\')+1)
+    Write-Host "localUserNameToAdd=$localUserNameToAdd"
+}
 $osUserPassword=$OsUserCredentials.GetNetworkCredential().Password
 
 #endregion
 
 #region 3. Get all processes
+
+$blockName="Getting all processes"
+Write-Progress @scriptProgress -Status $blockName
+Write-Host $blockName
 
 # Web Application pools
 $ishAppPools=Get-ISHDeploymentParameters| Where-Object -Property Name -Like "infoshare*webappname"|ForEach-Object {
@@ -93,29 +126,73 @@ $blockName="Initializing osuser"
 Write-Progress @scriptProgress -Status $blockName
 Write-Host $blockName
 
-if(Get-Module Microsoft.PowerShell.LocalAccounts -ListAvailable)
+if($createLocalUser)
 {
-    if(-not (Get-LocalUser -Name $osUserName -ErrorAction SilentlyContinue))
+    Write-Debug "Adding $localUserNameToAdd local user"
+    if(Get-Module Microsoft.PowerShell.LocalAccounts -ListAvailable)
     {
-        New-LocalUser -Name $osUserName -Password $OsUserCredentials.Password -AccountNeverExpires -PasswordNeverExpires
+        if(-not (Get-LocalUser -Name $localUserNameToAdd -ErrorAction SilentlyContinue))
+        {
+            New-LocalUser -Name $localUserNameToAdd -Password $OsUserCredentials.Password -AccountNeverExpires -PasswordNeverExpires
+        }
     }
-}
-else
-{
-    NET USER $osUserName $osUserPassword /ADD
-    # Uncheck 'User must change password'
-    $user = [adsi]"WinNT://$env:computername/$osUserName"
-    $user.UserFlags.value = $user.UserFlags.value -bor 0x10000
-    $user.CommitChanges()    
+    else
+    {
+        NET USER $localUserNameToAdd $osUserPassword /ADD
+        $user = [adsi]"WinNT://$env:computername/$localUserNameToAdd"
+        $user.UserFlags.value = $user.UserFlags.value -bor 0x10000
+        $user.CommitChanges()    
+    }
+    Write-Verbose "Added $localUserNameToAdd local user"
 }
 
 $arguments=@(
     "-Command"
-    "Initialize-ISHRegional"
+    "' { Initialize-ISHRegional } '"
 )
 Initialize-ISHUser -OSUser $osUserName
 $powerShellPath=& C:\Windows\System32\where.exe powershell
-Start-Process -FilePath $powerShellPath -ArgumentList $arguments -Credential $OsUserCredentials -LoadUserProfile -NoNewWindow  -Wait
+
+if(Test-Path -Path Variable:\PSSenderInfo)
+{
+    $useScheduledTask=$true
+}
+elseif($env:USERNAME -eq "NT AUTHORITY\SYSTEM")
+{
+    $useScheduledTask=$true
+}
+elseif($env:USERNAME -eq "$($env:computername)`$")
+{
+    $useScheduledTask=$true
+}
+else
+{
+    $useScheduledTask=$false
+}
+
+if($useScheduledTask)
+{
+    Write-Warning "Using a scheduled task to initialize $osUserName"
+    Add-Privilege -AccountName $osUserName -Privilege SeBatchLogonRight
+    $argumentList=$arguments -join ' '
+    $command="Start-Process -FilePath powershell -LoadUserProfile -Wait -ArgumentList ""$argumentList"""
+    $action = New-ScheduledTaskAction -Execute $powerShellPath -Argument "-Command '& { $command }'"
+    $task = Register-ScheduledTask "Install Alex" -Action $action -User $osUserName -Password $osUserPassword
+    Start-ScheduledTask -InputObject $task
+
+    $state=($task|Get-ScheduledTask).State
+    while($state -eq "Ready")
+    {
+        Start-Sleep -Milliseconds 500
+        $state=($task|Get-ScheduledTask).State
+    }
+    $task|Unregister-ScheduledTask -Confirm:$false
+    Remove-Privilege -AccountName $osUserName -Privilege SeBatchLogonRight
+}
+else
+{
+    Start-Process -FilePath $powerShellPath -ArgumentList $arguments -Credential $OsUserCredentials -LoadUserProfile -NoNewWindow  -Wait
+}
 
 #endregion
 
@@ -123,6 +200,10 @@ Start-Process -FilePath $powerShellPath -ArgumentList $arguments -Credential $Os
 
 if($useMockedDatabaseAsDemo)
 {
+    $blockName="Initializing Demo database"
+    Write-Progress @scriptProgress -Status $blockName
+    Write-Host $blockName
+
     $osUserSqlUser="$($env:COMPUTERNAME)\$($OsUserCredentials.UserName)"
     & $dbScriptsPath\Initialize-MockDatabase.ps1 -OSUserSqlUser $osUserSqlUser
     $ConnectionString=& $dbScriptsPath\Get-MockConnectionString.ps1
@@ -130,9 +211,9 @@ if($useMockedDatabaseAsDemo)
 
 #endregion
 
-#region 5. Setting process identiy
+#region 5. Setting process identities
 
-$blockName="Initializing process identity"    
+$blockName="Setting process identities"    
 Write-Progress @scriptProgress -Status $blockName
 Write-Host $blockName
 

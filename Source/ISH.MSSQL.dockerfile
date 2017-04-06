@@ -2,6 +2,7 @@
 
 MAINTAINER Alex Sarafian
 
+ARG ishVersion
 ARG accessKey
 ARG secretKey
 
@@ -18,7 +19,10 @@ SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPref
 ADD . C:/Provision/ISHBootstrap/Source
 ADD https://github.com/Microsoft/iis-docker/blob/master/windowsservercore/ServiceMonitor.exe?raw=true /Provision/ServiceMonitor.exe
 
-RUN & C:/Provision/ISHBootstrap/Source/Bake-ISHFromAWSS3.ps1" -ISHVersion 12.0.3  -AccessKey $Env:accessKey -SecretKey $Env:secretKey
+RUN & C:/Provision/ISHBootstrap/Source/Builders/Default/Install-ISHBootstrapPrerequisites.ps1 -ISHVersion $Env:ishVersion -AWS
+
+RUN $aws=& C:/Provision/ISHBootstrap/Source/Builders/Default/New-ISHBootstrapAWSReferences.ps1 -ISHVersion $Env:ishVersion; \
+    & C:/Provision/ISHBootstrap/Source/Bake-ISHFromAWSS3.ps1 -ISHVersion $Env:ishVersion -BucketName $aws.BucketName -ISHServerFolder $aws.ISHServerFolder -ISHCDFolder $aws.ISHCDFolder -ISHCDFileName $aws.ISHCDFileName -AccessKey $Env:accessKey -SecretKey $Env:secretKey -ErrorAction Stop
 
 # This instruction tells the container to listen on port 80. 
 EXPOSE 443

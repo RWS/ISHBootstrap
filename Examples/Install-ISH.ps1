@@ -56,6 +56,9 @@ try
         Write-Verbose "Installed $($ishDeployment.Name) from $cdPath"
     }
 
+    Write-Debug "Configuring IIS Applications for RequireSSL"
+    & $serverScriptsPaths\IIS\Set-IISRequireSSL.ps1 -Computer $computerName -Credential $credential
+    Write-Verbose "Configured IIS Applications for RequireSSL"
 }
 finally
 {
