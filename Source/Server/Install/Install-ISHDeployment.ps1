@@ -319,6 +319,19 @@ $newParameterScriptBlock={
 }
 
 $installScriptBlock={
+    [int]$major=($ISHVersion -split '\.')[0]
+    if($major -ge 13)
+    {
+        # Fixing JAVA_HOME not set because we didn't restart
+        $envVarName="JAVA_HOME"
+        if(-not (Get-Item -Path ENV:\$envVarName -ErrorAction SilentlyContinue))
+        {
+            $value=Get-ChildItem -Path $Env:ProgramFiles\Java |Sort-Object -Property Name -Descending|Select-Object -First 1 -ExpandProperty Name
+            Set-Item -Path ENV:\$envVarName -Value $value
+            Write-Warning "Environment variable $envVarName could not be retrieved. Setting to $value"
+        }
+    }
+
     $fileName="inputparameters-$Name.xml"
     $folderPath=Resolve-Path "$CDPath\.."
     $inputParametersPathPath=Join-Path $folderPath $fileName
@@ -347,7 +360,7 @@ try
     
     $blockName="Installing $Name"
     Write-Progress @scriptProgress -Status $blockName
-    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $installScriptBlock -BlockName $blockName -UseParameters @("cdPath","Name")
+    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $installScriptBlock -BlockName $blockName -UseParameters @("cdPath","ISHVersion","Name")
 }
 catch
 {
