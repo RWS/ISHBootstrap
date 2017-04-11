@@ -1,7 +1,6 @@
 {
   "variables": {
     "ishVersion": "",
-    "ServerVersion": "",
     "iso_url": "",
     "iso_checksum_type": "SHA1",
     "iso_checksum": "",
@@ -9,7 +8,7 @@
     "aws_access_key": "",
     "aws_secret_key": "",
     "output_box_path": "",
-    "autounattend_xml_filepath": "",
+    "autounattend_folder": "",
     "ish_mock_connectionstring": ""
   },
   "builders": [
@@ -33,7 +32,7 @@
       "shutdown_command": "shutdown /s /t 10 /f /d p:4:1 /c \"Packer Shutdown\"",
       "skip_compaction": true,
       "floppy_files": [
-        "{{user `autounattend_xml_filepath`}}",
+        "./answer_files/{{user `autounattend_folder`}}/Autounattend.xml",
         "./scripts/disable-winrm.ps1",
         "./scripts/enable-winrm.ps1",
         "./scripts/microsoft-updates.bat",

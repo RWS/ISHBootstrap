@@ -125,22 +125,22 @@ switch ($PSCmdlet.ParameterSetName) {
             $ServerVersion
             "ish.$ISHVersion"
         )
-        $autounattendSegments=@(
+        $autounattendFolderSegments=@(
             $ServerVersion
         )
         if ($ServerCore)
         {
-            $autounattendSegments+="core"
+            $autounattendFolderSegments+="core"
             $boxNameSegments+="core"
         }
 		
         if ($NoWindowsUpdates)
         {
-            $autounattendSegments+="no_windows_updates"
+            $autounattendFolderSegments+="no_windows_updates"
             $boxNameSegments+="no_windows_updates"
         }
 	
-        $autounattendFilePath="./answer_files/$($autounattendSegments -join '_')/Autounattend.xml"
+        $autounattendFolder=$autounattendFolderSegments -join '_'
 
         $boxNameSegments+="hyperv"
         $boxName=$boxNameSegments -join '_'
@@ -174,7 +174,7 @@ switch ($PSCmdlet.ParameterSetName) {
             "-var"
             "output_box_path=$boxPath"
             "-var"
-            "autounattend_xml_filepath=$autounattendFilePath"
+            "autounattend_folder=$autounattendFolder"
         )
 
         if($MockConnectionString)
