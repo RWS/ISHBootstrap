@@ -8,7 +8,7 @@ $cmdletsPaths="$PSScriptRoot\..\..\Cmdlets"
 Write-Separator -Invocation $MyInvocation -Header
 
 $blockName="[DEVELOPFRIENDLY][Windows Server]:Installing IIS Management Console (inetmgr.exe)"
-Write-Information $blockName
+Write-Host $blockName
 
 Get-WindowsFeature -Name Web-Mgmt-Console|Install-WindowsFeature
     

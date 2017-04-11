@@ -47,7 +47,7 @@ try
 
     $scope=Get-ISHBootstrapperContextValue -ValuePath "InstallModuleScope" -DefaultValue "AllUsers"
 
-    & $serverScriptsPaths\PowerShellGet\Install-Module.ps1 -Computer $computerName -Credential $credential -ModuleName @("CertificatePS","PSFTP","AWSPowerShell", "Azure.Storage") -Repository PSGallery -Scope:$scope
+    & $serverScriptsPaths\PowerShellGet\Install-Module.ps1 -Computer $computerName -Credential $credential -ModuleName @("CertificatePS","PoshPrivilege","PSFTP","AWSPowerShell", "Azure.Storage") -Repository PSGallery -Scope:$scope
 	& $serverScriptsPaths\PowerShellGet\Install-Module.ps1 -Computer $computerName -Credential $credential -ModuleName $ishServerModuleName -Repository $ishServerRepository -Scope:$scope
     & $serverScriptsPaths\PowerShellGet\Install-Module.ps1 -Computer $computerName -Credential $credential -ModuleName $ishDeployModuleName -Repository $ishDeployRepository -Scope:$scope
 }

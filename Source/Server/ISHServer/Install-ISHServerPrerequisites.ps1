@@ -84,18 +84,25 @@ try
         Initialize-ISHMSDTCSettings
     }
 
-    Write-Progress @scriptProgress -Status "Configuring firewall"
-    Set-ISHFirewallNETBIOS
-    Set-ISHFirewallSMTP
-    Set-ISHFirewallSQLServer
-    if($InstallOracle)
+    if((Get-Service -Name MpsSvc).Status -eq "Running")
     {
-        Set-ISHFirewallOracle
+        Write-Progress @scriptProgress -Status "Configuring firewall"
+        Set-ISHFirewallNETBIOS
+        Set-ISHFirewallSMTP
+        Set-ISHFirewallSQLServer
+        if($InstallOracle)
+        {
+            Set-ISHFirewallOracle
+        }
+        Set-ISHFirewallHTTPS
+        if($ISHServerVersion -eq "12")
+        {
+            Set-ISHFirewallMSDTC
+        }
     }
-    Set-ISHFirewallHTTPS
-    if($ISHServerVersion -eq "12")
+    else
     {
-        Set-ISHFirewallMSDTC
+        Write-Warning "Windows Firewall service is not running"
     }
 }
 

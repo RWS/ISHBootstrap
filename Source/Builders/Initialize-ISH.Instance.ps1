@@ -1,4 +1,4 @@
-﻿#reguires -runasadministrator
+﻿#requires -runasadministrator
 
 param(
     [Parameter(Mandatory=$true,ParameterSetName="External Database")]
@@ -34,7 +34,7 @@ $useMockedDatabaseAsDemo=$PSCmdlet.ParameterSetName -eq "Demo Database"
 
 $blockName="Importing certificate"
 Write-Progress @scriptProgress -Status $blockName
-Write-Information $blockName
+Write-Host $blockName
 
 $certificate=Import-PfxCertificate -Password $PFXCertificatePassword -FilePath $PFXCertificatePath -Exportable -CertStoreLocation "Cert:\LocalMachine\My"
 Import-Module WebAdministration
@@ -48,18 +48,51 @@ Pop-Location -StackName "IIS"
 
 $blockName="Getting deployment information"
 Write-Progress @scriptProgress -Status $blockName
-Write-Information $blockName
+Write-Host $blockName
 
 $softwareVersion=Get-ISHDeployment |Select-Object -First 1 -ExpandProperty SoftwareVersion
 $ishVersion="$($softwareVersion.Major).0.$($softwareVersion.Revision)"
 $ishServerVersion=($ishVersion -split "\.")[0]
 
+if($OsUserCredentials.UserName.StartsWith("$($env:computername)\"))
+{
+    $createLocalUser=$true
+}
+elseif($OsUserCredentials.UserName.StartsWith(".\"))
+{
+    Write-Host "Credentials normalization.Replaced .\ with $env:COMPUTERNAME"
+    $OsUserCredentials=New-Object System.Management.Automation.PSCredential($OsUserCredentials.UserName.Replace(".",$env:COMPUTERNAME),$OsUserCredentials.Password)
+    $createLocalUser=$true
+}
+elseif($OsUserCredentials.UserName.indexOf("\") -lt 0)
+{
+    Write-Host "Credentials normalization.Prefixed with $env:COMPUTERNAME"
+    $OsUserCredentials=New-Object System.Management.Automation.PSCredential("$env:COMPUTERNAME\$($OsUserCredentials.UserName)",$OsUserCredentials.Password)
+    $createLocalUser=$true
+}
+else
+{
+    $createLocalUser=$false
+}
+
+
 $osUserName=$OsUserCredentials.UserName
+Write-Host "osUserName=$osUserName"
+Write-Host "createLocalUser=$createLocalUser"
+if($createLocalUser)
+{
+    $localUserNameToAdd=$osUserName.Substring($osUserName.IndexOf('\')+1)
+    Write-Host "localUserNameToAdd=$localUserNameToAdd"
+}
 $osUserPassword=$OsUserCredentials.GetNetworkCredential().Password
 
 #endregion
 
 #region 3. Get all processes
+
+$blockName="Getting all processes"
+Write-Progress @scriptProgress -Status $blockName
+Write-Host $blockName
 
 # Web Application pools
 $ishAppPools=Get-ISHDeploymentParameters| Where-Object -Property Name -Like "infoshare*webappname"|ForEach-Object {
@@ -91,19 +124,75 @@ $trisoftInfoShareAuthorApplication=$applications|Where-Object -Property Name -EQ
 #region 4. Initialize OSUser
 $blockName="Initializing osuser"    
 Write-Progress @scriptProgress -Status $blockName
-Write-Information $blockName
+Write-Host $blockName
 
-if(-not (Get-LocalUser -Name $osUserName -ErrorAction SilentlyContinue))
+if($createLocalUser)
 {
-    New-LocalUser -Name $osUserName -Password $OsUserCredentials.Password -AccountNeverExpires -PasswordNeverExpires
+    Write-Debug "Adding $localUserNameToAdd local user"
+    if(Get-Module Microsoft.PowerShell.LocalAccounts -ListAvailable)
+    {
+        if(-not (Get-LocalUser -Name $localUserNameToAdd -ErrorAction SilentlyContinue))
+        {
+            New-LocalUser -Name $localUserNameToAdd -Password $OsUserCredentials.Password -AccountNeverExpires -PasswordNeverExpires
+        }
+    }
+    else
+    {
+        NET USER $localUserNameToAdd $osUserPassword /ADD
+        $user = [adsi]"WinNT://$env:computername/$localUserNameToAdd"
+        $user.UserFlags.value = $user.UserFlags.value -bor 0x10000
+        $user.CommitChanges()    
+    }
+    Write-Verbose "Added $localUserNameToAdd local user"
 }
+
 $arguments=@(
     "-Command"
-    "Initialize-ISHRegional"
+    "' { Initialize-ISHRegional } '"
 )
 Initialize-ISHUser -OSUser $osUserName
 $powerShellPath=& C:\Windows\System32\where.exe powershell
-Start-Process -FilePath $powerShellPath -ArgumentList $arguments -Credential $OsUserCredentials -LoadUserProfile -NoNewWindow  -Wait
+
+if(Test-Path -Path Variable:\PSSenderInfo)
+{
+    $useScheduledTask=$true
+}
+elseif($env:USERNAME -eq "NT AUTHORITY\SYSTEM")
+{
+    $useScheduledTask=$true
+}
+elseif($env:USERNAME -eq "$($env:computername)`$")
+{
+    $useScheduledTask=$true
+}
+else
+{
+    $useScheduledTask=$false
+}
+
+if($useScheduledTask)
+{
+    Write-Warning "Using a scheduled task to initialize $osUserName"
+    Add-Privilege -AccountName $osUserName -Privilege SeBatchLogonRight
+    $argumentList=$arguments -join ' '
+    $command="Start-Process -FilePath powershell -LoadUserProfile -Wait -ArgumentList ""$argumentList"""
+    $action = New-ScheduledTaskAction -Execute $powerShellPath -Argument "-Command '& { $command }'"
+    $task = Register-ScheduledTask "Install Alex" -Action $action -User $osUserName -Password $osUserPassword
+    Start-ScheduledTask -InputObject $task
+
+    $state=($task|Get-ScheduledTask).State
+    while($state -eq "Ready")
+    {
+        Start-Sleep -Milliseconds 500
+        $state=($task|Get-ScheduledTask).State
+    }
+    $task|Unregister-ScheduledTask -Confirm:$false
+    Remove-Privilege -AccountName $osUserName -Privilege SeBatchLogonRight
+}
+else
+{
+    Start-Process -FilePath $powerShellPath -ArgumentList $arguments -Credential $OsUserCredentials -LoadUserProfile -NoNewWindow  -Wait
+}
 
 #endregion
 
@@ -111,17 +200,21 @@ Start-Process -FilePath $powerShellPath -ArgumentList $arguments -Credential $Os
 
 if($useMockedDatabaseAsDemo)
 {
-    $osUserSqlUser="$($env:COMPUTERNAME)\$($OsUserCredentials.UserName)"
-    & $dbScriptsPath\Start-MockDatabase.ps1 -OSUserSqlUser $osUserSqlUser
+    $blockName="Initializing Demo database"
+    Write-Progress @scriptProgress -Status $blockName
+    Write-Host $blockName
+
+    & $dbScriptsPath\Initialize-MockDatabase.ps1 -OSUserSqlUser $osUserName
+    $ConnectionString=& $dbScriptsPath\Get-MockConnectionString.ps1
 }
 
 #endregion
 
-#region 5. Setting process identiy
+#region 5. Setting process identities
 
-$blockName="Initializing process identity"    
+$blockName="Setting process identities"    
 Write-Progress @scriptProgress -Status $blockName
-Write-Information $blockName
+Write-Host $blockName
 
 $ishAppPools|ForEach-Object {
     $_.ProcessModel.UserName = $osUserName
@@ -146,23 +239,30 @@ $applications.SaveChanges();
 #endregion
 
 #region 6. Change the database connection
+$blockName="Setting database connection"  
+Write-Progress @scriptProgress -Status $blockName
+Write-Host $blockName
+
 if(-not $useMockedDatabaseAsDemo)
 {
-    $blockName="Setting database connection"  
-    Write-Progress @scriptProgress -Status $blockName
-    Write-Information $blockName
 
     Set-ItemProperty -Path 'HKLM:\SOFTWARE\WOW6432Node\Trisoft\Tridk\TridkApp\InfoShareAuthor'-Name "Connect" -Value $ConnectionString
     Set-ItemProperty -Path 'HKLM:\SOFTWARE\WOW6432Node\Trisoft\Tridk\TridkApp\InfoShareAuthor'-Name "ComponentName" -Value $DbType
     Set-ItemProperty -Path 'HKLM:\SOFTWARE\WOW6432Node\Trisoft\Tridk\TridkApp\InfoShareBuilders'-Name "Connect" -Value $ConnectionString
     Set-ItemProperty -Path 'HKLM:\SOFTWARE\WOW6432Node\Trisoft\Tridk\TridkApp\InfoShareBuilders'-Name "ComponentName" -Value $DbType
 }
+else
+{
+    # This is because the computer name can change
+    Set-ItemProperty -Path 'HKLM:\SOFTWARE\WOW6432Node\Trisoft\Tridk\TridkApp\InfoShareAuthor'-Name "Connect" -Value $ConnectionString
+    Set-ItemProperty -Path 'HKLM:\SOFTWARE\WOW6432Node\Trisoft\Tridk\TridkApp\InfoShareBuilders'-Name "Connect" -Value $ConnectionString
+}
 #endregion
 
 #region 7. Hard replace files
 $blockName="Replacing mock input parameters"
 Write-Progress @scriptProgress -Status $blockName
-Write-Information $blockName
+Write-Host $blockName
 
 if($HostName)
 {
@@ -238,6 +338,18 @@ $replacementMatrix=@(
         CurrentValue=$deploymentParameters|Where-Object -Property Name -EQ machinename|Select-Object -ExpandProperty Value
         NewValue=$env:COMPUTERNAME
     }
+    
+    #TODO: Still need to check other files that connectstring and databasetype are found and add them to the extentions list
+    # connectstring. Change all derived parameters from machinename
+    @{
+        CurrentValue=$deploymentParameters|Where-Object -Property Name -EQ connectstring|Select-Object -ExpandProperty Value
+        NewValue=$ConnectionString
+    }
+    # databasetype. Change all derived parameters from machinename
+    @{
+        CurrentValue=$deploymentParameters|Where-Object -Property Name -EQ databasetype|Select-Object -ExpandProperty Value
+        NewValue=$DbType
+    }
 )
 
 Write-Verbose "Replacement matrix is:"
@@ -245,7 +357,7 @@ Write-Verbose "Replacement matrix is:"
 $foldersToScan |ForEach-Object {
     $blockName="Replacing files in $_"
     Write-Progress @scriptProgress -Status $blockName
-    Write-Information $blockName
+    Write-Host $blockName
 
     $filePaths=Get-ChildItem -Path $_ -Include $extensions -Recurse -File|Select-Object -ExpandProperty FullName
     $filePaths|ForEach-Object {
@@ -418,7 +530,7 @@ C:\IshCD\12.0.1\20160815.CD.InfoShare.12.0.3215.1.Trisoft-DITA-OT\Websites\Autho
 
 $blockName="Starting IIS application pools"
 Write-Progress @scriptProgress -Status $blockName
-Write-Information $blockName
+Write-Host $blockName
 
 $ishAppPools| Start-WebAppPool
 #endregion

@@ -1,0 +1,1 @@
+Packer scripts are copied from https://github.com/StefanScherer/packer-windows.
