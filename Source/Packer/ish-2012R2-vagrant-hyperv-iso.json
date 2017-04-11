@@ -14,7 +14,7 @@
   },
   "builders": [
     {
-      "vm_name": "ISH.{{user `ishVersion`}}-2012_r2-Packer",
+      "vm_name": "ISH.{{user `ishVersion`}}-2012R2-Packer",
       "type": "hyperv-iso",
       "disk_size": 41440,
       "ram_size": 2048,
@@ -72,7 +72,8 @@
     {
       "type": "powershell",
       "inline": [
-        "& C:/Provision/ISHBootstrap/Source/Bake-ISHFromAWSS3.ps1 -ISHVersion {{user `ishVersion`}} -MockConnectionString \"{{user `ish_mock_connectionstring`}}\" -AccessKey {{user `aws_access_key`}} -SecretKey {{user `aws_secret_key`}} -ErrorAction Stop"
+		  "$aws=& C:/Provision/ISHBootstrap/Source/Builders/Default/New-ISHBootstrapAWSReferences.ps1 -ISHVersion {{user `ishVersion`}}",
+		  "& C:/Provision/ISHBootstrap/Source/Bake-ISHFromAWSS3.ps1 -ISHVersion {{user `ishVersion`}} -MockConnectionString \"{{user `ish_mock_connectionstring`}}\" -BucketName $aws.BucketName -ISHServerFolder $aws.ISHServerFolder -ISHCDFolder $aws.ISHCDFolder -ISHCDFileName $aws.ISHCDFileName -AccessKey {{user `aws_access_key`}} -SecretKey {{user `aws_secret_key`}} -ErrorAction Stop"
       ]
     }
   ],

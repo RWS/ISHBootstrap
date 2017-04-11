@@ -1,9 +1,10 @@
+[CmdletBinding(SupportsShouldProcess=$true)]
 param(
     [Parameter(Mandatory=$true,ParameterSetName="AWS EC2 AMI")]
     [Parameter(Mandatory=$true,ParameterSetName="Vagrant Hyper-V")]
     [string]$ISHVersion,
     [Parameter(Mandatory=$false,ParameterSetName="AWS EC2 AMI")]
-    [Parameter(Mandatory=$false,ParameterSetName="Vagrant Hyper-V")]
+    [Parameter(Mandatory=$true,ParameterSetName="Vagrant Hyper-V")]
     [string]$MockConnectionString=$null,
     [Parameter(Mandatory=$false,ParameterSetName="AWS EC2 AMI")]
     [string]$SourceAMI,
@@ -26,14 +27,16 @@ param(
     [Parameter(Mandatory=$false,ParameterSetName="Vagrant Hyper-V")]
     [string]$SwitchName="External Virtual Switch",
     [Parameter(Mandatory=$false,ParameterSetName="Vagrant Hyper-V")]
-    [string]$BoxPath="$($env:TEMP)\ISH.$ISHVersion-hyperv-iso.box",
-    [Parameter(Mandatory=$true,ParameterSetName="Vagrant Hyper-V")]
-    [ValidateSet('2012_r2', '2016')]
-    [string]$ServerVersion,
+    [ValidateSet('2012_R2', '2016')]
+    [string]$ServerVersion="2016",
     [Parameter(Mandatory=$false,ParameterSetName="Vagrant Hyper-V")]
-    [switch]$NoWindowsUpdates,
+    [string]$OutputPath="$env:TEMP",
     [Parameter(Mandatory=$false,ParameterSetName="Vagrant Hyper-V")]
-    [switch]$ServerCore
+    [switch]$NoWindowsUpdates=$false,
+    [Parameter(Mandatory=$false,ParameterSetName="Vagrant Hyper-V")]
+    [switch]$ServerCore=$false,
+    [Parameter(Mandatory=$false,ParameterSetName="Vagrant Hyper-V")]
+    [switch]$Force=$false
 )
 
 if ($PSBoundParameters['Debug']) {
@@ -116,19 +119,45 @@ switch ($PSCmdlet.ParameterSetName) {
         $logRegExSource="amazon-ebs"
     }
     'Vagrant Hyper-V' {
-        $autounattendFilePath="./answer_files/{0}" -f $ServerVersion
-        if ($ServerCore.IsPresent)
+
+        $boxNameSegments=@(
+            "windowsserver"
+            $ServerVersion
+            "ish.$ISHVersion"
+        )
+        $autounattendSegments=@(
+            $ServerVersion
+        )
+        if ($ServerCore)
         {
-            $autounattendFilePath="{0}_{1}" -f $autounattendFilePath, "core"
+            $autounattendSegments+="core"
+            $boxNameSegments+="core"
         }
 		
-        if ($NoWindowsUpdates.IsPresent)
+        if ($NoWindowsUpdates)
         {
-            $autounattendFilePath="{0}_{1}" -f $autounattendFilePath, "no_windows_updates"
+            $autounattendSegments+="no_windows_updates"
+            $boxNameSegments+="no_windows_updates"
         }
 	
-        $autounattendFilePath="{0}/{1}" -f $autounattendFilePath, "Autounattend.xml"
-	
+        $autounattendFilePath="./answer_files/$($autounattendSegments -join '_')/Autounattend.xml"
+
+        $boxNameSegments+="hyperv"
+        $boxName=$boxNameSegments -join '_'
+        $boxPath=Join-Path $OutputPath "$($boxName).box"
+        if(Test-Path -Path $boxPath)
+        {
+            if($Force)
+            {
+                Write-Warning "Removing $boxPath"
+            }
+            else
+            {
+                Write-Error "Box $boxPath already exists"
+                return 1
+            }
+        }
+
         $packerArgs+=@(
             "-var"
             "iso_url=$ISOUrl"
@@ -143,26 +172,21 @@ switch ($PSCmdlet.ParameterSetName) {
             "-var"
             "aws_secret_key=$SecretKey"
             "-var"
-            "output_box_path=$BoxPath"
+            "output_box_path=$boxPath"
             "-var"
             "autounattend_xml_filepath=$autounattendFilePath"
         )
 
         if($MockConnectionString)
         {
-            Write-Host "No need to install SQL Express"
             $packerArgs+=@(
                 "-var"
                 "ish_mock_connectionstring=$MockConnectionString"
-	    )
-        }
-        else
-        {
-            Write-Host "TODO: NEED to install SQL Express"
-            Write-Host "The connections string will be calculated."
+	        )
         }
 
-        $packerFileNameName="ish-HyperV-{0}-Vagrant.json" -f $ServerVersion
+        $packerFileNameName="ish-$ServerVersion-vagrant-hyperv-iso.json"
+        $logRegExSource="hyperv-iso"
     }
 }
 
@@ -174,36 +198,48 @@ Push-Location -Path "$PSScriptRoot\Packer" -StackName Packer
 
 try
 {
-    $env:PACKER_LOG=1
-    $packetLogPath=Join-Path $env:TEMP "$($packerFileNameName).txt"
-    if(Test-Path -Path $packetLogPath)
-    {
-        Remove-Item -Path $packetLogPath -Force
+    $invokedPacker=$false
+
+    if ($PSCmdlet.ShouldProcess($packerFileNameName, "packer build")){
+        $invokedPacker=$true
+        $env:PACKER_LOG=1
+        $packetLogPath=Join-Path $env:TEMP "$($packerFileNameName).txt"
+        if(Test-Path -Path $packetLogPath)
+        {
+            Remove-Item -Path $packetLogPath -Force
+        }
+        $env:PACKER_LOG_PATH=$packetLogPath
+        Write-Host "packer $packerArgs"
+        & packer $packerArgs
+        Write-Host "LASTEXITCODE=$LASTEXITCODE"
     }
-    $env:PACKER_LOG_PATH=$packetLogPath
-    Write-Host "packer $packerArgs"
-    & packer $packerArgs
-    Write-Host "LASTEXITCODE=$LASTEXITCODE"
+    else
+    {
+        Write-Host "packer $($packerArgs -join ' ')"
+    }
 }
 finally
 {
-    Write-Warning "Packer log file available in $packetLogPath"
-    Pop-Location -StackName Packer
-
-    if($LASTEXITCODE -ne 0)
+    if($invokedPacker)
     {
-        if($logRegExSource)
+        Write-Warning "Packer log file available in $packetLogPath"
+        Pop-Location -StackName Packer
+
+        if($LASTEXITCODE -ne 0)
         {
-            $packerLogContent=Get-Content -Path  $packetLogPath -Raw
-            $regex=".*$($logRegExSource): (?<Objs>\<Objs.*\</Objs\>).*"
-            $matchCollections=[regex]::Matches($packerLogContent,$regex)
-            if($matchCollections.Count -gt 0)
+            if($logRegExSource)
             {
-                Write-Warning "Packer Objs xml entries available:"
-                for($i=0;$i -lt $matchCollections.Count;$i++) {
-                    $objsItemPath=$packetLogPath.Replace(".txt",".$i.xml")
-                    $matchCollections[$i].Groups['Objs'].Value | Format-TidyXml | Out-File -FilePath $objsItemPath
-                    Write-Warning $objsItemPath
+                $packerLogContent=Get-Content -Path  $packetLogPath -Raw
+                $regex=".*$($logRegExSource): (?<Objs>\<Objs.*\</Objs\>).*"
+                $matchCollections=[regex]::Matches($packerLogContent,$regex)
+                if($matchCollections.Count -gt 0)
+                {
+                    Write-Warning "Packer Objs xml entries available:"
+                    for($i=0;$i -lt $matchCollections.Count;$i++) {
+                        $objsItemPath=$packetLogPath.Replace(".txt",".$i.xml")
+                        $matchCollections[$i].Groups['Objs'].Value | Format-TidyXml | Out-File -FilePath $objsItemPath
+                        Write-Warning $objsItemPath
+                    }
                 }
             }
         }
