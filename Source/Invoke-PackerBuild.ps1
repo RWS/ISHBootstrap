@@ -28,7 +28,7 @@ param(
     [Parameter(Mandatory=$false,ParameterSetName="Vagrant Hyper-V")]
     [string]$BoxPath="$($env:TEMP)\ISH.$ISHVersion-hyperv-iso.box",
     [Parameter(Mandatory=$true,ParameterSetName="Vagrant Hyper-V")]
-	[ValidateSet('2012_r2', '2016')]
+    [ValidateSet('2012_r2', '2016')]
     [string]$ServerVersion,
     [Parameter(Mandatory=$false,ParameterSetName="Vagrant Hyper-V")]
     [switch]$NoWindowsUpdates,

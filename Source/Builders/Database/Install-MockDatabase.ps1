@@ -21,18 +21,6 @@ Start-Process -Wait -FilePath $sqlExpressPath -ArgumentList /qs, /x:`"$extractPa
 
 Write-Host "Installing"
 & $setupPath /q /ACTION=Install /INSTANCENAME=SQLEXPRESS /FEATURES=SQLEngine /UPDATEENABLED=0 /SQLSVCACCOUNT='NT AUTHORITY\System' /SQLSYSADMINACCOUNTS='BUILTIN\ADMINISTRATORS' /TCPENABLED=1 /NPENABLED=0 /IACCEPTSQLSERVERLICENSETERMS
-Write-Host "Installed"
-
-Write-Host "Stopping Service"
-stop-service MSSQL`$SQLEXPRESS
-
-Write-Host "Set sql server express to use static TCP port 1433"
-set-itemproperty -path 'HKLM:\software\microsoft\microsoft sql server\mssql12.SQLEXPRESS\mssqlserver\supersocketnetlib\tcp\ipall' -name tcpdynamicports -value ''
-set-itemproperty -path 'HKLM:\software\microsoft\microsoft sql server\mssql12.SQLEXPRESS\mssqlserver\supersocketnetlib\tcp\ipall' -name tcpport -value 1433
-set-itemproperty -path 'HKLM:\software\microsoft\microsoft sql server\mssql12.SQLEXPRESS\mssqlserver\' -name LoginMode -value 2
-
-Write-Host "Starting Service"
-start-service MSSQL`$SQLEXPRESS
 
 Write-Host "Cleaning"
 Remove-Item -Recurse -Force $sqlExpressPath, $setupPath

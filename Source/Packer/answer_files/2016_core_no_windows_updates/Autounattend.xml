@@ -189,12 +189,6 @@
                 </SynchronousCommand>
                 -->
                 <!-- END WITH WINDOWS UPDATES -->
-                <SynchronousCommand wcm:action="add">
-                    <CommandLine>cmd.exe /c C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -File a:\sqlexpress.ps1</CommandLine>
-                    <Description>Install SQLExpress</Description>
-                    <Order>200</Order>
-                    <RequiresUserInput>true</RequiresUserInput>
-                </SynchronousCommand>
             </FirstLogonCommands>
             <OOBE>
                 <HideEULAPage>true</HideEULAPage>
