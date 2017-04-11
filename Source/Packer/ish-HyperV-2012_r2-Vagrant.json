@@ -1,15 +1,15 @@
 {
   "variables": {
-    "ishVersion": "12.0.3",
-    "ServerVersion": "2012_r2",
-    "iso_url": "G:/PROVISION/_ISO/en_windows_server_2012_r2_with_update_x64_dvd_6052708.iso",
+    "ishVersion": "",
+    "ServerVersion": "",
+    "iso_url": "",
     "iso_checksum_type": "SHA1",
-    "iso_checksum": "865494E969704BE1C4496D8614314361D025775E",
-    "hyperv_switchname": "THE HYPERV SWITCH NAME",
-    "aws_access_key": "THE_ACCESS_KEY",
-    "aws_secret_key": "THE_SECRET_KEY",
-    "output_box_path": "G:/PROVISION/packer/boxes/ISH.12.0.3-2012r2-hyperv-iso.box",
-    "autounattend_xml_filepath": "./answer_files/2012_r2_no_windows_updates/Autounattend.xml",
+    "iso_checksum": "",
+    "hyperv_switchname": "",
+    "aws_access_key": "",
+    "aws_secret_key": "",
+    "output_box_path": "",
+    "autounattend_xml_filepath": "",
     "ish_mock_connectionstring": ""
   },
   "builders": [
