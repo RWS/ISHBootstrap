@@ -96,4 +96,4 @@ In the docker file
 1. Create a new VM from the exported one.
 1. Execute the instantiation example script.
 
-The process can be significantly improved by using [Packer](https://www.packer.io) and [Vagrant](vagrantbox.com).
+The process can be significantly improved by using [Packer](https://www.packer.io) and [Vagrant](vagrantbox.com). `Invoke-DockerBuild.ps1` and `Invoke-PackerBuild.ps1` wrap around the complexity of initializing parameters for packer and docker and create a container, an AMI or a vagrant box depending on the parameter set used.
