@@ -1,2 +1,2 @@
-output-hyperv-iso
-packer_cache
+**/Packer/output-hyperv-iso
+**/Packer/packer_cache
