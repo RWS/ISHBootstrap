@@ -142,7 +142,7 @@ else
     $user.UserFlags.value = $user.UserFlags.value -bor 0x10000
     $user.CommitChanges()    
 }
-& $serverScriptsPath\ISHServer\Initialize-ISHServerOSUser.ps1 -ISHServerVersion $ishServerVersion -OSUser ($mockOSUserCredential.UserName)
+& $serverScriptsPath\ISHServer\Initialize-ISHServerOSUser.ps1 -ISHServerVersion $ishServerVersion -OSUserCredential $mockOSUserCredential
 
 #endregion
 

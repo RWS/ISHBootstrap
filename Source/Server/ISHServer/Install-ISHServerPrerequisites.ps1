@@ -104,6 +104,8 @@ try
     {
         Write-Warning "Windows Firewall service is not running"
     }
+
+    Initialize-ISHRegistry
 }
 
 finally
