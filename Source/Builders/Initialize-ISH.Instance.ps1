@@ -98,9 +98,9 @@ $blockName="Initializing osuser"
 Write-Progress @scriptProgress -Status $blockName
 Write-Host $blockName
 
-Set-ISHUserLocal -OSUserCredentials $OSUserCredential
+Set-ISHUserLocal -OSUserCredentials $OSUserCredentials
 Set-ISHUserAdministrator -OSUser $osUserName
-Initialize-ISHUserLocalProfile -OSUserCredentials $OSUserCredential
+Initialize-ISHUserLocalProfile -OSUserCredentials $OSUserCredentials
 
 
 #endregion
