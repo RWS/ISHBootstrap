@@ -24,8 +24,8 @@ param (
     [Parameter(Mandatory=$false,ParameterSetName="Remote")]
     [switch]$CredSSP,
     [Parameter(Mandatory=$true,ParameterSetName="Local")]
-    [Parameter(ParameterSetName="Remote")]
-    [string]$OSUser,
+    [Parameter(Mandatory=$true,ParameterSetName="Remote")]
+    [PSCredential]$OSUserCredential,
     [Parameter(Mandatory=$true,ParameterSetName="Local")]
     [Parameter(ParameterSetName="Remote")]
     [ValidateSet("12","13")]
@@ -70,8 +70,13 @@ try
         $session=$null
     }
 
-    Write-Progress @scriptProgress -Status "Initializing $OSUser"
-    Initialize-ISHUser -OSUser $OSUser
+
+    $OSUserCredential=Get-ISHNormalizedCredential -Credentials $OSUserCredential
+    Write-Progress @scriptProgress -Status "Initializing $($OSUserCredential.UserName)"
+
+    Set-ISHUserLocal -OSUserCredentials $OSUserCredential
+    Set-ISHUserAdministrator -OSUser $OSUserCredential.Username
+    Initialize-ISHUserLocalProfile -OSUserCredentials $OSUserCredential
 }
 
 finally

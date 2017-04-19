@@ -81,23 +81,23 @@ if($computerName)
         if($useFQDNWithCredSSP)
         {
             $fqdn=[System.Net.Dns]::GetHostByName($computerName)| FL HostName | Out-String | %{ "{0}" -f $_.Split(':')[1].Trim() };
-             & $serverScriptsPaths\ISHServer\Initialize-ISHServerOSUser.ps1 -Computer $fqdn -Credential $credential -ISHServerVersion $ishServerVersion -OSUser ($osUserCredential.UserName) -CredSSP
+             & $serverScriptsPaths\ISHServer\Initialize-ISHServerOSUser.ps1 -Computer $fqdn -Credential $credential -ISHServerVersion $ishServerVersion -OSUserCredential $osUserCredential -CredSSP
         }
         else
         {
             $sessionOptionsWithCredSSP=Get-ISHBootstrapperContextValue -ValuePath "SessionOptionsWithCredSSPExpression" -Invoke
-             & $serverScriptsPaths\ISHServer\Initialize-ISHServerOSUser.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -SessionOptions $sessionOptionsWithCredSSP -OSUser ($osUserCredential.UserName) -CredSSP
+             & $serverScriptsPaths\ISHServer\Initialize-ISHServerOSUser.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -SessionOptions $sessionOptionsWithCredSSP -OSUserCredential $osUserCredential -CredSSP
         }
     }
     else
     {
-         & $serverScriptsPaths\ISHServer\Initialize-ISHServerOSUser.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -OSUser ($osUserCredential.UserName)
+         & $serverScriptsPaths\ISHServer\Initialize-ISHServerOSUser.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -OSUserCredential $osUserCredential
     }
      & $serverScriptsPaths\ISHServer\Initialize-ISHServerOSUserRegion.ps1 -Computer $computerName -OSUserCredential $osUserCredential -ISHServerVersion $ishServerVersion
 }
 else
 {
-   & $serverScriptsPaths\ISHServer\Initialize-ISHServerOSUser.ps1 -ISHServerVersion $ishServerVersion -OSUser ($osUserCredential.UserName)
+   & $serverScriptsPaths\ISHServer\Initialize-ISHServerOSUser.ps1 -ISHServerVersion $ishServerVersion -OSUserCredential $osUserCredential
    & $serverScriptsPaths\ISHServer\Initialize-ISHServerOSUserRegion.ps1 -OSUserCredential $osUserCredential -ISHServerVersion $ishServerVersion
 }
 

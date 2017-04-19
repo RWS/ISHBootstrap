@@ -4,6 +4,7 @@
 
 - GH-58: Configure RequireSSL attribute for ISHCM and ISHSTS web applications. After installing the web applications are configured for the **RequireSSL**.
 - GH-57: Load-ISHBootstrapperContext.ps1 fails to load json file when using Name parameter set.
+- GH-62: Use ISHServer cmdlets that manage the user profile
 
 ## pre-release v0.8
 

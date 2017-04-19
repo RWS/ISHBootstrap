@@ -7,6 +7,7 @@
 - GH-53: Add support for docker container images.
 - GH-58: Configure RequireSSL attribute for ISHCM and ISHSTS web applications. Script `Set-IISRequireSSL.ps1` is added.
 - GH-50: Import ISHTemplate repository as a Builders folder. ISHBootstrap provides builder scripts for use with AWS EC2 AMI, Docker containers, Packer and Vagrant.
+- GH-62: Use ISHServer cmdlets that manage the user profile
 
 ## pre-release v0.8
 
