@@ -1,13 +1,17 @@
 # Change log
 
-## pre-release v0.9
+## release v1.0
 
-- GH-54: Add support for Amazon Web Services EC2 AMI
+- GH-54: Add support for Amazon Web Services EC2 AMI.
 - GH-55: Add support for Vagrant boxes (Hyper-V).
 - GH-53: Add support for docker container images.
 - GH-58: Configure RequireSSL attribute for ISHCM and ISHSTS web applications. Script `Set-IISRequireSSL.ps1` is added.
 - GH-50: Import ISHTemplate repository as a Builders folder. ISHBootstrap provides builder scripts for use with AWS EC2 AMI, Docker containers, Packer and Vagrant.
 - GH-62: Use ISHServer cmdlets that manage the user profile
+
+Known issues:
+
+- GH-53: Add support for docker container images. Requires some fine-tuning
 
 ## pre-release v0.8
 
