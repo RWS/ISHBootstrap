@@ -20,7 +20,7 @@ if ($PSBoundParameters['Debug']) {
 
 $sourcePath=Resolve-Path "$PSScriptRoot\..\Source"
 $cmdletsPaths="$sourcePath\Cmdlets"
-$scriptsPaths="$sourcePath\Scripts"
+$serverScriptsPaths="$sourcePath\Server"
 
 . "$PSScriptRoot\Cmdlets\Get-ISHBootstrapperContextValue.ps1"
 $computerName=Get-ISHBootstrapperContextValue -ValuePath "ComputerName" -DefaultValue $null
@@ -70,7 +70,7 @@ try
 
     if(-not $computerName)
     {
-        & "$scriptsPaths\Helpers\Test-Administrator.ps1"
+        & "$serverScriptsPaths\Helpers\Test-Administrator.ps1"
     }
     Invoke-CommandWrap -ComputerName $computerName -Credential $credential -ScriptBlock $cleanBlock -BlockName "Clean ISH" -UseParameters @("ishVersion","ishServerVersion")
 

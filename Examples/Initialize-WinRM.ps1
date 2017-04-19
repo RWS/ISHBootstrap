@@ -22,7 +22,7 @@ try
 {
     $sourcePath=Resolve-Path "$PSScriptRoot\..\Source"
     $cmdletsPaths="$sourcePath\Cmdlets"
-    $scriptsPaths="$sourcePath\Scripts"
+    $serverScriptsPaths="$sourcePath\Server"
 
     . "$PSScriptRoot\Cmdlets\Get-ISHBootstrapperContextValue.ps1"
     $computerName=Get-ISHBootstrapperContextValue -ValuePath "ComputerName" -DefaultValue $null
@@ -30,10 +30,10 @@ try
     if(-not $computerName)
     {
         Write-Error "This script works only against a remote server"
-        & "$scriptsPaths\Helpers\Test-Administrator.ps1"
+        & "$serverScriptsPaths\Helpers\Test-Administrator.ps1"
     }
     
-    & $scriptsPaths\WinRM\Install-WinRMPrerequisites.ps1 -Computer $computerName -Credential $credential
+    & $serverScriptsPaths\WinRM\Install-WinRMPrerequisites.ps1 -Computer $computerName -Credential $credential
 
     $winRMCredSSP=Get-ISHBootstrapperContextValue -ValuePath "WinRMCredSSP"
     if($winRMCredSSP.UseWebCertificate)
@@ -99,14 +99,14 @@ try
 
     if($computerName)
     {
-        $certificate=& $scriptsPaths\Certificates\Install-Certificate.ps1 -Computer $computerName -Credential $credential @hash
+        $certificate=& $serverScriptsPaths\Certificates\Install-Certificate.ps1 -Computer $computerName -Credential $credential @hash
     }
     else
     {
-        $certificate=& $scriptsPaths\Certificates\Install-Certificate.ps1 @hash
+        $certificate=& $serverScriptsPaths\Certificates\Install-Certificate.ps1 @hash
     }
 
-    & $scriptsPaths\WinRM\Enable-WSManCredSSP.ps1 -Computer $computerName -Credential $credential -Thumbprint $certificate.Thumbprint
+    & $serverScriptsPaths\WinRM\Enable-WSManCredSSP.ps1 -Computer $computerName -Credential $credential -Thumbprint $certificate.Thumbprint
 
 }
 finally

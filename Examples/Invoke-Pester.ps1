@@ -31,7 +31,7 @@ if ($PSBoundParameters['Debug']) {
 
 $sourcePath=Resolve-Path "$PSScriptRoot\..\Source"
 $cmdletsPaths="$sourcePath\Cmdlets"
-$scriptsPaths="$sourcePath\Scripts"
+$serverScriptsPaths="$sourcePath\Server"
 try
 {
 
@@ -42,7 +42,7 @@ try
     . "$cmdletsPaths\Helpers\Invoke-CommandWrap.ps1"
     if(-not $computerName)
     {
-        & "$scriptsPaths\Helpers\Test-Administrator.ps1"
+        & "$serverScriptsPaths\Helpers\Test-Administrator.ps1"
     }
     else
     {

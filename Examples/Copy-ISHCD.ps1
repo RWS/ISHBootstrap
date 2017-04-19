@@ -20,7 +20,7 @@ if ($PSBoundParameters['Debug']) {
 
 $sourcePath=Resolve-Path "$PSScriptRoot\..\Source"
 $cmdletsPaths="$sourcePath\Cmdlets"
-$scriptsPaths="$sourcePath\Scripts"
+$serverScriptsPaths="$sourcePath\Server"
 
 . "$PSScriptRoot\Cmdlets\Get-ISHBootstrapperContextValue.ps1"
 . "$PSScriptRoot\Cmdlets\Get-ISHBootstrapperContextSource.ps1"
@@ -30,7 +30,7 @@ $computerName=Get-ISHBootstrapperContextValue -ValuePath "ComputerName" -Default
 $credential=Get-ISHBootstrapperContextValue -ValuePath "CredentialExpression" -Invoke
 if(-not $computerName)
 {
-    & "$scriptsPaths\Helpers\Test-Administrator.ps1"
+    & "$serverScriptsPaths\Helpers\Test-Administrator.ps1"
 }
 
 $ishVersion=Get-ISHBootstrapperContextValue -ValuePath "ISHVersion"
@@ -46,25 +46,25 @@ if($unc)
 {
     $internalCDFolder=$unc.ISHCDFolder
     $cdObject=((Get-ChildItem $internalCDFolder |Where-Object{Test-Path $_.FullName -PathType Leaf}| Sort-Object FullName -Descending)[0])
-    & $scriptsPaths\ISHServer\Copy-ISHCD.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -FilePath $cdObject.FullName 
+    & $serverScriptsPaths\ISHServer\Copy-ISHCD.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -FilePath $cdObject.FullName 
 }
 if($ftp)
 {
     $ftpPath="$($ftp.ISHCDFolder)$($ftp.ISHCDFileName)"
-    & $scriptsPaths\ISHServer\Copy-ISHCD.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -FTPHost $ftp.Host -FTPCredential $ftp.Credential -FTPPath $ftpPath
+    & $serverScriptsPaths\ISHServer\Copy-ISHCD.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -FTPHost $ftp.Host -FTPCredential $ftp.Credential -FTPPath $ftpPath
 }
 if($awss3)
 {
     $key="$($awss3.ISHCDFolderKey)$($awss3.ISHCDFileName)"
-    & $scriptsPaths\ISHServer\Copy-ISHCD.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -BucketName $awss3.BucketName -Key $key -AccessKey $awss3.AccessKey -SecretKey $awss3.SecretKey
+    & $serverScriptsPaths\ISHServer\Copy-ISHCD.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -BucketName $awss3.BucketName -Key $key -AccessKey $awss3.AccessKey -SecretKey $awss3.SecretKey
 }
 if($azurefilestorage)
 {
     $path="$($azurefilestorage.ISHCDFolderPath)$($azurefilestorage.ISHCDFileName)"
-    & $scriptsPaths\ISHServer\Copy-ISHCD.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -ShareName $azurefilestorage.ShareName -Path $path -StorageAccountName $azurefilestorage.StorageAccountName -StorageAccountKey $azurefilestorage.StorageAccountKey
+    & $serverScriptsPaths\ISHServer\Copy-ISHCD.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -ShareName $azurefilestorage.ShareName -Path $path -StorageAccountName $azurefilestorage.StorageAccountName -StorageAccountKey $azurefilestorage.StorageAccountKey
 }
 if($azureblobstorage)
 {
     $path="$($azureblobstorage.ISHCDFolderPath)$($azureblobstorage.ISHCDFileName)"
-    & $scriptsPaths\ISHServer\Copy-ISHCD.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -ContainerName $azureblobstorage.ContainerName -BlobName $path -StorageAccountName $azureblobstorage.StorageAccountName -StorageAccountKey $azureblobstorage.StorageAccountKey
+    & $serverScriptsPaths\ISHServer\Copy-ISHCD.ps1 -Computer $computerName -Credential $credential -ISHServerVersion $ishServerVersion -ContainerName $azureblobstorage.ContainerName -BlobName $path -StorageAccountName $azureblobstorage.StorageAccountName -StorageAccountKey $azureblobstorage.StorageAccountKey
 }

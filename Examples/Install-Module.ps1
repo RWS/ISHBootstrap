@@ -22,7 +22,7 @@ try
 {
     $sourcePath=Resolve-Path "$PSScriptRoot\..\Source"
     $cmdletsPaths="$sourcePath\Cmdlets"
-    $scriptsPaths="$sourcePath\Scripts"
+    $serverScriptsPaths="$sourcePath\Server"
     $modulesPaths="$sourcePath\Modules"
 
     . "$PSScriptRoot\Cmdlets\Get-ISHBootstrapperContextValue.ps1"
@@ -33,7 +33,7 @@ try
 
     if(-not $computerName)
     {
-        & "$scriptsPaths\Helpers\Test-Administrator.ps1"
+        & "$serverScriptsPaths\Helpers\Test-Administrator.ps1"
     }
 
     $ishVersion=Get-ISHBootstrapperContextValue -ValuePath "ISHVersion"
@@ -47,9 +47,9 @@ try
 
     $scope=Get-ISHBootstrapperContextValue -ValuePath "InstallModuleScope" -DefaultValue "AllUsers"
 
-    & $scriptsPaths\PowerShellGet\Install-Module.ps1 -Computer $computerName -Credential $credential -ModuleName @("CertificatePS","PSFTP","AWSPowerShell", "Azure.Storage") -Repository PSGallery -Scope:$scope
-	& $scriptsPaths\PowerShellGet\Install-Module.ps1 -Computer $computerName -Credential $credential -ModuleName $ishServerModuleName -Repository $ishServerRepository -Scope:$scope
-    & $scriptsPaths\PowerShellGet\Install-Module.ps1 -Computer $computerName -Credential $credential -ModuleName $ishDeployModuleName -Repository $ishDeployRepository -Scope:$scope
+    & $serverScriptsPaths\PowerShellGet\Install-Module.ps1 -Computer $computerName -Credential $credential -ModuleName @("CertificatePS","PoshPrivilege","PSFTP","AWSPowerShell", "Azure.Storage") -Repository PSGallery -Scope:$scope
+	& $serverScriptsPaths\PowerShellGet\Install-Module.ps1 -Computer $computerName -Credential $credential -ModuleName $ishServerModuleName -Repository $ishServerRepository -Scope:$scope
+    & $serverScriptsPaths\PowerShellGet\Install-Module.ps1 -Computer $computerName -Credential $credential -ModuleName $ishDeployModuleName -Repository $ishDeployRepository -Scope:$scope
 }
 finally
 {

@@ -24,7 +24,7 @@ param (
 )
 $ishBootStrapRootPath=Resolve-Path "$PSScriptRoot\..\.."
 $cmdletsPaths="$ishBootStrapRootPath\Source\Cmdlets"
-$scriptsPaths="$ishBootStrapRootPath\Source\Scripts"
+$serverScriptsPaths="$ishBootStrapRootPath\Source\Server"
 
 . $ishBootStrapRootPath\Examples\ISHDeploy\Cmdlets\Write-Separator.ps1
 Write-Separator -Invocation $MyInvocation -Header -Name "Configure"
@@ -33,7 +33,7 @@ $scriptProgress=Get-ProgressHash -Invocation $MyInvocation
 
 if(-not $Computer)
 {
-    & "$scriptsPaths\Helpers\Test-Administrator.ps1"
+    & "$serverScriptsPaths\Helpers\Test-Administrator.ps1"
 }
 
 if(-not (Get-Command Invoke-CommandWrap -ErrorAction SilentlyContinue))
