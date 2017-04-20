@@ -32,12 +32,12 @@
       "shutdown_command": "shutdown /s /t 10 /f /d p:4:1 /c \"Packer Shutdown\"",
       "skip_compaction": true,
       "floppy_files": [
-        "./answer_files/{{user `autounattend_folder`}}/Autounattend.xml",
-        "./scripts/disable-winrm.ps1",
-        "./scripts/enable-winrm.ps1",
-        "./scripts/microsoft-updates.bat",
-        "./scripts/unattend.xml",
-        "./scripts/win-updates.ps1"
+        "../answer_files/{{user `autounattend_folder`}}/Autounattend.xml",
+        "../scripts/disable-winrm.ps1",
+        "../scripts/enable-winrm.ps1",
+        "../scripts/microsoft-updates.bat",
+        "../scripts/unattend.xml",
+        "../scripts/win-updates.ps1"
       ]
     }
   ],
@@ -45,10 +45,10 @@
     {
       "type": "windows-shell",
       "scripts": [
-        "./scripts/vm-guest-tools.bat",
-        "./scripts/enable-rdp.bat",
-        "./scripts/compile-dotnet-assemblies.bat",
-        "./scripts/compact.bat"
+        "../scripts/vm-guest-tools.bat",
+        "../scripts/enable-rdp.bat",
+        "../scripts/compile-dotnet-assemblies.bat",
+        "../scripts/compact.bat"
       ]
     },
     {
@@ -59,7 +59,7 @@
     },
     {
       "type": "file",
-      "source": "../../Source/",
+      "source": "../../../../Source/",
       "destination": "C:/Provision/ISHBootstrap/Source"
     },
     {

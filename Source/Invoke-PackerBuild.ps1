@@ -6,8 +6,6 @@ param(
     [Parameter(Mandatory=$false,ParameterSetName="AWS EC2 AMI")]
     [Parameter(Mandatory=$true,ParameterSetName="Vagrant Hyper-V")]
     [string]$MockConnectionString=$null,
-    [Parameter(Mandatory=$false,ParameterSetName="AWS EC2 AMI")]
-    [string]$SourceAMI,
     [Parameter(Mandatory=$true,ParameterSetName="AWS EC2 AMI")]
     [string]$IAMInstanceProfile,
     [Parameter(Mandatory=$true,ParameterSetName="AWS EC2 AMI")]
@@ -20,8 +18,8 @@ param(
     [string]$SecretKey,
     [Parameter(Mandatory=$true,ParameterSetName="Vagrant Hyper-V")]
     [string]$ISOUrl,
-    [Parameter(Mandatory=$true,ParameterSetName="Vagrant Hyper-V")]
-    [string]$ISOChecksum,
+    [Parameter(Mandatory=$false,ParameterSetName="Vagrant Hyper-V")]
+    [string]$ISOChecksum=$null,
     [Parameter(Mandatory=$false,ParameterSetName="Vagrant Hyper-V")]
     [string]$ISOChecksumType="SHA1",
     [Parameter(Mandatory=$false,ParameterSetName="Vagrant Hyper-V")]
@@ -69,31 +67,30 @@ $packerArgs+=@(
 
 switch ($PSCmdlet.ParameterSetName) {
     'AWS EC2 AMI' {
-        if(-not $SourceAMI)
+        if($MockConnectionString)
         {
-            if($MockConnectionString)
-            {
-                Write-Host "Using Microsoft Windows Server 2016 Base  AMI ImageId for region $Region"
-                $SourceAMI=(Get-EC2ImageByName -Name WINDOWS_2016_BASE -Region $region).ImageId
-                $packerFileName="ish-amazon-ebs.json"
+            Write-Host "Using Microsoft Windows Server 2016 Base  AMI ImageId for region $Region"
+            $imageName="WINDOWS_2016_BASE"
+            $sourceAMI=(Get-EC2ImageByName -Name $imageName -Region $region).ImageId
+            $packerFileName="ish-amazon-ebs.json"
 
-                $packerArgs+=@(
-                    "-var"
-                    "ish_mock_connectionstring=$MockConnectionString"
-                )
-            }
-            else
-            {
-                Write-Host "Using Microsoft Windows Server 2012 R2 with SQL Server Express AMI ImageId for region $Region"
-                $SourceAMI=(Get-EC2ImageByName -Name WINDOWS_2012R2_SQL_SERVER_EXPRESS_2014 -Region $region).ImageId
-                $packerFileName="mssql2014-ish-amazon-ebs.json"
-            }
-            Write-Host "Building with $SourceAMI image id"
+            $packerArgs+=@(
+                "-var"
+                "ish_mock_connectionstring=$MockConnectionString"
+            )
         }
+        else
+        {
+            Write-Host "Using Microsoft Windows Server 2012 R2 with SQL Server Express AMI ImageId for region $Region"
+            $imageName="WINDOWS_2012R2_SQL_SERVER_EXPRESS_2014"
+            $sourceAMI=(Get-EC2ImageByName -Name $imageName -Region $region).ImageId
+            $packerFileName="mssql2014-ish-amazon-ebs.json"
+        }
+        Write-Host "Building with $SourceAMI image id"
 
         $packerArgs+=@(
             "-var"
-            "source_ami=$SourceAMI"
+            "source_ami=$sourceAMI"
             "-var"
             "iam_instance_profile=$IAMInstanceProfile"
             "-var"
@@ -114,11 +111,20 @@ switch ($PSCmdlet.ParameterSetName) {
                 "aws_secret_key=$SecretKey"
             )
         }
+        $packerFileLocation="AMI\$imageName"
 
-        $packerFileNameName=$packerFileName
         $logRegExSource="amazon-ebs"
     }
     'Vagrant Hyper-V' {
+
+        if(-not $ISOChecksum)
+        {
+            $fcivResult = & $PSScriptRoot\Packer\Vagrant\fciv.exe -sha1 $ISOUrl
+        
+            $ISOChecksum=($fcivResult[3] -split ' ')[0]
+            $ISOChecksumType="SHA1"
+            Write-Host "$ISOChecksumType checksum is $ISOChecksum"
+        }
 
         $boxNameSegments=@(
             "windowsserver"
@@ -184,26 +190,28 @@ switch ($PSCmdlet.ParameterSetName) {
                 "ish_mock_connectionstring=$MockConnectionString"
 	        )
         }
+        $packerFileLocation="Vagrant\$ServerVersion"
 
-        $packerFileNameName="ish-$ServerVersion-vagrant-hyperv-iso.json"
+        $packerFileName="ish-$ServerVersion-vagrant-hyperv-iso.json"
         $logRegExSource="hyperv-iso"
     }
 }
 
-Write-Host "Using $packerFileNameName"
+Write-Host "Using $packerFileName"
 
-$packerArgs+=$packerFileNameName
+$packerArgs+=$packerFileName
 
-Push-Location -Path "$PSScriptRoot\Packer" -StackName Packer
+$pushPath=Join-Path -Path "$PSScriptRoot\Packer" -ChildPath $packerFileLocation
+Push-Location -Path $pushPath -StackName Packer
 
 try
 {
     $invokedPacker=$false
 
-    if ($PSCmdlet.ShouldProcess($packerFileNameName, "packer build")){
+    if ($PSCmdlet.ShouldProcess($packerFileName, "packer build")){
         $invokedPacker=$true
         $env:PACKER_LOG=1
-        $packetLogPath=Join-Path $env:TEMP "$($packerFileNameName).txt"
+        $packetLogPath=Join-Path $env:TEMP "$($packerFileName).txt"
         if(Test-Path -Path $packetLogPath)
         {
             Remove-Item -Path $packetLogPath -Force
