@@ -211,12 +211,12 @@ try
     if ($PSCmdlet.ShouldProcess($packerFileName, "packer build")){
         $invokedPacker=$true
         $env:PACKER_LOG=1
-        $packetLogPath=Join-Path $env:TEMP "$($packerFileName).txt"
-        if(Test-Path -Path $packetLogPath)
+        $packerLogPath=Join-Path $env:TEMP "$($packerFileName).$ISHVersion.txt"
+        if(Test-Path -Path $packerLogPath)
         {
-            Remove-Item -Path $packetLogPath -Force
+            Remove-Item -Path $packerLogPath -Force
         }
-        $env:PACKER_LOG_PATH=$packetLogPath
+        $env:PACKER_LOG_PATH=$packerLogPath
         Write-Host "packer $packerArgs"
         & packer $packerArgs
         Write-Host "LASTEXITCODE=$LASTEXITCODE"
@@ -230,21 +230,21 @@ finally
 {
     if($invokedPacker)
     {
-        Write-Warning "Packer log file available in $packetLogPath"
+        Write-Warning "Packer log file available in $packerLogPath"
         Pop-Location -StackName Packer
 
         if($LASTEXITCODE -ne 0)
         {
             if($logRegExSource)
             {
-                $packerLogContent=Get-Content -Path  $packetLogPath -Raw
+                $packerLogContent=Get-Content -Path  $packerLogPath -Raw
                 $regex=".*$($logRegExSource): (?<Objs>\<Objs.*\</Objs\>).*"
                 $matchCollections=[regex]::Matches($packerLogContent,$regex)
                 if($matchCollections.Count -gt 0)
                 {
                     Write-Warning "Packer Objs xml entries available:"
                     for($i=0;$i -lt $matchCollections.Count;$i++) {
-                        $objsItemPath=$packetLogPath.Replace(".txt",".$i.xml")
+                        $objsItemPath=$packerLogPath.Replace(".txt",".$i.xml")
                         $matchCollections[$i].Groups['Objs'].Value | Format-TidyXml | Out-File -FilePath $objsItemPath
                         Write-Warning $objsItemPath
                     }
