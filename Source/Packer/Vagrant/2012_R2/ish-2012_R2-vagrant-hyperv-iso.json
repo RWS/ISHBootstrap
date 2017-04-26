@@ -68,6 +68,12 @@
         "& C:/Provision/ISHBootstrap/Source/Server/PackageManagement/Install-PackageManagement.ps1"
       ]
     },
+	{
+		"type": "powershell",
+		"inline": [
+			"& C:/Provision/ISHBootstrap/Source/Builders/Default/Install-ISHBootstrapPrerequisites.ps1 -ISHVersion {{user `ishVersion`}} -AWS"
+		]
+	},
     {
       "type": "powershell",
       "inline": [
