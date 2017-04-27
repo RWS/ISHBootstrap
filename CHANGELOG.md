@@ -1,5 +1,10 @@
 # Change log
 
+## release v1.1
+
+- GH-66: Allow parallel building of AMI and Vagrant boxes.
+- GH-67: Auto calculate checksum for given ISO file.
+
 ## release v1.0
 
 - GH-54: Add support for Amazon Web Services EC2 AMI.

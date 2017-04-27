@@ -22,14 +22,14 @@
       "iso_checksum_type": "{{user `iso_checksum_type`}}",
       "iso_checksum": "{{user `iso_checksum`}}",
       "floppy_files": [
-        "./answer_files/{{user `autounattend_folder`}}/Autounattend.xml",
-        "./floppy/WindowsPowershell.lnk",
-        "./floppy/PinTo10.exe",
-        "./scripts/disable-screensaver.ps1",
-        "./scripts/disable-winrm.ps1",
-        "./scripts/enable-winrm.ps1",
-        "./scripts/microsoft-updates.bat",
-        "./scripts/win-updates.ps1"
+        "../answer_files/{{user `autounattend_folder`}}/Autounattend.xml",
+        "../floppy/WindowsPowershell.lnk",
+        "../floppy/PinTo10.exe",
+        "../scripts/disable-screensaver.ps1",
+        "../scripts/disable-winrm.ps1",
+        "../scripts/enable-winrm.ps1",
+        "../scripts/microsoft-updates.bat",
+        "../scripts/win-updates.ps1"
       ],
       "communicator":"winrm",
       "winrm_username": "vagrant",
@@ -47,14 +47,14 @@
       "type": "windows-shell",
       "execute_command": "{{ .Vars }} cmd /c \"{{ .Path }}\"",
       "scripts": [
-        "./scripts/vm-guest-tools.bat",
-        "./scripts/enable-rdp.bat"
+        "../scripts/vm-guest-tools.bat",
+        "../scripts/enable-rdp.bat"
       ]
     },
     {
       "type": "powershell",
       "scripts": [
-        "./scripts/debloat-windows.ps1"
+        "../scripts/debloat-windows.ps1"
       ]
     },
     {
@@ -64,11 +64,11 @@
       "type": "windows-shell",
       "execute_command": "{{ .Vars }} cmd /c \"{{ .Path }}\"",
       "scripts": [
-        "./scripts/pin-powershell.bat",
-        "./scripts/set-winrm-automatic.bat",
-        "./scripts/compile-dotnet-assemblies.bat",
-        "./scripts/uac-enable.bat",
-        "./scripts/compact.bat"
+        "../scripts/pin-powershell.bat",
+        "../scripts/set-winrm-automatic.bat",
+        "../scripts/compile-dotnet-assemblies.bat",
+        "../scripts/uac-enable.bat",
+        "../scripts/compact.bat"
       ]
     },
 	{
@@ -79,7 +79,7 @@
 	},
 	{
 		"type": "file",
-		"source": "../../Source/",
+      "source": "../../../../Source/",
 		"destination": "C:/Provision/ISHBootstrap/Source"
 	},
 	{
