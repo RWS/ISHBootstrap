@@ -4,6 +4,7 @@
 
 - GH-66: Allow parallel building of AMI and Vagrant boxes.
 - GH-67: Auto calculate checksum for given ISO file.
+- GH-53: Add support for docker container images
 
 ## release v1.0
 
