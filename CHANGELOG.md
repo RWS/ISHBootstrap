@@ -4,6 +4,7 @@
 
 - GH-66: Allow parallel building of AMI and Vagrant boxes.
 - GH-67: Auto calculate checksum for given ISO file.
+- GH-70: Include changes for release of Knowledge Center 2016 SP4.
 
 ## release v1.0
 
