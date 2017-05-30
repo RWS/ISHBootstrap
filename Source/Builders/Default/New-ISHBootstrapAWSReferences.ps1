@@ -22,7 +22,7 @@ switch($ISHVersion) {
             BucketName="sct-released"
             ISHServerFolder="InfoShare/12.0/PreRequisites"
             ISHCDFolder="InfoShare/12.0/"
-            ISHCDFileName="20170302.CD.InfoShare.12.0.3902.4.Prod.Trisoft-DITA-OT.exe"
+            ISHCDFileName="20170528.CD.InfoShare.12.0.4128.4.Trisoft-DITA-OT.exe"
         }
     }
     '13.0.0' {
