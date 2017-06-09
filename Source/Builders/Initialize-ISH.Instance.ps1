@@ -230,6 +230,7 @@ $extensions=@(
     "*.xsl"
     "*.ps1"
     "*.psm1"
+    "*.bat"
 )
 
 $foldersToScan=@(
