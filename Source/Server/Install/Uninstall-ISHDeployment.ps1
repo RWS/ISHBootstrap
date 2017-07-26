@@ -60,7 +60,7 @@ $scriptBlock={
         "-project",$Name
         )
 
-    #region workaround GH-73
+    #region Workaround GH-73
     $nlogConfigPath=Join-Path $CDPath "__InstallTool\nlog.config"
     if(-not(Test-Path -Path ($nlogConfigPath+".bak")))
     {
