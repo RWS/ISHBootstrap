@@ -59,6 +59,18 @@ $scriptBlock={
     $installToolArgs=@("-Uninstall",
         "-project",$Name
         )
+
+    #region workaround GH-73
+    $nlogConfigPath=Join-Path $CDPath "__InstallTool\nlog.config"
+    if(-not(Test-Path -Path ($nlogConfigPath+".bak")))
+    {
+        $null=Copy-Item -Path $nlogConfigPath -Destination ($nlogConfigPath+".bak")
+        $nlog=Get-Content -Path $nlogConfigPath -Raw
+        $nlog=$nlog.Replace('fileName="${serviceName}.${processId}.${creationDateTime}.log"','fileName="${processname:fullName=True}.${processId}.${creationDateTime}.log"')
+        [System.IO.File]::WriteAllText($nlogConfigPath,$nlog)
+    }
+    #endregion
+
     & $installToolPath $installToolArgs
 }
 
