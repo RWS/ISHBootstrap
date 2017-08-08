@@ -345,7 +345,6 @@ $installScriptBlock={
         "-installplan",$installPlanPath
         "-inputparameters",$inputParametersPathPath
         )
-
     & $installToolPath $installToolArgs
 }
 
