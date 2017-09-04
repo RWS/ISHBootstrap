@@ -154,6 +154,7 @@ if($webCertificate)
 }
 else
 {
+    & $serverScriptsPaths\IIS\New-SelfSignedTrustedCertificate.ps1 -Computer $computerName -Credential $credential
     & $serverScriptsPaths\IIS\Set-IISSslBinding.ps1 -Computer $computerName -Credential $credential
 }
 
