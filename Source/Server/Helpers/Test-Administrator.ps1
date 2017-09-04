@@ -31,7 +31,7 @@ $adminRole=[System.Security.Principal.WindowsBuiltInRole]::Administrator
 # Check to see if we are currently running "as Administrator"
 if (-not $myWindowsPrincipal.IsInRole($adminRole))
 {
-    throw "The current Windows PowerShell session is not running as Administrator. Start Windows PowerShell by  using the Run as Administrator option, and then try running the script again." -RecommendedAction "Start Windows PowerShell by  using the Run as Administrator option, and then try running the script again." -ErrorAction Stop
+    Write-Error "The current Windows PowerShell session is not running as Administrator. Start Windows PowerShell by  using the Run as Administrator option, and then try running the script again." -RecommendedAction "Start Windows PowerShell by  using the Run as Administrator option, and then try running the script again." -ErrorAction Stop
 }
 
 Write-Progress @scriptProgress -Completed
