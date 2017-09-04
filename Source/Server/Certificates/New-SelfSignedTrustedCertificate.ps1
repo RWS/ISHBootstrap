@@ -37,17 +37,19 @@ try
         $providerName="Microsoft Strong Cryptographic Provider"
         if($PSVersionTable.PSVersion.Major -ge 5)
         {
-            $certificate=New-SelfSignedCertificate -DnsName "mock-$($env:COMPUTERNAME)" -CertStoreLocation "cert:\LocalMachine\My" -Provider $providerName
+            $certificate=New-SelfSignedCertificate -DnsName $env:COMPUTERNAME -CertStoreLocation "cert:\LocalMachine\My" -Provider $providerName
         }
         else
         {
             # -Parameter not supported on PowerShell v4 New-SelfSignedCertificate
-            $certificate=New-SelfSignedCertificate -DnsName "mock-$($env:COMPUTERNAME)" -CertStoreLocation "cert:\LocalMachine\My"
+            $certificate=New-SelfSignedCertificate -DnsName $env:COMPUTERNAME -CertStoreLocation "cert:\LocalMachine\My"
         }
         $rootStore = New-Object System.Security.Cryptography.X509Certificates.X509Store -ArgumentList Root, LocalMachine
         $rootStore.Open("MaxAllowed")
         $rootStore.Add($certificate)
         $rootStore.Close()
+
+        $certificate
     }
     $blockName="Create new selfsigned certificate"
     Write-Progress @scriptProgress -Status $blockName
