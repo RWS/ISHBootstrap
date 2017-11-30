@@ -150,12 +150,14 @@ if($webCertificate)
         }
     }
 
-    & $serverScriptsPaths\IIS\Set-IISSslBinding.ps1 -Computer $computerName -Credential $credential -Thumbprint $certificate.Thumbprint
 }
 else
 {
-    & $serverScriptsPaths\IIS\Set-IISSslBinding.ps1 -Computer $computerName -Credential $credential
+    $certificate=& $serverScriptsPaths\Certificates\New-SelfSignedTrustedCertificate.ps1 -Computer $computerName -Credential $credential
 }
+& $serverScriptsPaths\IIS\Set-IISSslBinding.ps1 -Computer $computerName -Credential $credential -Thumbprint $certificate.Thumbprint
+
+
 
 if($unc)
 {
