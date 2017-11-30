@@ -1,5 +1,3 @@
-#requires -runasadministrator
-
 param(
     [Parameter(Mandatory=$true,ParameterSetName="WindowsServerCore")]
     [Parameter(Mandatory=$true,ParameterSetName="MSSQLExpress")]
@@ -72,11 +70,11 @@ else
 
 if($isWindowsClient)
 {
-    $memory="2GB"
+    $memory="4GB"
     Write-Warning "Client operating system detected. Container will run with Hyper-V isolation. Increasing the memory size to $memory"
     $dockerArgs+=@(
         "-m"
-        "2GB"
+        $memory
     )
 }
 

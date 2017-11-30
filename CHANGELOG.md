@@ -1,5 +1,9 @@
 # Change log
 
+## release v1.2
+
+- GH-53: Add support for docker container images
+
 ## release v1.1
 
 - GH-66: Allow parallel building of AMI and Vagrant boxes.
