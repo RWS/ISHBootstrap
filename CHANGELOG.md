@@ -3,6 +3,10 @@
 ## release v1.2
 
 - GH-53: Add support for docker container images
+- GH-78: Make ContentManager2018 the primary target
+
+Remarks:
+- Moved links from https://github.com/Sarafian to https://github.com/sdl .
 
 ## release v1.1
 
