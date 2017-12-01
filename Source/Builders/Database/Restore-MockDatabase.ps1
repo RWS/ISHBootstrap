@@ -55,8 +55,8 @@ $segments=@(
     $ishCDPath
     "Database"
     "Dump"
-    "SQLServer2012"
-    "20151116.InfoShareEmpty-12.0.0-sqlserver2012.isource.InfoShare-OasisDita.1.2.bak"
+    "SQLServer2014"
+    "20171018.ISHEmpty-13.0.0-sqlserver2014.isource.InfoShare-OasisDita.1.2.bak"
 )
 $infoShareBakPath=$segments -join '\'
 

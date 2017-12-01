@@ -1,6 +1,6 @@
 # How to use the repository (Examples)
 
-Starting from a clean server operating system this how you end up with a [SDL Knowledge Center 2016](sdl.com/xml) Content Manager 12.0.1 Deployment.
+Starting from a clean server operating system this how you end up with a [SDL Knowledge Center 2018](sdl.com/xml) Content Manager Deployment.
 
 # Acknowledgements
 
@@ -11,8 +11,8 @@ Starting from a clean server operating system this how you end up with a [SDL Kn
 - Dependency to PowerShell modules on gallery
   - [CertificatePS](http://www.powershellgallery.com/packages/CertificatePS/). This is used to help with certificate templates. Read more about this [here](https://github.com/Sarafian/CertificatePS)
   - [PSFTP](http://www.powershellgallery.com/packages/PSFTP/). This is used to download files from an ftp server.
-  - [ISHServer.12](http://www.powershellgallery.com/packages/ISHServer.12/). This is used to automate the prerequisites instalation.
-  - [ISHDeploy.12.0.0](http://www.powershellgallery.com/packages/ISHDeploy.12.0.0/). This is used to download files from an ftp server.
+  - [ISHServer.13](http://www.powershellgallery.com/packages/ISHServer.13/). This is used to automate the prerequisites instalation.
+  - [ISHDeploy.13](http://www.powershellgallery.com/packages/ISHDeploy.13/). This is used to download files from an ftp server.
 
 To quickly host an internal NuGet server follow the instructions in this [article](https://docs.nuget.org/create/hosting-your-own-nuget-feeds). 
 Once the server is up you need to register the repository on your system while specifying the both the `-SourceLocation` and `PublishLocation` parameters. 
@@ -29,10 +29,10 @@ The process depends on scripts in the examples directory. To help run these scri
   1. Register a repository for `mymachine`.
 1. Install all modules
 1. Enable the CredSSP authentication for PSSession. 
-1. Install the server prerequisites using module [ISHServer.12](http://www.powershellgallery.com/packages/ISHServer.12/).
+1. Install the server prerequisites using module [ISHServer.13](http://www.powershellgallery.com/packages/ISHServer.13/).
 1. Seed the server with a Content Manager CD.
 1. Install a deployment.
-1. Apply code as configuration scripts using PowerShell module [ISHDeploy.12.0.1](www.powershellgallery.com/packages/ISHDeploy.12.0.1/). Other module variants are also possible
+1. Apply code as configuration scripts using PowerShell module [ISHDeploy.13](www.powershellgallery.com/packages/ISHDeploy.13/). Other module variants are also possible
 1. Run Pester tests
 
 ## Load the data container json file
@@ -43,7 +43,7 @@ The process depends on scripts in the examples directory. To help run these scri
 An obfuscated file for local execution looks like this
 ```json
 {
-  "ISHVersion": "12.0.1",
+  "ISHVersion": "13.0.0",
   "ISHDeployRepository": "PSGallery",
   "PSRepository": [
   ],
@@ -55,9 +55,9 @@ An obfuscated file for local execution looks like this
   "FTP": {
     "Host": "host",
     "CredentialExpression": "New-Credential -Message \"FTP\"",
-    "ISHServerFolder": "Download/InfoShare120/ISHServer/",
-    "ISHCDFolder": "Download/InfoShare120/SP1/",
-    "ISHCDFileName": "20160815.CD.InfoShare.12.0.3215.1.Trisoft-DITA-OT.exe",
+    "ISHServerFolder": "Download/InfoShare130/ISHServer/",
+    "ISHCDFolder": "Download/InfoShare130/SP0/",
+    "ISHCDFileName": "20171110.CD.InfoShare.13.0.3510.0.Trisoft-DITA-OT.exe",
     "AntennaHouseLicensePath": "License/AntennaHouse/AHFormatter.lic"
   },
   "AWSS3": {
@@ -65,9 +65,9 @@ An obfuscated file for local execution looks like this
     "ProfileName": "profilename",
     "AccessKey": "accesskey",
     "SecretKey": "secretkey",
-    "ISHServerFolderKey": "InfoShare/12.0/PreRequisites",
-    "ISHCDFolderKey": "InfoShare/12.0/",
-    "ISHCDFileName": "20160815.CD.InfoShare.12.0.3215.1.Trisoft-DITA-OT.exe",
+    "ISHServerFolderKey": "InfoShare/13.0/PreRequisites",
+    "ISHCDFolderKey": "InfoShare/13.0/",
+    "ISHCDFileName": "20171110.CD.InfoShare.13.0.3510.0.Trisoft-DITA-OT.exe",
     "AntennaHouseLicenseKey": "Licenses/AntennaHouse/AHFormatter.lic"
   },
   "OSUserCredentialExpression": "New-Credential -Message \"OSUser\"",
@@ -130,7 +130,7 @@ Installs all required modules.
 & .\Examples\Initialize-WinRM.ps1
 ```
 
-The required certificate for the Secure WinRM is issued by the domain certificate authority, effectively making it a double hop. More about the issue [PowerShell Remoting Caveats](https://sarafian.github.io/post/powershell/powershell-remoting-caveats/). 
+The required certificate for the Secure WinRM is issued by the domain certificate authority, effectively making it a double hop. More about the issue [PowerShell Remoting Caveats](https://sarafian.github.io/2016/07/05/remoting-caveats.html). 
 For this script to work we need an extra fragment in the JSON
 
 ```json
@@ -263,9 +263,9 @@ You can trigger the sequence with
 ```
 
 The above scripts are based on executing script blocks on the remote servers. 
-This pattern is not very friendly to the concept of code as configuration as described on [code as configuration](https://sarafian.github.io/post/code%20as%20configuration/). 
+This pattern is not very friendly to the concept of code as configuration as described on [code as configuration](https://sarafian.github.io/2016/05/17/code-configuration.html). 
 Although much of the noise is hidden away using the `Invoke-CommandWrap` which is available on [gist](https://gist.github.com/Sarafian/a277cd64468a570dff74682eb929ff3c) for some people it is not good enough. 
-For this reason all scripts have a sibling counterpart that uses implicit remoting as described on [import and use module from a remote server](https://sarafian.github.io/post/powershell/Import-Use-Module-Remote-Server/).
+For this reason all scripts have a sibling counterpart that uses implicit remoting as described on [import and use module from a remote server]https://sarafian.github.io/tips/2016/07/01/Import-Module-Remote.html).
 
 - `Set-ISHCMComponents.ImplicitRemoting.ps1`
 - `Set-ISHCMMenuAndButton.ImplicitRemoting.ps1`
@@ -276,7 +276,7 @@ For this reason all scripts have a sibling counterpart that uses implicit remoti
 All *ImplicitRemoting.ps1* variants do exactly the same thing but the code is conceptually different. 
 You must also watch out because the code executes also differently. 
 There are some important aspects of PowerShell remoting that one needs to be aware of. 
-Read more about it on [PowerShell remoting caveats](https://sarafian.github.io/post/powershell/powershell-remoting-caveats/) and google.
+Read more about it on [PowerShell remoting caveats](https://sarafian.github.io/2016/07/05/remoting-caveats.html) and google.
 
 > What you see is not exactly what you get!
 

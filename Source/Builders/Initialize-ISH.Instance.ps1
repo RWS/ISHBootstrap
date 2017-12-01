@@ -17,7 +17,10 @@ param(
     [securestring]$PFXCertificatePassword,
     [Parameter(Mandatory=$false,ParameterSetName="External Database")]
     [Parameter(Mandatory=$false,ParameterSetName="Demo Database")]
-    [string]$HostName=$null
+    [string]$HostName=$null,
+    [Parameter(Mandatory=$false,ParameterSetName="External Database")]
+    [Parameter(Mandatory=$false,ParameterSetName="Demo Database")]
+    [switch]$InContainer=$false
 )
 
 $cmdletsPaths="$PSScriptRoot\..\Cmdlets"
@@ -102,6 +105,27 @@ Set-ISHUserLocal -OSUserCredentials $OSUserCredentials
 Set-ISHUserAdministrator -OSUser $osUserName
 Initialize-ISHUserLocalProfile -OSUserCredentials $OSUserCredentials
 
+#region Grant read access to certificate private key
+
+if($InContainer)
+{
+    $permission = $OSUserCredentials.UserName,"Read","Allow"
+    $accessRule = New-Object -TypeName System.Security.AccessControl.FileSystemAccessRule -ArgumentList $permission
+
+    $keyPath = $env:ProgramData + "\Microsoft\Crypto\RSA\MachineKeys\"
+    $keyName = $certificate.PrivateKey.CspKeyContainerInfo.UniqueKeyContainerName
+    $keyFullPath = Join-Path $keyPath $keyName
+
+    # Get the current acl of the private key
+    $acl = Get-Acl -Path $keyFullPath
+
+    # Add the new ace to the acl of the private key
+    $acl.AddAccessRule($accessRule)
+
+    # Write back the new acl
+    Set-Acl -Path $keyFullPath -AclObject $acl
+}
+#endregion
 
 #endregion
 
@@ -206,6 +230,7 @@ $extensions=@(
     "*.xsl"
     "*.ps1"
     "*.psm1"
+    "*.bat"
 )
 
 $foldersToScan=@(

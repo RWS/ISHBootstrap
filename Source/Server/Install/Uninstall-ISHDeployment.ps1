@@ -59,6 +59,7 @@ $scriptBlock={
     $installToolArgs=@("-Uninstall",
         "-project",$Name
         )
+
     & $installToolPath $installToolArgs
 }
 

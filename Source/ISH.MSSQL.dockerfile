@@ -16,6 +16,10 @@ ENV ACCEPT_EULA _
 
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
+# Workaround for powershell in interactive container can paste only 50 chars from clipboard
+# https://github.com/moby/moby/issues/29646#issuecomment-300474598
+RUN Remove-Item -Path $env:ProgramFiles/WindowsPowerShell/Modules/PSReadLine" -Recurse -Force
+
 ADD . C:/Provision/ISHBootstrap/Source
 ADD https://github.com/Microsoft/iis-docker/blob/master/windowsservercore/ServiceMonitor.exe?raw=true /Provision/ServiceMonitor.exe
 
