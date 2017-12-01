@@ -10,28 +10,28 @@ The **builders** is a collection of scripts that wrap up the rest of the reposit
 
 ## Baking
 
-The following example bakes a **SDL Knowledge Center 2016 SP3 Content Manager** (`$ishVersion="12.0.3"`)
+The following example bakes a **SDL Knowledge Center 2018 Content Manager** (`$ishVersion="13.0.0"`)
 
 ```powershell
 Get-PackageProvider -Name NuGet -ForceBootstrap | Out-Null
 Save-Script -Name Get-Github -Path $env:TEMP -Force
 $getGitHubPath=Join-Path $env:TEMP Get-GitHub.ps1
-$ishBootstrapPath=(& $getGitHubPath -User Sarafian -Repository ISHBootstrap -Expand).FullName
+$ishBootstrapPath=(& $getGitHubPath -User sdl -Repository ISHBootstrap -Expand).FullName
 $buildersPath="$ishBootstrapPath\Source\Builders"
 
-$ishVersion="12.0.3"
-$awsISH1203=@{
+$ishVersion="13.0.0"
+$awsISH1300=@{
     BucketName="sct-released"
-    ISHServerFolder="InfoShare/12.0/PreRequisites"
-    ISHCDFolder="InfoShare/12.0/"
-    ISHCDFileName="20170125.CD.InfoShare.12.0.3725.3.Trisoft-DITA-OT.exe"
+    ISHServerFolder="InfoShare/13.0/PreRequisites"
+    ISHCDFolder="InfoShare/13.0/"
+    ISHCDFileName="20171110.CD.InfoShare.13.0.3510.0.Trisoft-DITA-OT.exe"
     AccessKey="accesskey"
     SecretKey="secretkey"
 }
 
 & $buildersPath\Default\Install-ISHBootstrapPrerequisites.ps1 -ISHVersion $ishVersion
 
-& $buildersPath\Initialize-ISHImage.ps1 @awsISH1203 -ISHVersion $ishVersion -InformationAction Continue -ErrorAction Stop
+& $buildersPath\Initialize-ISHImage.ps1 @awsISH1300 -ISHVersion $ishVersion -InformationAction Continue -ErrorAction Stop
 ```
 
 ## Instantiating
@@ -45,7 +45,7 @@ Set-StrictMode -Version latest
 
 Save-Script -Name Get-Github -Path $env:TEMP -Force
 $getGitHubPath=Join-Path $env:TEMP Get-GitHub.ps1
-$ishBootstrapPath=(& $getGitHubPath -User Sarafian -Repository ISHBootstrap -Branch import-builders -Expand).FullName
+$ishBootstrapPath=(& $getGitHubPath -User sdl -Repository ISHBootstrap -Branch import-builders -Expand).FullName
 $buildersPath="$ishBootstrapPath\Source\Builders"
 
 $osUserCredentials=New-Object System.Management.Automation.PSCredential("InfoShareServiceUser",(ConvertTo-SecureString "Password123" -AsPlainText -Force))
@@ -70,7 +70,7 @@ Use the `Invoke-PackerBuild.ps1` to start building an AMI.
 
 ```powershell
 $hash=@{
-    ISHVersion="12.0.3"
+    ISHVersion="13.0.0"
     IAMInstanceProfile="IAMInstanceProfile"
     Region="eu-west-1"
     AccessKey="AccessKey"
@@ -96,13 +96,13 @@ As part of the `userdata` or **CodeDeploy** packages, to configure the EC2 execu
 
 When building the container, you need to specify the `ISHVersion` and amazon authorization for the S3 bucket that holds the ISHBootstrap dependencies. When building the image, there are two options depending on whether a mock connection string for a SQL Server 2014 SP2 ISH database is provided. When not provided, the container will derive from `asarafian/mssql-server-windows-express:2014SP2` and include a database.
 
-The following example builds a **SDL Knowledge Center 2016 SP3 Content Manager** (`$ishVersion="12.0.3"`) with embedded SQL Server 2014 SP2. The image name is `asarafian/ishmssql` with tag `12.0.3`.
+The following example builds a **SDL Knowledge Center 2018 Content Manager** (`$ishVersion="13.0.0"`) with embedded SQL Server 2014 SP2. The image name is `asarafian/ishmssql` with tag `13.0.0`.
 
 ```powershell
 
-# Build container with internal SQL Server 2014 SP2
+# Build container with internal SQL Server 2016
 $hash=@{
-    ISHVersion="12.0.3"
+    ISHVersion="13.0.0"
     AccessKey="accesskey"
     SecretKey="secretkey"
 }
@@ -111,13 +111,13 @@ $hash=@{
 
 ```
 
-The following example builds a **SDL Knowledge Center 2016 SP3 Content Manager** (`$ishVersion="12.0.3"`) using an external database with connection string `connectionstring`. The image name is `asarafian/ish` with tag `12.0.3`.
+The following example builds a **SDL Knowledge Center 2018 Content Manager** (`$ishVersion="13.0.0"`) using an external database with connection string `connectionstring`. The image name is `asarafian/ish` with tag `13.0.0`.
 
 ```powershell
 
 # Build container with internal SQL Server 2014 SP2
 $hash=@{
-    ISHVersion="12.0.3"
+    ISHVersion="13.0.0"
     AccessKey="accesskey"
     SecretKey="secretkey"
     MockConnectionString="connectionstring"
@@ -169,7 +169,7 @@ Use the `Invoke-PackerBuild.ps1` to start building a Vagrant box.
 
 ```powershell
 $hash=@{
-    ISHVersion="12.0.3"
+    ISHVersion="13.0.0"
     IAMInstanceProfile="IAMInstanceProfile"
     Region="eu-west-1"
     AccessKey="AccessKey"
