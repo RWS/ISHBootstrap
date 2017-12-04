@@ -26,12 +26,13 @@ $serverScriptsPaths="$sourcePath\Server"
 $computerName=Get-ISHBootstrapperContextValue -ValuePath "ComputerName" -DefaultValue $null
 $credential=Get-ISHBootstrapperContextValue -ValuePath "CredentialExpression" -Invoke
 $ishVersion=Get-ISHBootstrapperContextValue -ValuePath "ISHVersion"
+$ishServerVersion=($ishVersion -split "\.")[0]
 
 . "$cmdletsPaths\Helpers\Invoke-CommandWrap.ps1"
 
 
 $getDeploymentsBlock= {
-    $ishDeployModuleName="ISHDeploy.$ishVersion"
+    $ishDeployModuleName="ISHDeploy.$($ishServerVersion).0"
     if(Get-Module $ishDeployModuleName -ListAvailable)
     {
         Get-ISHDeployment |Select-Object -ExpandProperty Name

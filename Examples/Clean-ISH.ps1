@@ -37,13 +37,13 @@ $cleanBlock= {
     $infoSharePath="C:\InfoShare"
     Write-Debug "infoSharePath=$infoSharePath"
 
-    $ishDeployProgramDataPath=Join-Path "C:\ProgramData" "ISHDeploy.$ishVersion"
+    $ishDeployProgramDataPath=Join-Path "C:\ProgramData" "ISHDeploy.$($ishServerVersion).0"
     Write-Debug "ishDeployProgramDataPath=$ishDeployProgramDataPath"
 
     $ishServerProgramDataPath=Join-Path "C:\ProgramData" "ISHServer.$ishServerVersion"
     Write-Debug "ishServerProgramDataPath=$ishServerProgramDataPath"
 
-    $ishDeployModuleName="ISHDeploy.$ishVersion"
+    $ishDeployModuleName="ISHDeploy.$($ishServerVersion).0"
     Write-Debug "ishDeployModuleName=$ishDeployModuleName"
     $ishServerModuleName="ISHServer.$ishServerVersion"
     Write-Debug "ishServerModuleName=$ishServerModuleName"

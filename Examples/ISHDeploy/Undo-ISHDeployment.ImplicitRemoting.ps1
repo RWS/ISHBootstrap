@@ -43,11 +43,13 @@ if(-not $Computer)
 
 try
 {
+	$ishServerVersion=($ishVersion -split "\.")[0]
+
     Write-Progress @scriptProgress -Status "Undoing deployment $deploymentName"
 
     if($Computer)
     {
-        $ishDelpoyModuleName="ISHDeploy.$ISHVersion"
+        $ishDelpoyModuleName="ISHDeploy.$($ishServerVersion).0"
         $remote=Add-ModuleFromRemote -ComputerName $Computer -Credential $Credential -Name $ishDelpoyModuleName
     }
 
