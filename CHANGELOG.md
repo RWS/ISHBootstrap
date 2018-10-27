@@ -1,6 +1,6 @@
 # Change log
 
-## release v1.2
+## next release
 - GH-xx: Update valid/supported versions (released: 13.0.1, 13.0.2, not released 14.0.0).
 
 ## release v1.2
