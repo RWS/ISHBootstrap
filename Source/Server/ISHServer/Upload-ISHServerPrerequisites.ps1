@@ -22,7 +22,7 @@ param (
     [Parameter(Mandatory=$true)]
     [string]$PrerequisitesSourcePath,
     [Parameter(Mandatory=$true)]
-    [ValidateSet("12","13")]
+    [ValidateSet("12","13","14")]
     [string]$ISHServerVersion
 )    
 $cmdletsPaths="$PSScriptRoot\..\..\Cmdlets"

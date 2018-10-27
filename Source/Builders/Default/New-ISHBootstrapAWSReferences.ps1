@@ -1,6 +1,6 @@
 param(
     [Parameter(Mandatory=$true)]
-    [ValidateSet("12.0.3","12.0.4","13.0.0")]
+    [ValidateSet("12.0.3","12.0.4","13.0.0","13.0.1","13.0.2","14.0.0")]
     [string]$ISHVersion
 )
 
@@ -27,10 +27,34 @@ switch($ISHVersion) {
     }
     '13.0.0' {
         $hash=@{
-            BucketName="sct-notreleased"
+            BucketName="sct-released"
             ISHServerFolder="InfoShare/13.0/PreRequisites"
             ISHCDFolder="InfoShare/13.0/"
-            ISHCDFileName="20170202.CD.InfoShare.13.0.2602.0.Test.Trisoft-DITA-OT.exe"
+            ISHCDFileName="20171110.CD.InfoShare.13.0.3510.0.Trisoft-DITA-OT.exe"
+        }
+    }
+    '13.0.1' {
+        $hash=@{
+            BucketName="sct-released"
+            ISHServerFolder="InfoShare/13.0/PreRequisites"
+            ISHCDFolder="InfoShare/13.0/"
+            ISHCDFileName="20180515.CD.InfoShare.13.0.4115.1.Trisoft-DITA-OT.exe"
+        }
+    }
+    '13.0.2' {
+        $hash=@{
+            BucketName="sct-released"
+            ISHServerFolder="InfoShare/13.0/PreRequisites"
+            ISHCDFolder="InfoShare/13.0/"
+            ISHCDFileName="20181023.CD.InfoShare.13.0.4623.2.Trisoft-DITA-OT.exe"
+        }
+    }
+    '14.0.0' {
+        $hash=@{
+            BucketName="sct-notreleased"
+            ISHServerFolder="InfoShare/14.0/PreRequisites"
+            ISHCDFolder="InfoShare/14.0/"
+            ISHCDFileName="20181026a.CD.InfoShare.14.0.2226.0.Test.Trisoft-DITA-OT.exe"
         }
     }
 }
