@@ -1,7 +1,7 @@
 # Change log
 
 ## next release
-- GH-84: Add installation of AdoptOpenJDK pre-requisite
+- GH-84: Add installation of AdoptOpenJDK and JRE pre-requisite
 - GH-xx: Update valid/supported versions (released: 13.0.1, 13.0.2, not released 14.0.0).
 
 ## release v1.2

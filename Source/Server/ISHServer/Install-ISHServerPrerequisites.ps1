@@ -64,10 +64,14 @@ try
     {
         Install-ISHToolMSXML4
     }
-    Install-ISHToolJAVA
     if($ISHServerVersion -eq "14")
     {
+        Install-ISHToolAdoptOpenJRE
         Install-ISHToolAdoptOpenJDK
+    }
+    else
+    {
+        Install-ISHToolJAVA
     }
     Install-ISHToolJavaHelp
     Install-ISHToolHtmlHelp
