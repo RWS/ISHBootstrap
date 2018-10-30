@@ -320,7 +320,7 @@ $newParameterScriptBlock={
 
 $installScriptBlock={
     [int]$major=($ISHVersion -split '\.')[0]
-    if($major -ge 13)
+    if($major -eq 13)
     {
         # Fixing JAVA_HOME not set because we didn't restart
         $envVarName="JAVA_HOME"
