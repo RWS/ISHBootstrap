@@ -50,11 +50,13 @@ try
     $adfsComputerName=Get-ISHBootstrapperContextValue -ValuePath "Configuration.ADFSComputerName"
     #endegion
 
+	$ishServerVersion=($ishVersion -split "\.")[0]
+
     Write-Progress @scriptProgress -Status "Getting information from ADFS"
 
     if($Computer)
     {
-        $ishDelpoyModuleName="ISHDeploy.$ISHVersion"
+        $ishDelpoyModuleName="ISHDeploy.$($ishServerVersion).0"
         $remote=Add-ModuleFromRemote -ComputerName $Computer -Credential $Credential -Name $ishDelpoyModuleName
     }
     $remoteADFS=Add-ModuleFromRemote -ComputerName $adfsComputerName -Name ADFS

@@ -27,6 +27,7 @@ param (
 $ishBootStrapRootPath=Resolve-Path "$PSScriptRoot\..\.."
 $cmdletsPaths="$ishBootStrapRootPath\Source\Cmdlets"
 $serverScriptsPaths="$ishBootStrapRootPath\Source\Server"
+$ishServerVersion=($ishVersion -split "\.")[0]
 
 . $ishBootStrapRootPath\Examples\ISHDeploy\Cmdlets\Write-Separator.ps1
 Write-Separator -Invocation $MyInvocation -Header -Name "Configure"
@@ -47,7 +48,7 @@ try
 
     if($Computer)
     {
-        $ishDelpoyModuleName="ISHDeploy.$ISHVersion"
+        $ishDelpoyModuleName="ISHDeploy.$($ishServerVersion).0"
         $remote=Add-ModuleFromRemote -ComputerName $Computer -Credential $Credential -Name $ishDelpoyModuleName
     }
 
