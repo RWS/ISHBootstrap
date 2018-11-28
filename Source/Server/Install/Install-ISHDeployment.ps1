@@ -318,6 +318,28 @@ $newParameterScriptBlock={
     
 }
 
+$logLevelScriptBlock={
+    $installToolNlogPath=Join-Path $CDPath "__InstallTool\NLog.config"
+    Write-Debug "installToolNlogPath=$installToolNlogPath"
+
+    [xml]$xml=Get-Content -Path $installToolNlogPath -Raw
+
+    $nsmgr = New-Object System.Xml.XmlNamespaceManager $xml.NameTable
+    $nsmgr.AddNamespace('ns','http://www.nlog-project.org/schemas/NLog.xsd')
+
+    # Check if the debug level for the File target is set to Debug
+    $xpathFileLoggerRule='ns:nlog/ns:rules/ns:logger[@writeTo="File"]'
+
+    $nodeFileLoggerRule=$xml.SelectSingleNode($xpathFileLoggerRule)
+
+    if ($nodeFileLoggerRule.minLevel -ne "Debug")
+    {
+        Write-Warning "Changing the minLevel attribute of the File logger from '$($nodeFileLoggerRule.minLevel)' to 'Debug'"
+        $nodeFileLoggerRule.minLevel="Debug"
+        $xml.Save($installToolNlogPath)
+        Write-Verbose "Saved to $installToolNlogPath"
+    }
+}
 $installScriptBlock={
     [int]$major=($ISHVersion -split '\.')[0]
     if($major -eq 13)
@@ -357,6 +379,9 @@ try
     $blockName="Creating new deployment parameters for $Name"
     Write-Progress @scriptProgress -Status $blockName
     Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $newParameterScriptBlock -BlockName $blockName -UseParameters @("cdPath","ISHVersion","OSUserCredential","ConnectionString","IsOracle","Name","RootPath","LucenePort","UseRelativePaths")
+    $blockName="Making sure that the minLevel of the File logger is set to 'Debug' for InstallTool"
+    Write-Progress @scriptProgress -Status $blockName
+    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $logLevelScriptBlock -BlockName $blockName -UseParameters @("cdPath")
     
     $blockName="Installing $Name"
     Write-Progress @scriptProgress -Status $blockName

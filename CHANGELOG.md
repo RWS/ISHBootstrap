@@ -1,6 +1,7 @@
 # Change log
 
 ## next release
+- GH-85: Make sure that the minLevel of the File logger is set to 'Debug' for InstallTool
 - GH-84: Add installation of AdoptOpenJDK and JRE pre-requisite
 - GH-xx: Update valid/supported versions (released: 13.0.1, 13.0.2, not released 14.0.0).
 
