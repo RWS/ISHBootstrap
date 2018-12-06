@@ -329,8 +329,7 @@ $logLevelScriptBlock={
 
     # Check if the debug level for the File target is set to Debug
     $xpathFileLoggerRule='ns:nlog/ns:rules/ns:logger[@writeTo="File"]'
-
-    $nodeFileLoggerRule=$xml.SelectSingleNode($xpathFileLoggerRule)
+    $nodeFileLoggerRule=$xml.SelectSingleNode($xpathFileLoggerRule, $nsmgr)
 
     if ($nodeFileLoggerRule.minLevel -ne "Debug")
     {
@@ -340,6 +339,7 @@ $logLevelScriptBlock={
         Write-Verbose "Saved to $installToolNlogPath"
     }
 }
+
 $installScriptBlock={
     [int]$major=($ISHVersion -split '\.')[0]
     if($major -eq 13)
