@@ -56,9 +56,10 @@ $segments=@(
     "Database"
     "Dump"
     "SQLServer2014"
-    "20171018.ISHEmpty-13.0.0-sqlserver2014.isource.InfoShare-OasisDita.1.2.bak"
+    "*ISHEmpty*.bak"
 )
 $infoShareBakPath=$segments -join '\'
+$infoShareBakPath=Resolve-Path $infoShareBakPath
 
 $dbName="InfoShare"
 $sqlRestoreDBCmd=@"
