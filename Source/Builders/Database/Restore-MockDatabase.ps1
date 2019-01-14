@@ -14,16 +14,30 @@ $scriptProgress=Get-ProgressHash -Invocation $MyInvocation
 $ishServerVersion=($ISHVersion -split "\.")[0]
 $ishRevision=($ISHVersion -split "\.")[2]
 
-#region 0. Configure SQLExpress networking and login mode
-
-Stop-Service MSSQL`$SQLEXPRESS
-Set-ItemProperty -Path 'HKLM:\software\microsoft\microsoft sql server\mssql1*.SQLEXPRESS/mssqlserver/supersocketnetlib/tcp' -Name Enabled -Value '1'
-Set-ItemProperty -Path 'HKLM:\software\microsoft\microsoft sql server\mssql1*.SQLEXPRESS/mssqlserver/supersocketnetlib/tcp/ipall' -Name tcpdynamicports -Value ''
-Set-ItemProperty -Path 'HKLM:\software\microsoft\microsoft sql server\mssql1*.SQLEXPRESS/mssqlserver/supersocketnetlib/tcp/ipall' -Name tcpport -Value 1433
-Set-ItemProperty -Path 'HKLM:\software\microsoft\microsoft sql server\mssql1*.SQLEXPRESS/mssqlserver/' -Name LoginMode -Value 2
-Start-Service  MSSQL`$SQLEXPRESS
-			
+#region 0. Configure tcp settings and login mode for ISHSQLEXPRESS
+# !! ONLY if one SQL instance is installed and the instancename equals ISHSQLEXPRESS (installed using Install-MockDatabaseServer)
+# Otherwise you need to execute these commands yourself so you can configure the correct instance
+#   e.g. in the packer file like for mssql2014-ish-amazon-ebs.json 
+if (
+    (Test-Path "HKLM:\SOFTWARE\Microsoft\Microsoft SQL Server") <# SQL Server is installed#> `
+    -and ((get-itemproperty 'HKLM:\SOFTWARE\Microsoft\Microsoft SQL Server').InstalledInstances.Count -eq 1) <# Only one SQL Server instance installed#> `
+    -and ((get-itemproperty 'HKLM:\SOFTWARE\Microsoft\Microsoft SQL Server').InstalledInstances -eq "ISHSQLEXPRESS") <# Only our specific ISHSQLEXPRESS instance is installed#> `
+    )
+{
+    Write-Host "Configuring tcp settings and login mode for ISHSQLEXPRESS" 
+    Stop-Service MSSQL`$ISHSQLEXPRESS
+    Set-ItemProperty -Path 'HKLM:\software\microsoft\microsoft sql server\mssql1*.ISHSQLEXPRESS/mssqlserver/supersocketnetlib/tcp' -Name Enabled -Value '1'
+    Set-ItemProperty -Path 'HKLM:\software\microsoft\microsoft sql server\mssql1*.ISHSQLEXPRESS/mssqlserver/supersocketnetlib/tcp/ipall' -Name tcpdynamicports -Value ''
+    Set-ItemProperty -Path 'HKLM:\software\microsoft\microsoft sql server\mssql1*.ISHSQLEXPRESS/mssqlserver/supersocketnetlib/tcp/ipall' -Name tcpport -Value 1433
+    Set-ItemProperty -Path 'HKLM:\software\microsoft\microsoft sql server\mssql1*.ISHSQLEXPRESS/mssqlserver/' -Name LoginMode -Value 2
+    Start-Service MSSQL`$ISHSQLEXPRESS
+}
+else
+{
+  Write-Warning "Skipped configuring tcp settings and login mode for ISHSQLEXPRESS. ISHSQLEXPRESS not installed or multiple SQL instances installed."
+}
 #endregion	
+
 $sqlServerItem=Get-ChildItem -Path "${env:ProgramFiles(x86)}\Microsoft SQL Server" -Filter "*0" |Sort-Object -Descending @{expression={[int]$_.Name}}| Select-Object -First 1
 $sqlServerPath=$sqlServerItem |Select-Object -ExpandProperty FullName
 $sqlServerMajorVersion=$sqlServerItem.Name.Substring(0,$sqlServerItem.Name.Length-1)
