@@ -24,7 +24,6 @@ if($mockDatabase)
     $sql_express_2016_download_url="https://download.microsoft.com/download/2/A/5/2A5260C3-4143-47D8-9823-E91BB0121F94/SQLEXPR_x64_ENU.exe"
     $sql_express_2017_download_url="https://go.microsoft.com/fwlink/?linkid=829176"
 
-
     $sql_express_download_url= $sql_express_2017_download_url
 
     switch -regex ($ISHVersion) {
@@ -47,6 +46,15 @@ if($mockDatabase)
 
     Write-Host "Cleaning"
     Remove-Item -Recurse -Force $sqlExpressPath, $setupPath
+
+    # Configure tcp settings and login mode for ISHSQLEXPRESS
+    Write-Host "Configuring tcp settings and login mode for ISHSQLEXPRESS" 
+    Stop-Service MSSQL`$ISHSQLEXPRESS
+    Set-ItemProperty -Path 'HKLM:\software\microsoft\microsoft sql server\mssql1*.ISHSQLEXPRESS/mssqlserver/supersocketnetlib/tcp' -Name Enabled -Value '1'
+    Set-ItemProperty -Path 'HKLM:\software\microsoft\microsoft sql server\mssql1*.ISHSQLEXPRESS/mssqlserver/supersocketnetlib/tcp/ipall' -Name tcpdynamicports -Value ''
+    Set-ItemProperty -Path 'HKLM:\software\microsoft\microsoft sql server\mssql1*.ISHSQLEXPRESS/mssqlserver/supersocketnetlib/tcp/ipall' -Name tcpport -Value 1433
+    Set-ItemProperty -Path 'HKLM:\software\microsoft\microsoft sql server\mssql1*.ISHSQLEXPRESS/mssqlserver/' -Name LoginMode -Value 2
+    Start-Service MSSQL`$ISHSQLEXPRESS  
 }
 else
 {
