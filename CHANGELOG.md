@@ -1,6 +1,7 @@
 # Change log
 
 ## next release
+- GH-87: Restore support for local SQL Server Express database for Vagrant boxes (Hyper-V)
 - GH-86: Make it possible to initialize an image with only the third party software prerequisites and/or the Application prerequisites and installation
 - GH-85: Make sure that the minLevel of the File logger is set to 'Debug' for InstallTool
 - GH-84: Add installation of AdoptOpenJDK and JRE pre-requisite
