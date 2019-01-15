@@ -25,7 +25,7 @@ param(
     [Parameter(Mandatory=$false,ParameterSetName="Vagrant Hyper-V")]
     [string]$SwitchName="External Virtual Switch",
     [Parameter(Mandatory=$false,ParameterSetName="Vagrant Hyper-V")]
-    [ValidateSet('2012_R2', '2016')]
+    [ValidateSet('2012_R2', '2016', '2019')]
     [string]$ServerVersion="2016",
     [Parameter(Mandatory=$false,ParameterSetName="Vagrant Hyper-V")]
     [string]$OutputPath="$env:TEMP",

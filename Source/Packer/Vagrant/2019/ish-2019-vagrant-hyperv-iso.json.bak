@@ -1,0 +1,161 @@
+{
+  "variables": {
+    "ishVersion": "",
+    "iso_url": "",
+    "iso_checksum_type": "SHA1",
+    "iso_checksum": "",
+    "hyperv_switchname": "",
+    "aws_access_key": "",
+    "aws_secret_key": "",
+    "output_box_path": "",
+    "autounattend_folder": "",
+    "ish_mock_connectionstring": ""
+  },
+  "builders": [
+    {
+      "vm_name": "ISH.{{user `ishVersion`}}-2019-Packer",
+      "type": "hyperv-iso",
+      "disk_size": 41440,
+      "boot_wait": "0s",
+      "guest_additions_mode": "disable",
+      "iso_url": "{{user `iso_url`}}",
+      "iso_checksum_type": "{{user `iso_checksum_type`}}",
+      "iso_checksum": "{{user `iso_checksum`}}",
+      "floppy_files": [
+        "../answer_files/{{user `autounattend_folder`}}/Autounattend.xml",
+        "../scripts/disable-screensaver.ps1",
+        "../scripts/disable-winrm.ps1",
+        "../scripts/enable-winrm.ps1",
+        "../scripts/microsoft-updates.bat",
+        "../scripts/unattend.xml",
+        "../scripts/sysprep.bat",
+        "../scripts/win-updates.ps1"
+      ],
+      "communicator": "winrm",
+      "winrm_username": "vagrant",
+      "winrm_password": "vagrant",
+      "winrm_timeout": "4h",
+      "shutdown_command": "a:/sysprep.bat",
+      "ram_size": 4096,
+      "cpu": 4,
+      "switch_name": "{{user `hyperv_switchname`}}",
+      "enable_secure_boot": true,
+      "enable_virtualization_extensions": true
+    }
+  ],
+  "provisioners": [
+    {
+      "execute_command": "{{ .Vars }} cmd /c \"{{ .Path }}\"",
+      "scripts": [
+        "../scripts/vm-guest-tools.bat",
+        "../scripts/enable-rdp.bat"
+      ],
+      "type": "windows-shell"
+    },
+    {
+      "scripts": [
+        "../scripts/debloat-windows.ps1"
+      ],
+      "type": "powershell"
+    },
+    {
+      "type": "windows-restart"
+    },
+    {
+      "type": "windows-shell",
+      "execute_command": "{{ .Vars }} cmd /c \"{{ .Path }}\"",
+      "scripts": [
+        "../scripts/pin-powershell.bat",
+        "../scripts/set-winrm-automatic.bat",
+        "../scripts/uac-enable.bat",
+        "../scripts/compile-dotnet-assemblies.bat",
+        "../scripts/dis-updates.bat",
+        "../scripts/compact.bat"
+      ]
+    },
+    {
+      "type": "file",
+      "source": "../../Invoke-ProvisionWorkAround.ps1",
+      "destination": "C:/ProvisionWorkAround/Invoke-ProvisionWorkAround.ps1"
+    },
+    {
+      "type": "powershell",
+      "inline": [
+        "$ErrorActionPreference='Stop'",
+        "& C:/ProvisionWorkAround/Invoke-ProvisionWorkAround.ps1 -ProvisionBucketName {{user `provision_bucketname`}} -ProvisionKeyPrefix {{user `provision_keyprefix`}} -ProvisionFolder C:/Provision -AccessKey {{user `aws_access_key`}} -SecretKey {{user `aws_secret_key`}}"
+      ]
+    },
+    {
+      "type": "powershell",
+      "inline": [
+        "$ishBootstrapItem=& C:/Provision/AWSSCT/Core/Bootstrap/Source/Scripts/Helpers/Get-Github.ps1 -User beutepa -Repository ISHBootstrap {{user `get_github_argument`}} -Expand",
+        "$ishBootstrapItem | Move-Item -Destination C:/Provision/ISHBootstrap"
+      ]
+    },
+    {
+      "type": "powershell",
+      "inline": [
+        "& C:/Provision/ISHBootstrap/Source/Server/PackageManagement/Install-NugetPackageProvider.ps1"
+      ]
+    },
+    {
+      "type": "windows-restart"
+    },
+    {
+      "type": "powershell",
+      "inline": [
+        "$ishBootstrapItem=& C:/Provision/ISHBootstrap/Source/Builders/Database/Install-MockDatabaseServer.ps1 -ISHVersion {{user `ishVersion`}} -MockConnectionString \"{{user `ish_mock_connectionstring`}}\""
+      ]
+    },
+    {
+      "type": "windows-restart"
+    },
+    {
+      "type": "powershell",
+      "inline": [
+        "& C:/Provision/AWSSCT/Core/Bootstrap/Source/Scripts/Builders/Default/Register-AWSSCTNexusRepository.ps1 -CodeVersion {{user `code_version`}}",
+        "& C:/Provision/AWSSCT/Core/Bootstrap/Source/Scripts/Builders/Default/Install-ISHBootstrapPrerequisites.ps1 -ISHVersion {{user `ishVersion`}}",
+        "& C:/Provision/AWSSCT/Core/Bootstrap/Source/Scripts/Builders/Default/Add-ProfileEnhancement.ps1"
+      ]
+    },
+    {
+      "type": "powershell",
+      "inline": [
+        "& C:/Provision/ISHBootstrap/Source/Bake-ISHFromAWSS3.ps1 -InstallISHApplicationServer $false -InstallISHPrerequisites $true -ISHVersion {{user `ishVersion`}} -MockConnectionString \"{{user `ish_mock_connectionstring`}}\" -BucketName {{user `bucket_name`}} -ISHServerFolder {{user `ish_server_folder`}} -ISHCDFolder {{user `ish_cd_folder`}} -ISHCDFileName {{user `ish_cd_filename`}} -AccessKey {{user `aws_access_key`}} -SecretKey {{user `aws_secret_key`}}"
+      ]
+    },
+    {
+      "type": "windows-restart"
+    },
+    {
+      "type": "powershell",
+      "inline": [
+        "& C:/Provision/ISHBootstrap/Source/Bake-ISHFromAWSS3.ps1 -InstallISHApplicationServer $true -InstallISHPrerequisites $false -ISHVersion {{user `ishVersion`}} -MockConnectionString \"{{user `ish_mock_connectionstring`}}\" -BucketName {{user `bucket_name`}} -ISHServerFolder {{user `ish_server_folder`}} -ISHCDFolder {{user `ish_cd_folder`}} -ISHCDFileName {{user `ish_cd_filename`}} -AccessKey {{user `aws_access_key`}} -SecretKey {{user `aws_secret_key`}}"
+      ]
+    },
+    {
+      "type": "powershell",
+      "inline": [
+        "& C:/Provision/AWSSCT/Core/Bootstrap/Source/Scripts/Builders/Default/Stop-ISHDeployment.ps1",
+        "& C:/Provision/AWSSCT/Core/Bootstrap/Source/Scripts/Builders/Default/Set-SCTAISHLocalTag.ps1 -CodeVersion {{user `code_version`}} -ISHVersion {{user `ishVersion`}}",
+        "& C:/Provision/AWSSCT/Core/Bootstrap/Source/Scripts/Builders/Default/Set-SCTAISHMarker.ps1 -ISHVersion {{user `ishVersion`}} -BuilderType 'HyperV-VagrantBox'"
+      ]
+    },
+    {
+      "type": "powershell",
+      "inline": [
+        "& C:/Provision/AWSSCT/Core/Bootstrap/Source/Scripts/Builders/Experimental/Install-WindowsFeatures.ps1",
+        "& C:/Provision/AWSSCT/Core/Bootstrap/Source/Scripts/Builders/Experimental/Install-Chocolatey.ps1",
+        "& C:/Provision/AWSSCT/Core/Bootstrap/Source/Scripts/Builders/Experimental/Install-ChocolateyPackages.ps1"
+      ]
+    }
+  ],
+  "post-processors": [
+    {
+      "type": "vagrant",
+      "keep_input_artifact": false,
+      "output": "{{user `output_directory`}}/{{user `output_name`}}.box",
+      "vagrantfile_template": "vagrantfile-windows_2019.template"
+    }
+  ]
+}
