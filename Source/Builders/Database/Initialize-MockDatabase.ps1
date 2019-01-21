@@ -80,15 +80,17 @@ IF NOT EXISTS
      WHERE name = N'$SqlUserName')
 BEGIN
     SELECT N'Creating login for: $SqlUserName'
-    CREATE LOGIN [$SqlUserName] WITH PASSWORD = N'$SqlPassword', CHECK_POLICY = OFF, CHECK_EXPIRATION = OFF
+    CREATE LOGIN [$SqlUserName] WITH PASSWORD = N'$SqlPassword', CHECK_POLICY = OFF, CHECK_EXPIRATION = OFF, DEFAULT_DATABASE=[$dbName]
 END
 ELSE
 BEGIN
     SELECT N'Altering login for: $SqlUserName'
-    ALTER LOGIN [$SqlUserName] WITH PASSWORD = N'$SqlPassword', CHECK_POLICY = OFF, CHECK_EXPIRATION = OFF
+    ALTER LOGIN [$SqlUserName] WITH PASSWORD = N'$SqlPassword', CHECK_POLICY = OFF, CHECK_EXPIRATION = OFF, DEFAULT_DATABASE=[$dbName]
 END
 GO
 ALTER LOGIN [$SqlUserName] ENABLE;
+GO
+EXEC master..sp_addsrvrolemember @loginame = N'$SqlUserName', @rolename = N'sysadmin'
 GO
 USE [$dbName]
 GO
