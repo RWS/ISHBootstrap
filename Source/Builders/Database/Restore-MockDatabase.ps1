@@ -1,7 +1,9 @@
 ﻿param(
     [Parameter(Mandatory=$true)]
     [ValidateSet("12.0.3","12.0.4","13.0.0","13.0.1","13.0.2","14.0.0")]
-    [string]$ISHVersion
+    [string]$ISHVersion,
+    [Parameter(Mandatory=$false)]
+    [switch]$EmptyDB
 )
 
 $cmdletsPaths="$PSScriptRoot\..\..\Cmdlets"
@@ -56,8 +58,17 @@ $segments=@(
     "Database"
     "Dump"
     "SQLServer2014"
-    "*ISHEmpty*.bak"
 )
+
+if ($EmptyDB.IsPresent)
+{
+    $segments+=@("*ISHEmpty*.bak")
+}
+else
+{
+    $segments+=@("*ISHDemo*.bak")
+}
+
 $infoShareBakPath=$segments -join '\'
 $infoShareBakPath=Resolve-Path $infoShareBakPath
 
