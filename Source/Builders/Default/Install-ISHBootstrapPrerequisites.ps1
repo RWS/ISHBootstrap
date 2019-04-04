@@ -34,7 +34,7 @@ Get-PackageProvider -Name NuGet -ForceBootstrap | Out-Null
 
 #region Installing modules
 $moduleNames=@(
-    "ISHDeploy.$ISHVersion"
+    "ISHDeploy"
     "CertificatePS"
     "PoshPrivilege"
 )
