@@ -1,7 +1,13 @@
 # Change log
 
 ## next release
+- GH-102: Database - Add the option to restore the Demo or and Empty database from the ISHCD as local/'mock' database
+- GH-101: DevelopFriendly - Improve PowerShell scripts to help in troubleshooting instances
 - GH-100: Update the example scripts to use the 'versionless' ISHDeploy module
+- GH-97: DevelopFriendly - PowerShell scripts to help in troubleshooting instances (enhancement)
+- GH-94: Add support for local SQL Server (Express) 2016 database for AWS (EC2) instances (enhancement)
+- GH-92: Initialize-MockDatabase.ps1 - Support creation of a SQL user when initializing the mock database (enhancement)
+- GH-89: Add support for Windows Server 2019
 - GH-87: Restore support for local SQL Server Express database for Vagrant boxes (Hyper-V)
 - GH-86: Make it possible to initialize an image with only the third party software prerequisites and/or the Application prerequisites and installation
 - GH-85: Make sure that the minLevel of the File logger is set to 'Debug' for InstallTool
