@@ -16,7 +16,7 @@ With the ISHBootstrapper the following flow gets automated for a clean/default W
 1. Install Content Manager prerequisites as described in the [documentation](https://docs.sdl.com/LiveContent/web/pub.xql?action=home&pub=SDL%20Knowledge%20Center%20full%20documentation-v3&lang=en-US)
 1. Copy the deliverable of the Content Manager CD
 1. Install Content Manager. One or more deployments.
-1. Execute [ISHDeploy](powershellgallery.com/packages/ISHDeploy.13/) based code as configuration scripts
+1. Execute [ISHDeploy](powershellgallery.com/packages/ISHDeploy/) based code as configuration scripts
 
 Do all of the above with minimum manual actions and all should work locally and remotely. 
 At the end the dream goal is to execute a seamless update of a Content Manager deployments   

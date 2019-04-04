@@ -12,7 +12,7 @@ Starting from a clean server operating system this how you end up with a [SDL Kn
   - [CertificatePS](http://www.powershellgallery.com/packages/CertificatePS/). This is used to help with certificate templates. Read more about this [here](https://github.com/Sarafian/CertificatePS)
   - [PSFTP](http://www.powershellgallery.com/packages/PSFTP/). This is used to download files from an ftp server.
   - [ISHServer.13](http://www.powershellgallery.com/packages/ISHServer.13/). This is used to automate the prerequisites instalation.
-  - [ISHDeploy.13](http://www.powershellgallery.com/packages/ISHDeploy.13/). This is used to download files from an ftp server.
+  - [ISHDeploy](http://www.powershellgallery.com/packages/ISHDeploy/). This is used to download files from an ftp server.
 
 To quickly host an internal NuGet server follow the instructions in this [article](https://docs.nuget.org/create/hosting-your-own-nuget-feeds). 
 Once the server is up you need to register the repository on your system while specifying the both the `-SourceLocation` and `PublishLocation` parameters. 
@@ -32,7 +32,7 @@ The process depends on scripts in the examples directory. To help run these scri
 1. Install the server prerequisites using module [ISHServer.13](http://www.powershellgallery.com/packages/ISHServer.13/).
 1. Seed the server with a Content Manager CD.
 1. Install a deployment.
-1. Apply code as configuration scripts using PowerShell module [ISHDeploy.13](www.powershellgallery.com/packages/ISHDeploy.13/). Other module variants are also possible
+1. Apply code as configuration scripts using PowerShell module [ISHDeploy](www.powershellgallery.com/packages/ISHDeploy/). Other module variants are also possible
 1. Run Pester tests
 
 ## Load the data container json file
