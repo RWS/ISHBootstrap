@@ -1,6 +1,7 @@
 # Change log
 
 ## next release
+- GH-107: Changes required for new 'ISHCS' web application (InstallTool inputparameters)
 - GH-102: Database - Add the option to restore the Demo or and Empty database from the ISHCD as local/'mock' database
 - GH-101: DevelopFriendly - Improve PowerShell scripts to help in troubleshooting instances
 - GH-100: Update the example scripts to use the 'versionless' ISHDeploy module
