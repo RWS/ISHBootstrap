@@ -77,6 +77,7 @@ $newParameterScriptBlock={
 
     $isMatch=$Name -match "InfoShare(?<suffix>.*)"
     $suffix=$Matches["suffix"]
+    $major=($ISHVersion -split '\.')[0]
 
     $computerName=$env:COMPUTERNAME.ToLower()
     $infosharestswebappname="ISHSTS$suffix".ToLower()
@@ -152,6 +153,10 @@ $newParameterScriptBlock={
     }
 
     $inputParameters["infoshareauthorwebappname"]="ISHCM$suffix".ToLower()
+    if($major -ge 14)
+    {
+        $inputParameters["infosharecswebappname"]="ISHCS$suffix".ToLower()
+    }
     $inputParameters["infosharewswebappname"]="ISHWS$suffix".ToLower()
     $inputParameters["infosharestswebappname"]=$infosharestswebappname
     $inputParameters["servicecertificatethumbprint"]=$serviceCertificateThumbprint
