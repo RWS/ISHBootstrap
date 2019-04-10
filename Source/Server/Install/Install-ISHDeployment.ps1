@@ -399,7 +399,7 @@ try
     Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $newParameterScriptBlock -BlockName $blockName -UseParameters @("cdPath","ISHVersion","OSUserCredential","ConnectionString","IsOracle","Name","RootPath","LucenePort","UseRelativePaths")
     $blockName="Making sure that the minLevel of the File logger is set to 'Debug' for InstallTool"
     Write-Progress @scriptProgress -Status $blockName
-    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $logLevelScriptBlock -BlockName $blockName -UseParameters @("cdPath")
+    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $logLevelScriptBlock -BlockName $blockName -UseParameters @("cdPath","ISHVersion")
     
     $blockName="Installing $Name"
     Write-Progress @scriptProgress -Status $blockName
