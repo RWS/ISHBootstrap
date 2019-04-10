@@ -324,6 +324,15 @@ $newParameterScriptBlock={
 }
 
 $logLevelScriptBlock={
+    $major=($ISHVersion -split '\.')[0]
+    if($major -ge 14)
+    {
+        $requiredLevel="Info"
+    }
+    else
+    {
+        $requiredLevel="Debug"
+    }
     $installToolNlogPath=Join-Path $CDPath "__InstallTool\NLog.config"
     Write-Debug "installToolNlogPath=$installToolNlogPath"
 
@@ -336,12 +345,16 @@ $logLevelScriptBlock={
     $xpathFileLoggerRule='ns:nlog/ns:rules/ns:logger[@writeTo="File"]'
     $nodeFileLoggerRule=$xml.SelectSingleNode($xpathFileLoggerRule, $nsmgr)
 
-    if ($nodeFileLoggerRule.minLevel -ne "Debug")
+    if ($nodeFileLoggerRule.minLevel -ne $requiredLevel)
     {
-        Write-Warning "Changing the minLevel attribute of the File logger from '$($nodeFileLoggerRule.minLevel)' to 'Debug'"
+        Write-Warning "Changing the minLevel attribute of the File logger from '$($nodeFileLoggerRule.minLevel)' to '$($requiredLevel)'"
         $nodeFileLoggerRule.minLevel="Debug"
         $xml.Save($installToolNlogPath)
         Write-Verbose "Saved to $installToolNlogPath"
+    }
+    else
+    {
+        Write-Warning "The minLevel attribute of the File logger is already set to '$($requiredLevel)'"
     }
 }
 
@@ -386,7 +399,7 @@ try
     Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $newParameterScriptBlock -BlockName $blockName -UseParameters @("cdPath","ISHVersion","OSUserCredential","ConnectionString","IsOracle","Name","RootPath","LucenePort","UseRelativePaths")
     $blockName="Making sure that the minLevel of the File logger is set to 'Debug' for InstallTool"
     Write-Progress @scriptProgress -Status $blockName
-    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $logLevelScriptBlock -BlockName $blockName -UseParameters @("cdPath")
+    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $logLevelScriptBlock -BlockName $blockName -UseParameters @("cdPath","ISHVersion")
     
     $blockName="Installing $Name"
     Write-Progress @scriptProgress -Status $blockName
