@@ -19,7 +19,7 @@ But keep in mind that this is just an example.
 With the ISHBootstrapper the following flow gets automated for a clean/default Windows Server 2016 installation
 
 1. Enable and configure the **WinRM** (Windows Remoting) for secure connections and `CredSSP`
-1. Install Content Manager prerequisites as described in the [documentation](https://docs.sdl.com/LiveContent/web/pub.xql?action=home&pub=SDL%20Knowledge%20Center%20full%20documentation-v3&lang=en-US)
+1. Install Content Manager prerequisites as described in the [documentation](https://docs.sdl.com/LiveContent/), under the section 'SDL Tridion Docs'.
 1. Copy the deliverable of the Content Manager CD
 1. Install Content Manager. One or more deployments.
 1. Execute [ISHDeploy](https://powershellgallery.com/packages/ISHDeploy/) based code as configuration scripts
