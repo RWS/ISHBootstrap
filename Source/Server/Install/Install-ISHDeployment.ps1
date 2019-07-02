@@ -77,7 +77,10 @@ $newParameterScriptBlock={
 
     $isMatch=$Name -match "InfoShare(?<suffix>.*)"
     $suffix=$Matches["suffix"]
+    $major=($ISHVersion -split '\.')[0]
 
+    $revision=($ISHVersion -split '\.')[2]
+    
     $computerName=$env:COMPUTERNAME.ToLower()
     $infosharestswebappname="ISHSTS$suffix".ToLower()
 
@@ -152,6 +155,10 @@ $newParameterScriptBlock={
     }
 
     $inputParameters["infoshareauthorwebappname"]="ISHCM$suffix".ToLower()
+    if($major -ge 14)
+    {
+        $inputParameters["infosharecswebappname"]="ISHCS$suffix".ToLower()
+    }
     $inputParameters["infosharewswebappname"]="ISHWS$suffix".ToLower()
     $inputParameters["infosharestswebappname"]=$infosharestswebappname
     $inputParameters["servicecertificatethumbprint"]=$serviceCertificateThumbprint
@@ -167,6 +174,15 @@ $newParameterScriptBlock={
     if($MachineName)
     {
         $inputParameters["machinename"]=$MachineName
+    }
+    
+    if($major -eq 13 -and $revision -ge 2)
+    {
+        # With the introduction of AdoptOpenJDK/JRE as the default for 13.0.2, we need to set the ps_java_home when using JDK8
+        # We cannot use AdoptOpenJDK, since ISHServer that drives the download/install of prerequisites does not (yet) have a notion of SPs
+        $value=Get-ChildItem -Path $Env:ProgramFiles\Java |Sort-Object -Property Name -Descending|Select-Object -First 1 -ExpandProperty FullName
+        $inputParameters["ps_java_home"]="$value"
+        $inputParameters["ps_java_jvmdll"]="$value\bin\server\jvm.dll"
     }
 
     $inputParametersPath=Join-Path $CDPath "__InstallTool\inputparameters.xml"
@@ -318,9 +334,44 @@ $newParameterScriptBlock={
     
 }
 
+$logLevelScriptBlock={
+    $major=($ISHVersion -split '\.')[0]
+    if($major -ge 14)
+    {
+        $requiredLevel="Info"
+    }
+    else
+    {
+        $requiredLevel="Debug"
+    }
+    $installToolNlogPath=Join-Path $CDPath "__InstallTool\NLog.config"
+    Write-Debug "installToolNlogPath=$installToolNlogPath"
+
+    [xml]$xml=Get-Content -Path $installToolNlogPath -Raw
+
+    $nsmgr = New-Object System.Xml.XmlNamespaceManager $xml.NameTable
+    $nsmgr.AddNamespace('ns','http://www.nlog-project.org/schemas/NLog.xsd')
+
+    # Check if the debug level for the File target is set to Debug
+    $xpathFileLoggerRule='ns:nlog/ns:rules/ns:logger[@writeTo="File"]'
+    $nodeFileLoggerRule=$xml.SelectSingleNode($xpathFileLoggerRule, $nsmgr)
+
+    if ($nodeFileLoggerRule.minLevel -ne $requiredLevel)
+    {
+        Write-Warning "Changing the minLevel attribute of the File logger from '$($nodeFileLoggerRule.minLevel)' to '$($requiredLevel)'"
+        $nodeFileLoggerRule.minLevel="Debug"
+        $xml.Save($installToolNlogPath)
+        Write-Verbose "Saved to $installToolNlogPath"
+    }
+    else
+    {
+        Write-Warning "The minLevel attribute of the File logger is already set to '$($requiredLevel)'"
+    }
+}
+
 $installScriptBlock={
     [int]$major=($ISHVersion -split '\.')[0]
-    if($major -ge 13)
+    if($major -eq 13)
     {
         # Fixing JAVA_HOME not set because we didn't restart
         $envVarName="JAVA_HOME"
@@ -357,6 +408,9 @@ try
     $blockName="Creating new deployment parameters for $Name"
     Write-Progress @scriptProgress -Status $blockName
     Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $newParameterScriptBlock -BlockName $blockName -UseParameters @("cdPath","ISHVersion","OSUserCredential","ConnectionString","IsOracle","Name","RootPath","LucenePort","UseRelativePaths")
+    $blockName="Making sure that the minLevel of the File logger is set to 'Debug' for InstallTool"
+    Write-Progress @scriptProgress -Status $blockName
+    Invoke-CommandWrap -ComputerName $Computer -Credential $Credential -ScriptBlock $logLevelScriptBlock -BlockName $blockName -UseParameters @("cdPath","ISHVersion")
     
     $blockName="Installing $Name"
     Write-Progress @scriptProgress -Status $blockName

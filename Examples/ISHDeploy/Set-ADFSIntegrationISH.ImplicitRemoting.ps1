@@ -59,7 +59,7 @@ try
 
     if($Computer)
     {
-        $ishDelpoyModuleName="ISHDeploy.$ISHVersion"
+        $ishDelpoyModuleName="ISHDeploy"
         $remote=Add-ModuleFromRemote -ComputerName $Computer -Credential $Credential -Name $ishDelpoyModuleName
     }
     $remoteADFS=Add-ModuleFromRemote -ComputerName $adfsComputerName -Name ADFS

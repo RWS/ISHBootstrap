@@ -3,7 +3,7 @@
 param(
     [Parameter(Mandatory=$true,ParameterSetName="From AWS S3")]
     [Parameter(Mandatory=$true,ParameterSetName="From FTP")]
-    [ValidateSet("12.0.3","12.0.4","13.0.0")]
+    [ValidateSet("12.0.3","12.0.4","13.0.0","13.0.1","13.0.2","14.0.0")]
     [string]$ISHVersion,
     [Parameter(Mandatory=$false,ParameterSetName="From AWS S3")]
     [Parameter(Mandatory=$false,ParameterSetName="From FTP")]
@@ -34,7 +34,7 @@ Get-PackageProvider -Name NuGet -ForceBootstrap | Out-Null
 
 #region Installing modules
 $moduleNames=@(
-    "ISHDeploy.$ISHVersion"
+    "ISHDeploy"
     "CertificatePS"
     "PoshPrivilege"
 )

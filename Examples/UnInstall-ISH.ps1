@@ -31,7 +31,7 @@ $ishVersion=Get-ISHBootstrapperContextValue -ValuePath "ISHVersion"
 
 
 $getDeploymentsBlock= {
-    $ishDeployModuleName="ISHDeploy.$ishVersion"
+    $ishDeployModuleName="ISHDeploy"
     if(Get-Module $ishDeployModuleName -ListAvailable)
     {
         Get-ISHDeployment |Select-Object -ExpandProperty Name

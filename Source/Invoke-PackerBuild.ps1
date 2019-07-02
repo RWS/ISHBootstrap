@@ -24,8 +24,9 @@ param(
     [string]$ISOChecksumType="SHA1",
     [Parameter(Mandatory=$false,ParameterSetName="Vagrant Hyper-V")]
     [string]$SwitchName="External Virtual Switch",
+    [Parameter(Mandatory=$false,ParameterSetName="AWS EC2 AMI")]
     [Parameter(Mandatory=$false,ParameterSetName="Vagrant Hyper-V")]
-    [ValidateSet('2012_R2', '2016')]
+    [ValidateSet('2012_R2', '2016', '2019')]
     [string]$ServerVersion="2016",
     [Parameter(Mandatory=$false,ParameterSetName="Vagrant Hyper-V")]
     [string]$OutputPath="$env:TEMP",
@@ -81,10 +82,24 @@ switch ($PSCmdlet.ParameterSetName) {
         }
         else
         {
-            Write-Host "Using Microsoft Windows Server 2012 R2 with SQL Server Express AMI ImageId for region $Region"
+            if ($ServerVersion -eq "2016")
+            {
+                $imageName="WINDOWS_2016_SQL_SERVER_EXPRESS_2016"
+                Write-Verbose "Using Microsoft Windows Server 2016 with SQL Server Express 2016 AMI ImageId for region $Region"
+                $sourceAMI=(Get-EC2ImageByName -Name $imageName -Region $Region).ImageId
+                $packerFileName="mssql2016-ish-amazon-ebs.json"
+            }
+            elseif ($ServerVersion -eq "2012_R2")
+            {
             $imageName="WINDOWS_2012R2_SQL_SERVER_EXPRESS_2014"
-            $sourceAMI=(Get-EC2ImageByName -Name $imageName -Region $region).ImageId
+                Write-Verbose "Using Microsoft Windows Server 2012 R2 with SQL Server Express 2014 AMI ImageId for region $Region"
+                $sourceAMI=(Get-EC2ImageByName -Name $imageName -Region $Region).ImageId
             $packerFileName="mssql2014-ish-amazon-ebs.json"
+            }
+            else
+            {
+                Throw "Unsupported ServerVersion '$ServerVersion' for building AWS AMI's without providing a mock connectionstring"
+            }
         }
         Write-Host "Building with $SourceAMI image id"
 
