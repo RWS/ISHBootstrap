@@ -1,6 +1,7 @@
 # Change log
 
-## next release
+## release v1.3
+
 - GH-107: Changes required for new 'ISHCS' web application (InstallTool inputparameters)
 - GH-102: Database - Add the option to restore the Demo or and Empty database from the ISHCD as local/'mock' database
 - GH-101: DevelopFriendly - Improve PowerShell scripts to help in troubleshooting instances
@@ -13,7 +14,7 @@
 - GH-86: Make it possible to initialize an image with only the third party software prerequisites and/or the Application prerequisites and installation
 - GH-85: Make sure that the minLevel of the File logger is set to 'Debug' for InstallTool
 - GH-84: Add installation of AdoptOpenJDK and JRE pre-requisite
-- GH-xx: Update valid/supported versions (released: 13.0.1, 13.0.2, not released 14.0.0).
+- Update valid/supported versions (released: 13.0.1, 13.0.2, not released 14.0.0).
 
 ## release v1.2
 

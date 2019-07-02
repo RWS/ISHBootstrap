@@ -1,22 +1,28 @@
 # ISHBootstrap
-Bootstrapper for [SDL Knowledge Center](https://sdl.com/xml) Content Manager deployments
+Bootstrapper for deployments of [SDL Tridion Docs](https://sdl.com/xml) Content Manager (Knowledge Center Content Manager, LiveContent Architect, Trisoft InfoShare)
 
 # Description
 
-For those who don't like repetitive tasks, this repository is all about automating the deployment of [SDL Knowledge Center](sdl.com/xml) Content Manager.
-[SDL Knowledge Center](sdl.com/xml) Content Manager is also known as with historical names ~~Trisoft~~, ~~InfoShare~~ or as we recently established **ISH**.
+For those who don't like repetitive tasks, this repository is all about automating the deployment of [SDL Tridion Docs](https://sdl.com/xml) Content Manager.
+[SDL Tridion Docs](https://sdl.com/xml) Content Manager is also known under its historical product names Knowledge Center Content Manager, LiveContent Architect, Trisoft InfoShare.
 
-I initially started this codebase as my own internal automation for a lab that I use to experiment with [ISHDeploy](https://sarafian.github.io/tags/#ISHDeploy). 
-This repository is a port of that code base combined with some effort to improve it.
+ISHBootstrap gives you the ability to bootstrap a clean Windows Server (bare metal, virtualized, cloud) and turn it into a fully operational Content Manager (ISH) deployment.
+The bootstrapping can be executed locally or against a remote server using Windows remoting.
+The supported operating systems are Windows Server 2012R2, 2016, 2019.
+
+[How to use the repository (Examples)](Tutorials/How%20to%20use%20the%20repository%20(Examples).md) showcases how the complete process could look like, driven by a json file. 
+But keep in mind that this is just an example.
+
+[How to use the repository (Builders)](Tutorials/How%20to%20use%20the%20repository%20(Builders).md) explains how to use the 'builders' to build artifacts such as Amazon Web Services (AWS) EC2 AMI or Hyper-V Vagrant boxes.
 
 # Goal 
 With the ISHBootstrapper the following flow gets automated for a clean/default Windows Server 2016 installation
 
 1. Enable and configure the **WinRM** (Windows Remoting) for secure connections and `CredSSP`
-1. Install Content Manager prerequisites as described in the [documentation](https://docs.sdl.com/LiveContent/web/pub.xql?action=home&pub=SDL%20Knowledge%20Center%20full%20documentation-v3&lang=en-US)
+1. Install Content Manager prerequisites as described in the [documentation](https://docs.sdl.com/LiveContent/), under the section 'SDL Tridion Docs'.
 1. Copy the deliverable of the Content Manager CD
 1. Install Content Manager. One or more deployments.
-1. Execute [ISHDeploy](powershellgallery.com/packages/ISHDeploy/) based code as configuration scripts
+1. Execute [ISHDeploy](https://powershellgallery.com/packages/ISHDeploy/) based code as configuration scripts
 
 Do all of the above with minimum manual actions and all should work locally and remotely. 
 At the end the dream goal is to execute a seamless update of a Content Manager deployments   
@@ -30,7 +36,7 @@ For this reason, some remote instructions fill face the double hop limitation de
 
 # Using the repository
 
-Tutorials are also provided in [Tutorials](Tutorials) folder.
+As mentioned before some tutorials are provided in the [Tutorials](Tutorials) folder.
 
 # Future
 
@@ -40,7 +46,3 @@ Potential targets of a trigger can be:
 - Deliver a collection of servers.
 - Spin up a server on demand and then take it down.
 - Spin up a environment for full client/api/data testing and then take it down.
-
-# Acknowledgements
-
-This a **personal** effort and by **no means** reflects an official deliverable for [SDL](sdl.com).
