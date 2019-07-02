@@ -1,6 +1,6 @@
 # How to use the repository (Examples)
 
-Starting from a clean server operating system this how you end up with a [SDL Knowledge Center 2018](sdl.com/xml) Content Manager Deployment.
+Starting from a clean server operating system this how you end up with a [SDL Knowledge Center 2018](https://sdl.com/xml) Content Manager Deployment.
 
 # Acknowledgements
 

@@ -3,8 +3,17 @@ Bootstrapper for deployments of [SDL Tridion Docs](https://sdl.com/xml) Content 
 
 # Description
 
-For those who don't like repetitive tasks, this repository is all about automating the deployment of [SDL Tridion Docs](sdl.com/xml) Content Manager.
-[SDL Tridion Docs](sdl.com/xml) Content Manager is also known as (historical product names): Knowledge Center Content Manager, LiveContent Architect, Trisoft InfoShare or as we recently established **ISH**.
+For those who don't like repetitive tasks, this repository is all about automating the deployment of [SDL Tridion Docs](https://sdl.com/xml) Content Manager.
+[SDL Tridion Docs](https://sdl.com/xml) Content Manager is also known under its historical product names Knowledge Center Content Manager, LiveContent Architect, Trisoft InfoShare.
+
+ISHBootstrap gives you the ability to bootstrap a clean Windows Server (bare metal, virtualized, cloud) and turn it into a fully operational Content Manager (ISH) deployment.
+The bootstrapping can be executed locally or against a remote server using Windows remoting.
+The supported operating systems are Windows Server 2012R2, 2016, 2019.
+
+[How to use the repository (Examples)](Tutorials/How%20to%20use%20the%20repository%20(Examples).md) showcases how the complete process could look like, driven by a json file. 
+But keep in mind that this is just an example.
+
+[How to use the repository (Builders)](Tutorials/How%20to%20use%20the%20repository%20(Builders).md) explains how to use the 'builders' to build artifacts such as Amazon Web Services (AWS) EC2 AMI or Hyper-V Vagrant boxes.
 
 # Goal 
 With the ISHBootstrapper the following flow gets automated for a clean/default Windows Server 2016 installation
@@ -27,7 +36,7 @@ For this reason, some remote instructions fill face the double hop limitation de
 
 # Using the repository
 
-Tutorials are also provided in [Tutorials](Tutorials) folder.
+As mentioned before some tutorials are provided in the [Tutorials](Tutorials) folder.
 
 # Future
 
