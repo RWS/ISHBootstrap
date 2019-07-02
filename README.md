@@ -1,13 +1,10 @@
 # ISHBootstrap
-Bootstrapper for [SDL Knowledge Center](https://sdl.com/xml) Content Manager deployments
+Bootstrapper for deployments of [SDL Tridion Docs](https://sdl.com/xml) Content Manager (Knowledge Center Content Manager, LiveContent Architect, Trisoft InfoShare)
 
 # Description
 
-For those who don't like repetitive tasks, this repository is all about automating the deployment of [SDL Knowledge Center](sdl.com/xml) Content Manager.
-[SDL Knowledge Center](sdl.com/xml) Content Manager is also known as with historical names ~~Trisoft~~, ~~InfoShare~~ or as we recently established **ISH**.
-
-I initially started this codebase as my own internal automation for a lab that I use to experiment with [ISHDeploy](https://sarafian.github.io/tags/#ISHDeploy). 
-This repository is a port of that code base combined with some effort to improve it.
+For those who don't like repetitive tasks, this repository is all about automating the deployment of [SDL Tridion Docs](sdl.com/xml) Content Manager.
+[SDL Tridion Docs](sdl.com/xml) Content Manager is also known as (historical product names): Knowledge Center Content Manager, LiveContent Architect, Trisoft InfoShare or as we recently established **ISH**.
 
 # Goal 
 With the ISHBootstrapper the following flow gets automated for a clean/default Windows Server 2016 installation
@@ -40,7 +37,3 @@ Potential targets of a trigger can be:
 - Deliver a collection of servers.
 - Spin up a server on demand and then take it down.
 - Spin up a environment for full client/api/data testing and then take it down.
-
-# Acknowledgements
-
-This a **personal** effort and by **no means** reflects an official deliverable for [SDL](sdl.com).
