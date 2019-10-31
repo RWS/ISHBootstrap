@@ -1,6 +1,6 @@
 ﻿param(
     [Parameter(Mandatory=$true)]
-    [ValidateSet("12.0.3","12.0.4","13.0.0","13.0.1","13.0.2","14.0.0")]
+    [ValidateSet("12.0.3","12.0.4","13.0.0","13.0.1","13.0.2","14.0.0","14.0.1")]
     [string]$ISHVersion,
     [Parameter(Mandatory=$false)]
     [switch]$EmptyDB
