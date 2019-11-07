@@ -3,6 +3,7 @@
 ## release v1.4
 
 - GH-119: Update valid/supported versions (released: 13.0.1, 13.0.2, 14.0.0, not released 14.0.1)
+- GH-121: Update valid/supported versions (add not released 14.0.2)
 
 ## release v1.3
 

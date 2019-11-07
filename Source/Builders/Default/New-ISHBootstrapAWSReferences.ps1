@@ -62,7 +62,15 @@ switch($ISHVersion) {
             BucketName="sct-notreleased"
             ISHServerFolder="InfoShare/14.0/PreRequisites"
             ISHCDFolder="InfoShare/14.0/"
-            ISHCDFileName="20191030.CD.InfoShare.14.0.3430.1.Test.Trisoft-DITA-OT.exe"
+            ISHCDFileName="20191106.CD.InfoShare.14.0.3506.1.Test.Trisoft-DITA-OT.exe"
+        }
+    }
+    '14.0.2' {
+        $hash=@{
+            BucketName="sct-notreleased"
+            ISHServerFolder="InfoShare/14.0/PreRequisites"
+            ISHCDFolder="InfoShare/14.0/"
+            ISHCDFileName="20191107.CD.InfoShare.14.0.3507.2.Test.Trisoft-DITA-OT.exe"
         }
     }
 }
