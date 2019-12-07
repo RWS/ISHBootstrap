@@ -57,7 +57,7 @@ $segments=@(
     $ishCDPath
     "Database"
     "Dump"
-    "SQLServer2014"
+    "SQLServer*"
 )
 
 if ($EmptyDB.IsPresent)

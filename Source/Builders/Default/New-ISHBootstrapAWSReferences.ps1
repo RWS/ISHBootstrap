@@ -1,6 +1,6 @@
 param(
     [Parameter(Mandatory=$true)]
-    [ValidateSet("12.0.3","12.0.4","13.0.0","13.0.1","13.0.2","14.0.0")]
+    [ValidateSet("12.0.3","12.0.4","13.0.0","13.0.1","13.0.2","14.0.0","14.0.1","14.0.2")]
     [string]$ISHVersion
 )
 
@@ -59,10 +59,10 @@ switch($ISHVersion) {
     }
     '14.0.1' {
         $hash=@{
-            BucketName="sct-notreleased"
+            BucketName="sct-released"
             ISHServerFolder="InfoShare/14.0/PreRequisites"
             ISHCDFolder="InfoShare/14.0/"
-            ISHCDFileName="20191106.CD.InfoShare.14.0.3506.1.Test.Trisoft-DITA-OT.exe"
+            ISHCDFileName="20191206.CD.InfoShare.14.0.3606.1.Trisoft-DITA-OT.exe"
         }
     }
     '14.0.2' {

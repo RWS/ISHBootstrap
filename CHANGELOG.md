@@ -4,6 +4,7 @@
 
 - GH-119: Update valid/supported versions (released: 13.0.1, 13.0.2, 14.0.0, not released 14.0.1)
 - GH-121: Update valid/supported versions (add not released 14.0.2)
+- GH-126: Restore mock database has a fixed sqlserver2014 path to the demo or empty database. Use wildcard.
 
 ## release v1.3
 
