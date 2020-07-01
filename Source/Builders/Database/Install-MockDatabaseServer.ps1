@@ -1,6 +1,6 @@
 ﻿param(
     [Parameter(Mandatory=$true,ParameterSetName="Database")]
-    [ValidateSet("12.0.3","12.0.4","13.0.0","13.0.1","13.0.2","14.0.0","14.0.1","14.0.2")]
+    [ValidateSet("12.0.3","12.0.4","13.0.0","13.0.1","13.0.2","14.0.0","14.0.1","14.0.2","14.0.3","15.0.0")]
     [string]$ISHVersion,
     [Parameter(Mandatory=$false,ParameterSetName="Database")]
     [string]$MockConnectionString=$null
@@ -29,7 +29,7 @@ if($mockDatabase)
     switch -regex ($ISHVersion) {
         '12.0.3|12.0.4' {$sql_express_download_url= $sql_express_2014_download_url}
         '13.0.0|13.0.1' {$sql_express_download_url= $sql_express_2016_download_url}
-        '13.0.2|14.0.0|14.0.1|14.0.2' {$sql_express_download_url= $sql_express_2017_download_url}
+        '13.0.2|14.0.0|14.0.1|14.0.2|14.0.3|15.0.0' {$sql_express_download_url= $sql_express_2017_download_url}
         default         {$sql_express_download_url= $sql_express_2017_download_url}
     }
     $sqlExpressPath=Join-Path $PSScriptRoot "sqlexpress.exe"
