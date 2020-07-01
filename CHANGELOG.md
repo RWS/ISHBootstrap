@@ -2,7 +2,7 @@
 
 ## release v1.5
 
-- GH-128: Update valid/supported versions (released 14.0.2, unreleased 15.0.0)
+- GH-128: Update valid/supported versions (released 14.0.2, unreleased 15.0.0 and 14.0.3)
 
 ## release v1.4
 
