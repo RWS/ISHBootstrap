@@ -1,5 +1,9 @@
 # Change log
 
+## release v1.5
+
+- GH-128: Update valid/supported versions (released 14.0.2, unreleased 15.0.0)
+
 ## release v1.4
 
 - GH-119: Update valid/supported versions (released: 13.0.1, 13.0.2, 14.0.0, not released 14.0.1)
