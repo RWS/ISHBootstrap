@@ -80,7 +80,10 @@ try
     {
         Install-ISHToolOracleODAC
     }
-
+    if($ISHServerVersion -eq "15")
+    {
+        Install-ISHDotNetHosting 
+    }
     Write-Progress @scriptProgress -Status "Initializing"
     Initialize-ISHLocale
     Initialize-ISHIIS
