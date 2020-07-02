@@ -20,7 +20,7 @@ param (
     [Parameter(Mandatory=$false)]
     [pscredential]$Credential=$null,
     [Parameter(Mandatory=$true)]
-    [ValidateSet("12","13","14")]
+    [ValidateSet("12","13","14","15")]
     [string]$ISHServerVersion
 )    
 $cmdletsPaths="$PSScriptRoot\..\..\Cmdlets"
