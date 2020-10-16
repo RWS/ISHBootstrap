@@ -68,6 +68,7 @@ try
     {
         Install-ISHToolAdoptOpenJRE
         Install-ISHToolAdoptOpenJDK
+        Install-ISHDotNetHosting
     }
     else
     {
@@ -79,10 +80,6 @@ try
     if($InstallOracle)
     {
         Install-ISHToolOracleODAC
-    }
-    if($ISHServerVersion -eq "15")
-    {
-        Install-ISHDotNetHosting 
     }
     Write-Progress @scriptProgress -Status "Initializing"
     Initialize-ISHLocale
