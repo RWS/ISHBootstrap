@@ -1,17 +1,16 @@
 # Change log
 
-## release v1.5
-
-- GH-128: Update valid/supported versions (released 14.0.2, unreleased 15.0.0 and 14.0.3)
-
 ## release v1.4
 
+- GH-130: Install .NET Core Hosting (future v15.0.0)
+- GH-128: Update valid/supported versions (released 14.0.2, 14.0.3 and unreleased 15.0.0)
 - GH-119: Update valid/supported versions (released: 13.0.1, 13.0.2, 14.0.0, not released 14.0.1)
 - GH-121: Update valid/supported versions (add not released 14.0.2)
 - GH-126: Restore mock database has a fixed sqlserver2014 path to the demo or empty database. Use wildcard.
 
 ## release v1.3
 
+- GH-111: Packer - Provide the correct ps_java_... inputparameters
 - GH-107: Changes required for new 'ISHCS' web application (InstallTool inputparameters)
 - GH-102: Database - Add the option to restore the Demo or and Empty database from the ISHCD as local/'mock' database
 - GH-101: DevelopFriendly - Improve PowerShell scripts to help in troubleshooting instances
