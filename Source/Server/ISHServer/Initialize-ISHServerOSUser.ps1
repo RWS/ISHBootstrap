@@ -28,7 +28,7 @@ param (
     [PSCredential]$OSUserCredential,
     [Parameter(Mandatory=$true,ParameterSetName="Local")]
     [Parameter(ParameterSetName="Remote")]
-    [ValidateSet("12","13","14")]
+    [ValidateSet("12","13","14","15")]
     [string]$ISHServerVersion
 )    
 $cmdletsPaths="$PSScriptRoot\..\..\Cmdlets"
