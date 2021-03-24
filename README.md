@@ -1,48 +1,64 @@
-# ISHBootstrap
-Bootstrapper for deployments of [SDL Tridion Docs](https://sdl.com/xml) Content Manager (Knowledge Center Content Manager, LiveContent Architect, Trisoft InfoShare)
+# ISHBootstrap: The Module
 
-# Description
+Up until now, ISHBootstrap was just a collection of PowerShell scripts and examples to automate the installation of Tridion Docs. 
+Starting from the preparation of the OS, the OS users, the installation of third party prerequisites (using [ISHServer](https://github.com/sdl/ISHServer)) up to an OOTB/Vanilla installation of Tridion Docs ([README_ISHBootstrap_Scripts.md](./README_ISHBootstrap_Scripts.md)).
 
-For those who don't like repetitive tasks, this repository is all about automating the deployment of [SDL Tridion Docs](https://sdl.com/xml) Content Manager.
-[SDL Tridion Docs](https://sdl.com/xml) Content Manager is also known under its historical product names Knowledge Center Content Manager, LiveContent Architect, Trisoft InfoShare.
+It only included some basic configuration/customization examples (using [ISHDeploy](https://www.powershellgallery.com/packages/ISHDeploy)). 
+We now added an **ISHBootstrap PowerShell Module**, to introduce a **common standard way of:** 
 
-ISHBootstrap gives you the ability to bootstrap a clean Windows Server (bare metal, virtualized, cloud) and turn it into a fully operational Content Manager (ISH) deployment.
-The bootstrapping can be executed locally or against a remote server using Windows remoting.
-The supported operating systems are Windows Server 2012R2, 2016, 2019.
+- **Specifying the intent of your Tridion Docs deployment** 
+- **Organizing your configuring/customizing scripts**
+- **Applying your configuration/customization scripts**
 
-[How to use the repository (Examples)](Tutorials/How%20to%20use%20the%20repository%20(Examples).md) showcases how the complete process could look like, driven by a json file. 
-But keep in mind that this is just an example.
+The module is not focused on cmdlets to configure/customize Tridion Docs, but on organizing and sequencing the configuration/customization scripts.
 
-[How to use the repository (Builders)](Tutorials/How%20to%20use%20the%20repository%20(Builders).md) explains how to use the 'builders' to build artifacts such as Amazon Web Services (AWS) EC2 AMI or Hyper-V Vagrant boxes.
+Over time, the initial scripts and examples to automate the installation of Tridion Docs will also be incorporated in the PowerShell module, but **for now the ISHBootstrap PowerShell Module is focused on the configuration/customization of Tridion Docs.**
 
-# Goal 
-With the ISHBootstrapper the following flow gets automated for a clean/default Windows Server 2016 installation
 
-1. Enable and configure the **WinRM** (Windows Remoting) for secure connections and `CredSSP`
-1. Install Content Manager prerequisites as described in the [documentation](https://docs.sdl.com/LiveContent/), under the section 'SDL Tridion Docs'.
-1. Copy the deliverable of the Content Manager CD
-1. Install Content Manager. One or more deployments.
-1. Execute [ISHDeploy](https://powershellgallery.com/packages/ISHDeploy/) based code as configuration scripts
+# ISHBootstrap: Some Concepts
+We first want to introduce the high level concepts of this standardized way of  configuring/customizing Tridion Docs.
 
-Do all of the above with minimum manual actions and all should work locally and remotely. 
-At the end the dream goal is to execute a seamless update of a Content Manager deployments   
+## The Starting Point
 
-**Remarks**:
+Before you start using the ISHBootstrap Module to configure/customize Tridion Docs, we assume you have:
 
-- Typically a Content Manager deployment is deployed on a server already part of Active Directory. 
-For this reason, some remote instructions fill face the double hop limitation described in [Powershell Remoting Caveats](https://sarafian.github.io/2016/07/05/remoting-caveats.html) and to work around the problem sessions with `CredSSP` will be required.
-- Not all modules available here will be published to PowerShell gallery. Setting up an internal nuget repository is easy. The process is described [here](https://docs.nuget.org/create/hosting-your-own-nuget-feeds).
-- To avoid revealing internal asset names some variables will not be defined in code but we'll be acquired with cmdlets such as `Get-Variable`
+- A working OOTB/Vanilla Tridion Docs installation (manually installed or using ISHBootstrap/ISHServer or ...).
+- Installed all PowerShell Modules ISHBootstrap depends on (Install-ISHBootstrapPrerequisites.ps1)
 
-# Using the repository
+## The Deployment Configuration
 
-As mentioned before some tutorials are provided in the [Tutorials](Tutorials) folder.
+Some minimal information is needed to drive the automated configuration/customization of Tridion Docs. The ISHBootstrap Module contains cmdlets to create that configuration file.
 
-# Future
+## The Roles and Components
 
-If you can fully automate the delivery of a deployment then you can trigger this from any Continuous Integration (CI) system. 
-Potential targets of a trigger can be:
+The ISHBootstrap Module also provides cmdlets to tag a Tridion Docs server with a certain **Role**. That role determines, which Tridion Docs **Components** need to be configured, enabled and/or started on that Tridion Docs server.
+ISHBootstrap provides cmdlets to:
 
-- Deliver a collection of servers.
-- Spin up a server on demand and then take it down.
-- Spin up a environment for full client/api/data testing and then take it down.
+- Tag a system with a certain Role and it's Components
+- Test if a server is tagged with a certain Role and/or Component.
+
+Using these Role and Components as a condition in your scripts to configure/customize Tridion Docs, makes them for instance portable across the different stages of a Tridion Docs deployment, e.g. from development (one server) to staging, production (multiple servers).  
+
+## The Deployment Sequence
+
+The ISHBootstrap Module provides a cmdlet to **start the configuration/customization of Tridion Docs in a certain standardized sequence**. During the execution of this sequence, entry-points/hooks are foreseen that can execute certain specific configuration/customization scripts you developed.
+
+## IMPORTANT
+Up until now, we did not do anything to actually make changes to the configuration or to customize Tridion Docs. We just agreed and standardized on:
+
+1. The starting point
+2. The configuration
+3. The roles/components
+4. The deployment sequence
+
+The actual configuration/customization is done in the next most important part. The implementation of the Recipe
+
+## The Recipe
+
+The **Recipe** is **a standardized, pre-defined, structured collection of scripts and resources that hook into the Deployment Sequence**. It provides template scripts where your specific configuration and customization code or scripts can be added or included in a particular step of the sequence.
+
+The ISHBootstrap module contains a cmdlet to create an 'empty' Recipe which you can use to start implementing your custom Recipe.
+
+# ISHBootstrap: How To Use The Module
+
+ Detailed information on how to use the ISHBootstrap PowerShell Module can be found in the [HOWTO.md](./HOWTO.md).

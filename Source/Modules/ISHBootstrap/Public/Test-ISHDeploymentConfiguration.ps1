@@ -1,0 +1,112 @@
+<#
+.Synopsis
+   Validate Deployment configuration (project/stage)
+.DESCRIPTION
+   Validate Deployment configuration (project/stage)
+.EXAMPLE
+   Test-ISHDeploymentConfiguration -ConfigFile cofigfile -ISBootstrapVersion 2.0 -Project project -Stage stage
+#>
+Function Test-ISHDeploymentConfiguration {
+   [CmdletBinding()]
+   param(
+      [Parameter(Mandatory = $true)]
+      [ValidateScript( { Test-Path $_ })]
+      [string]$ConfigFile,
+      [Parameter(Mandatory = $true)]
+      [string]$ISBootstrapVersion,
+      [Parameter(Mandatory = $true)]
+      [string]$Project,
+      [Parameter(Mandatory = $true)]
+      [string]$Stage
+   )
+
+   begin {
+      Write-Debug "PSCmdlet.ParameterSetName=$($PSCmdlet.ParameterSetName)"
+      foreach ($psbp in $PSBoundParameters.GetEnumerator()) { Write-Debug "$($psbp.Key)=$($psbp.Value)" }
+   }
+
+   process {
+      $keyValues = Get-Content -Raw -Path $ConfigFile | ConvertFrom-Json
+      Write-Verbose "Reed existing $ConfigFile"
+      if (-not $keyValues.$ISBootstrapVersion.Project.$Project.$Stage) {
+         throw "Project/Stage $Project/$Stage does not exist."
+      }
+      if (-not $keyValues.$ISBootstrapVersion.Project.$Project.$Stage.Description) {
+         throw "Key $Project/$Stage/Description does not exist."
+      }
+      if (-not $keyValues.$ISBootstrapVersion.Project.$Project.$Stage.Hostname) {
+         throw "Key $Project/$Stage/Hostname does not exist."
+      }
+      if (-not $keyValues.$ISBootstrapVersion.Project.$Project.$Stage.ISH) {
+         throw "Key $Project/$Stage/ISH does not exist."
+      }
+      if (-not $keyValues.$ISBootstrapVersion.Project.$Project.$Stage.ISH.ProductVersion) {
+         throw "Key $Project/$Stage/ISH/ProductVersion does not exist."
+      }
+      if (-not $keyValues.$ISBootstrapVersion.Project.$Project.$Stage.ISH.Integration) {
+         throw "Key $Project/$Stage/ISH/Integration does not exist."
+      }
+      if (-not $keyValues.$ISBootstrapVersion.Project.$Project.$Stage.ISH.Integration.Database) {
+         throw "Key $Project/$Stage/ISH/Integration/Database does not exist."
+      }
+      if (-not $keyValues.$ISBootstrapVersion.Project.$Project.$Stage.ISH.Integration.Database.SQLServer) {
+         throw "Key $Project/$Stage/ISH/Integration/Database/SQLServer does not exist."
+      }
+      if (-not $keyValues.$ISBootstrapVersion.Project.$Project.$Stage.ISH.Integration.Database.SQLServer.DataSource) {
+         throw "Key $Project/$Stage/ISH/Integration/Database/SQLServer/DataSource does not exist."
+      }
+      if (-not $keyValues.$ISBootstrapVersion.Project.$Project.$Stage.ISH.Integration.Database.SQLServer.InitialCatalog) {
+         throw "Key $Project/$Stage/ISH/Integration/Database/SQLServer/InitialCatalog does not exist."
+      }
+      if (-not $keyValues.$ISBootstrapVersion.Project.$Project.$Stage.ISH.Integration.Database.SQLServer.Username) {
+         throw "Key $Project/$Stage/ISH/Integration/Database/SQLServer/Username does not exist."
+      }
+      if (-not $keyValues.$ISBootstrapVersion.Project.$Project.$Stage.ISH.Integration.Database.SQLServer.Password) {
+         throw "Key $Project/$Stage/ISH/Integration/Database/SQLServer/Password does not exist."
+      }
+      if (-not $keyValues.$ISBootstrapVersion.Project.$Project.$Stage.ISH.Integration.Database.SQLServer.Type) {
+         throw "Key $Project/$Stage/ISH/Integration/Database/SQLServer/Type does not exist."
+      }
+      if (-not $keyValues.$ISBootstrapVersion.Project.$Project.$Stage.ISH.Component) {
+         throw "Key $Project/$Stage/ISH/Component does not exist."
+      }
+      if (-not $keyValues.$ISBootstrapVersion.Project.$Project.$Stage.ISH.Component."Single") {
+         throw "Key $Project/$Stage/ISH/Component/Single does not exist."
+      }
+      if (-not $keyValues.$ISBootstrapVersion.Project.$Project.$Stage.ISH.Component."Single".Count) {
+         throw "Key $Project/$Stage/ISH/Component/Single/Count does not exist."
+      }
+      if (-not $keyValues.$ISBootstrapVersion.Project.$Project.$Stage.ISH.Component."Publish") {
+         throw "Key $Project/$Stage/ISH/Component/Publish does not exist."
+      }
+      if (-not $keyValues.$ISBootstrapVersion.Project.$Project.$Stage.ISH.Component."Publish".Count) {
+         throw "Key $Project/$Stage/ISH/Component/Publish/Count does not exist."
+      }
+      if (-not $keyValues.$ISBootstrapVersion.Project.$Project.$Stage.ISH.Component."BackgroundTask-Multi") {
+         throw "Key $Project/$Stage/ISH/Component/BackgroundTask-Multi does not exist."
+      }
+      if (-not $keyValues.$ISBootstrapVersion.Project.$Project.$Stage.ISH.Component."BackgroundTask-Multi".Count) {
+         throw "Key $Project/$Stage/ISH/Component/BackgroundTask-Multi/Count does not exist."
+      }
+      if (-not $keyValues.$ISBootstrapVersion.Project.$Project.$Stage.ISH.Component."Crawler") {
+         throw "Key $Project/$Stage/ISH/Component/Crawler does not exist."
+      }
+      if (-not $keyValues.$ISBootstrapVersion.Project.$Project.$Stage.ISH.Component."Crawler".Count) {
+         throw "Key $Project/$Stage/ISH/Component/Crawler/Count does not exist."
+      }
+      if (-not $keyValues.$ISBootstrapVersion.Project.$Project.$Stage.ISH.Component."TranslationBuilder") {
+         throw "Key $Project/$Stage/ISH/Component/TranslationBuilder does not exist."
+      }
+      if (-not $keyValues.$ISBootstrapVersion.Project.$Project.$Stage.ISH.Component."TranslationBuilder".Count) {
+         throw "Key $Project/$Stage/ISH/Component/TranslationBuilder/Count does not exist."
+      }if (-not $keyValues.$ISBootstrapVersion.Project.$Project.$Stage.ISH.Component."TranslationOrganizer") {
+         throw "Key $Project/$Stage/ISH/Component/TranslationOrganizer does not exist."
+      }
+      if (-not $keyValues.$ISBootstrapVersion.Project.$Project.$Stage.ISH.Component."TranslationOrganizer".Count) {
+         throw "Key $Project/$Stage/ISH/Component/TranslationOrganizer/Count does not exist."
+      }
+   }
+   end {
+
+   }
+}
