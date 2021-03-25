@@ -16,42 +16,29 @@
 
 <#
 .Synopsis
-   Set the content of the json
+   Get one or multiple markers from the system
 .DESCRIPTION
-   Set the content of the json based on the requested type
+   Get one or multiple markers from the system.
+   Marker values can be used in the Recipe to drive specific customizations and/or configuration changes.
 .EXAMPLE
-   Set-JSONContent -JSON $json -Type Tag
+   Get-ISHMarker
 .EXAMPLE
-   Set-JSONContent -JSON $json -Type Marker
+   Get-ISHMarker -Name name
 #>
-function Set-JSONContent {
+Function Get-ISHMarker {
     [CmdletBinding()]
-    param (
-        [Parameter(Mandatory = $true)]
-        [PSCustomObject]$JSON,
-        [Parameter(Mandatory = $true)]
-        [string]$Type
+    param(
+        [Parameter(Mandatory = $false)]
+        [string]$Name = $null
     )
 
     begin {
         Write-Debug "PSCmdlet.ParameterSetName=$($PSCmdlet.ParameterSetName)"
         foreach ($psbp in $PSBoundParameters.GetEnumerator()) { Write-Debug "$($psbp.Key)=$($psbp.Value)" }
-
-        $commonJSONParameters = @{ } + $PSBoundParameters
-        $null = $commonJSONParameters.Remove("JSON")
     }
 
     process {
-        Write-Debug "Getting JSON for Type=$Type"
-        $filePath = Get-JSONContentPath @commonJSONParameters
-        Write-Debug "filePath=$filePath"
-
-        if (-not (Test-Path -Path $filePath)) {
-            $null = New-Item -Path $filePath -ItemType File -Force
-            Write-Verbose "Created $filePath"
-        }
-        $JSON | ConvertTo-Json | Format-Json | Out-File -FilePath $filePath -Force
-        Write-Verbose "Updated $filePath"
+        Get-JSON @PSBoundParameters -Type Marker
     }
 
     end {

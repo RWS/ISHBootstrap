@@ -1,4 +1,20 @@
 <#
+# Copyright (c) 2021 All Rights Reserved by the SDL Group.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#>
+
+<#
 .Synopsis
    Initialize the ISHBootstrap's "almost ready" state
 .DESCRIPTION
@@ -17,7 +33,7 @@ Function Initialize-ISHEC2FromAMI {
         Write-Debug "Testing if the EC2 host has been once initialized from AMI"
         # This cmdlet cannot execute twice on the same host
 
-        if (Test-Requirement -Marker -Name "ISH.EC2InitializedFromAMI") {
+        if (Test-ISHRequirement -Marker -Name "ISH.EC2InitializedFromAMI") {
             throw "EC2 is already initialized from AMI"
         }
         Write-Debug "EC2 host has not been once initialized from AMI"
@@ -177,7 +193,7 @@ Function Initialize-ISHEC2FromAMI {
         #endregion
 
         Write-Debug "Setting marker ISH.EC2InitializedFromAMI, to avoid re-execution on the same host"
-        Set-Marker -Name "ISH.EC2InitializedFromAMI"
+        Set-ISHMarker -Name "ISH.EC2InitializedFromAMI"
     }
     end {
 

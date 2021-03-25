@@ -1,6 +1,22 @@
 <#
+# Copyright (c) 2021 All Rights Reserved by the SDL Group.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#>
+
+<#
 .Synopsis
-   Test if the system satisfies the requirement
+   Test if the system meets a requirement
 .DESCRIPTION
    A requirement can be
    - A module is installed
@@ -9,21 +25,21 @@
    - A component tag is set
    - A product version is installed
 .EXAMPLE
-   Test-Requirement -Name name -Marker
+   Test-ISHRequirement -Name name -Marker
 .EXAMPLE
-   Test-Requirement -Name name -Value value -Marker
+   Test-ISHRequirement -Name name -Value value -Marker
 .EXAMPLE
-   Test-Requirement -Name name -tag
+   Test-ISHRequirement -Name name -tag
 .EXAMPLE
-   Test-Requirement -Name name -Value value -tag
+   Test-ISHRequirement -Name name -Value value -tag
 .EXAMPLE
-   Test-Requirement -Name DatabaseUpgrade -ISH
+   Test-ISHRequirement -Name DatabaseUpgrade -ISH
 .EXAMPLE
-   Test-Requirement -Name BackgroundTask -BackgrountTaskRole Default -ISH
+   Test-ISHRequirement -Name BackgroundTask -BackgrountTaskRole Default -ISH
 .EXAMPLE
-   Test-Requirement -Major 13 -ISH
+   Test-ISHRequirement -Major 13 -ISH
 #>
-Function Test-Requirement {
+Function Test-ISHRequirement {
     [OutputType([Boolean])]
     [CmdletBinding()]
     param(
@@ -85,9 +101,9 @@ Function Test-Requirement {
                 }
             }
             'Marker' {
-                if (Test-Marker -Name $Name) {
+                if (Test-ISHMarker -Name $Name) {
                     if ($Value) {
-                        (Get-Marker -Name $Name) -eq $Value
+                        (Get-ISHMarker -Name $Name) -eq $Value
                     }
                     else {
                         $true
