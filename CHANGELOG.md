@@ -2,6 +2,7 @@
 
 ## release v1.4
 
+- GH-139: Update valid/supported versions
 - GH-130: Install .NET Core Hosting (future v15.0.0)
 - GH-128: Update valid/supported versions (released 14.0.2, 14.0.3 and unreleased 15.0.0)
 - GH-119: Update valid/supported versions (released: 13.0.1, 13.0.2, 14.0.0, not released 14.0.1)
@@ -76,13 +77,13 @@ Known issues:
 
 - All source code has header based on SDL's open source policy.
   - SDLDevTools module helps power `Test-OpenSourceHeaders.Tests.ps1` to safe guard SDL's open source policy.
-- Dropped module **xISHInstall** and ported the code into **Install** scripts.    
+- Dropped module **xISHInstall** and ported the code into **Install** scripts.
 - As the MSXML4 is not required for ISH
   - Removed `Install-ISHToolMSXML4` from **xISHServer.13**.
-  - Script `Install-ISHServerPrerequisites.ps1` will invoke `Install-ISHToolMSXML4` only for version 12 and when parameter `-InstallMSXML` is specified. 
+  - Script `Install-ISHServerPrerequisites.ps1` will invoke `Install-ISHToolMSXML4` only for version 12 and when parameter `-InstallMSXML` is specified.
 - Enhanced progress indicators in scripts.
 - Refactored the WinRM secure initialization pipeline. No manual step is required on the remote server.
-  - `Install-WinRMPrerequisites.ps1` 
+  - `Install-WinRMPrerequisites.ps1`
   - `Enable-WSManCredSSP.ps1`
 - New script `Install-certificate.ps1` installs a certificate.
 - Renamed the `Invoke-Restart.ps1` to `Restart-Server.ps1`.
@@ -94,7 +95,7 @@ Known issues:
 **20161020**
 
 - Changes in module **xISHServer**
-  - Use new cmdlet `Get-ISHPrerequisites` for one of the following functions: 
+  - Use new cmdlet `Get-ISHPrerequisites` for one of the following functions:
     - Download the necessary files.
       - Initial supported method is with FTP.
     - Get the file names of the necessary files.
@@ -102,17 +103,17 @@ Known issues:
   - To add or update the Antenna House Formatter license use cmdlet `Set-ISHToolAntennaHouseLicense.ps1`
 - Changes in scripts folder **xISHServer**
   - To seed the **xISHServer** module folder with the prerequisites:
-    - Use **new** script `Get-ISHServerPrerequisites.ps1` and the **xISHServer** module will download the files. 
+    - Use **new** script `Get-ISHServerPrerequisites.ps1` and the **xISHServer** module will download the files.
     - Use **updated** script `Upload-ISHServerPrerequisites.ps1`. Script uses the `Get-ISHPrerequisites` to know which files to copy.
-  - Use **new** script `Set-ISHAntennaHouseLicense.ps1` to set the Antenna House Formatter license. 
-  
+  - Use **new** script `Set-ISHAntennaHouseLicense.ps1` to set the Antenna House Formatter license.
+
 ## Before pre-release v0.2
 
 **20161011**
 
-- Major code refactoring. **Before** this all code expected to access and execute remote code without specifying credential. This worked for domain credentials. 
-  - Improved the `Add-ModuleFromRemote.ps1` to accept a `-Credential` parameter. 
-  - Improved the `Invoke-CommandWrap.ps1` to accept a `-Credential` parameter. 
+- Major code refactoring. **Before** this all code expected to access and execute remote code without specifying credential. This worked for domain credentials.
+  - Improved the `Add-ModuleFromRemote.ps1` to accept a `-Credential` parameter.
+  - Improved the `Invoke-CommandWrap.ps1` to accept a `-Credential` parameter.
   - All scripts accept a `-Credential` parameter.
 - **xISHServer** is now smarter:
   - `Get-ISHOSInfo` breaks down the information from the caption of the operating system.
@@ -123,7 +124,7 @@ Known issues:
     - Windows Server 2012 R2.
     - Windows Server 10.
     - Windows Server 8.1 **not tested though**.
-  - `Install-ISHVisualBasicRuntime` installs the Visual Basic Runtime SP6. Requires file `vbrun60sp6.exe`. Get it from [Service Pack 6 for Visual Basic 6.0: Run-Time Redistribution Pack (vbrun60sp6.exe)](https://www.microsoft.com/en-us/download/details.aspx?id=24417) and then extract. **Use only** with Windows Server 2016 core variant. **This is a workaround**. [More information](https://social.technet.microsoft.com/Forums/windowsserver/en-US/9b0f8911-07f4-420f-9e48-d31915f91528/msvbvm60dll-missing-in-core?forum=winservercore).    
+  - `Install-ISHVisualBasicRuntime` installs the Visual Basic Runtime SP6. Requires file `vbrun60sp6.exe`. Get it from [Service Pack 6 for Visual Basic 6.0: Run-Time Redistribution Pack (vbrun60sp6.exe)](https://www.microsoft.com/en-us/download/details.aspx?id=24417) and then extract. **Use only** with Windows Server 2016 core variant. **This is a workaround**. [More information](https://social.technet.microsoft.com/Forums/windowsserver/en-US/9b0f8911-07f4-420f-9e48-d31915f91528/msvbvm60dll-missing-in-core?forum=winservercore).
   - Removed dependency to powershell module [Carbon](https://www.powershellgallery.com/packages/Carbon/2.3.0) by introducing alternatives.
     - Grant logon as privilege for a user. Added new `Grant-ISHUserLogOnAsService`.
     - Add user to local users group. Use `Add-LocalGroupMember` available on Windows PowerShell v.5.
@@ -131,7 +132,7 @@ Known issues:
 
 **Known Issues**
 
-- When executing against a remote server that is not in the same domain, certain copy actions will not be supported when the client is powered by PowerShell v.4 because the `Copy-Item` doesn't accept specific credentials. 
+- When executing against a remote server that is not in the same domain, certain copy actions will not be supported when the client is powered by PowerShell v.4 because the `Copy-Item` doesn't accept specific credentials.
   - `Upload-ISHServerPrerequisites.ps1` should work but not tested.
 
 **20160908**
@@ -156,7 +157,7 @@ Known issues:
 
 - Refactored the implicit remoting by using the new `Add-ModuleFromRemote` and `Remove-ModuleFromRemote`.
 - Made installation of OracleODAC an optional part of the flow.
-- Separated **Examples** specific changes from the main changelog.  
+- Separated **Examples** specific changes from the main changelog.
 
 **20160816**
 
@@ -168,7 +169,7 @@ Known issues:
 
 - Fixes to support non-remote execution.
 - Introduced specific code path in `Initialize-ISHServer.ps1` to help with lengthy Fully Qualified Domain Name (FQDN) and implicit remoting.
-- Install-ISHWindowsFeatures now works with both ServerManager and DISM modules. 
+- Install-ISHWindowsFeatures now works with both ServerManager and DISM modules.
 
 **20160727**
 
