@@ -1,11 +1,8 @@
 # Change log
 
-## release v1.5
-
-- GH-139: Update valid/supported versions
-
 ## release v1.4
 
+- GH-139: Update valid/supported versions
 - GH-130: Install .NET Core Hosting (future v15.0.0)
 - GH-128: Update valid/supported versions (released 14.0.2, 14.0.3 and unreleased 15.0.0)
 - GH-119: Update valid/supported versions (released: 13.0.1, 13.0.2, 14.0.0, not released 14.0.1)
