@@ -1,7 +1,7 @@
 ﻿#reguires -runasadministrator
 
 <#
-# Script developed for Windows Server 2016 
+# Script developed for Windows Server 2016
 # Windows PowerShell 5.1 is already installed
 # PowerShellGet is also available
 #>
@@ -9,7 +9,7 @@
 param(
     [Parameter(Mandatory=$true,ParameterSetName="From FTP")]
     [Parameter(Mandatory=$true,ParameterSetName="From AWS S3")]
-    [ValidateSet("12.0.3","12.0.4","13.0.0","13.0.1","13.0.2","14.0.0","14.0.1","14.0.2","14.0.3","15.0.0")]
+    [ValidateSet("12.0.3","12.0.4","13.0.0","13.0.1","13.0.2","14.0.0","14.0.1","14.0.2","14.0.3","14.0.4","15.0.0")]
     [string]$ISHVersion,
     [Parameter(Mandatory=$false,ParameterSetName="From FTP")]
     [Parameter(Mandatory=$false,ParameterSetName="From AWS S3")]
@@ -131,7 +131,7 @@ if ($InstallISHApplicationServer)
 
     & $serverScriptsPath\ISHServer\Copy-ISHCD.ps1 -ISHServerVersion $ishServerVersion @ishCDHash
     #endregion
-    
+
     #region 3. Initial os user
     $blockName="Initializing mock user"
     Write-Progress @scriptProgress -Status $blockName
@@ -151,7 +151,7 @@ if ($InstallISHApplicationServer)
         # Uncheck 'User must change password'
         $user = [adsi]"WinNT://$env:computername/$mockOSUserName"
         $user.UserFlags.value = $user.UserFlags.value -bor 0x10000
-        $user.CommitChanges()    
+        $user.CommitChanges()
     }
     & $serverScriptsPath\ISHServer\Initialize-ISHServerOSUser.ps1 -ISHServerVersion $ishServerVersion -OSUserCredential $mockOSUserCredential
 
@@ -197,7 +197,7 @@ if ($InstallISHApplicationServer)
         & $dbScriptsPath\Restore-MockDatabase.ps1 -ISHVersion $ishVersion
     }
     #endregion
-    
+
     #region 7. Install ISH
     $blockName="Installing ISH"
     Write-Progress @scriptProgress -Status $blockName
@@ -231,15 +231,15 @@ if ($InstallISHApplicationServer)
 
     # COMPlus
     $comAdmin = New-Object -com ("COMAdmin.COMAdminCatalog.1")
-    $catalog = New-Object -com COMAdmin.COMAdminCatalog 
-    $applications = $catalog.getcollection("Applications") 
+    $catalog = New-Object -com COMAdmin.COMAdminCatalog
+    $applications = $catalog.getcollection("Applications")
     $applications.populate()
 
     $comAdmin.ShutdownApplication("Trisoft-InfoShare-Author")
 
     #endregion
 
-    #region 9. Clean up 
+    #region 9. Clean up
     $blockName="Cleaning up"
     Write-Progress @scriptProgress -Status $blockName
 
@@ -257,7 +257,7 @@ if ($InstallISHApplicationServer)
     #endregion
 }
 
-#region Clean up temp files 
+#region Clean up temp files
 $blockName="Cleaning up temp files"
 Write-Progress @scriptProgress -Status $blockName
 
