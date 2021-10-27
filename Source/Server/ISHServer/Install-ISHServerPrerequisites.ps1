@@ -64,10 +64,14 @@ try
     {
         Install-ISHToolMSXML4
     }
-    if($ISHServerVersion -ge "14")
+    if($ISHServerVersion -eq "14")
     {
         Install-ISHToolAdoptOpenJRE
         Install-ISHToolAdoptOpenJDK
+    }
+    if($ISHServerVersion -ge "15")
+    {
+        Install-ISHToolEclipseTemurinOpenJDK
     }
     else
     {
@@ -82,7 +86,7 @@ try
     }
     if($ISHServerVersion -eq "15")
     {
-        Install-ISHDotNetHosting 
+        Install-ISHDotNetHosting
     }
     Write-Progress @scriptProgress -Status "Initializing"
     Initialize-ISHLocale
