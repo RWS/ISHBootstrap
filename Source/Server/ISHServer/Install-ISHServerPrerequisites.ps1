@@ -69,7 +69,7 @@ try
         Install-ISHToolAdoptOpenJRE
         Install-ISHToolAdoptOpenJDK
     }
-    if($ISHServerVersion -ge "15")
+    elseif($ISHServerVersion -eq "15")
     {
         Install-ISHToolEclipseTemurinOpenJDK
     }
