@@ -188,6 +188,13 @@ $newParameterScriptBlock={
     $inputParametersPath=Join-Path $CDPath "__InstallTool\inputparameters.xml"
     [xml]$xml=Get-Content $inputParametersPath
     
+    if($major -eq 15)
+    {
+        $value = ($xml | Select-Xml -XPath "//param[@name='ps_java_home']/defaultvalue").Node.InnerText
+        $inputParameters["ps_java_home"]="$value"
+        $inputParameters["ps_java_jvmdll"]="$value\bin\server\jvm.dll"
+    }
+
     #region Add the missing xml elements
 
     if($suffix -ne "")
