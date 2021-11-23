@@ -7,6 +7,9 @@ param(
     [string]$ISHVersion,
     [Parameter(Mandatory=$false,ParameterSetName="From AWS S3")]
     [Parameter(Mandatory=$false,ParameterSetName="From FTP")]
+    [string]$Repository="PSGallery",
+    [Parameter(Mandatory=$false,ParameterSetName="From AWS S3")]
+    [Parameter(Mandatory=$false,ParameterSetName="From FTP")]
     [switch]$DebugISHServer=$false,
     [Parameter(Mandatory=$false,ParameterSetName="From AWS S3")]
     [switch]$AWS,
@@ -25,7 +28,7 @@ $ishServerVersion=($ISHVersion -split "\.")[0]
 
 
 #region Update NuGet Package provider
-$blockName="Installing NuGet PackageProvider" 
+$blockName="Installing NuGet PackageProvider"
 Write-Progress @scriptProgress -Status $blockName
 Write-Host $blockName
 
@@ -34,9 +37,16 @@ Get-PackageProvider -Name NuGet -ForceBootstrap | Out-Null
 
 #region Installing modules
 $moduleNames=@(
+    "Pester"
     "ISHDeploy"
+    "ISHRemote"
     "CertificatePS"
+    "InvokeQuery"
     "PoshPrivilege"
+    "WcfPS"
+    "XWrite"
+    "PSHosts"
+    "SemVerPS"
 )
 if(-not $DebugISHServer)
 {
@@ -58,7 +68,7 @@ foreach($name in $moduleNames)
     Write-Progress @scriptProgress -Status $blockName
     Write-Host $blockName
 
-    Install-Module $name -Force
+    Install-Module $name -Repository $Repository -Force
 }
 
 #endregion

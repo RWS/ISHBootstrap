@@ -67,5 +67,4 @@
       "& C:/Provision/ISHBootstrap/Source/Packer/AMI/Scripts/Set-EC2Launch.ps1"
 	]
   }]
-}}
-
+}
