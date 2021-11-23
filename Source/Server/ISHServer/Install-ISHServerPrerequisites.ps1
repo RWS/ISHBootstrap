@@ -64,7 +64,7 @@ try
     {
         Install-ISHToolMSXML4
     }
-    if($ISHServerVersion -eq "14")
+    if($ISHServerVersion -ge "14")
     {
         Install-ISHToolAdoptOpenJRE
         Install-ISHToolAdoptOpenJDK
