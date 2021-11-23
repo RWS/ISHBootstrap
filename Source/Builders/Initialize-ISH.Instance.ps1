@@ -3,6 +3,7 @@
 param(
     [Parameter(Mandatory=$true,ParameterSetName="External Database")]
     [string]$ConnectionString,
+    [ValidateSet("sqlserver2014")]
     [Parameter(Mandatory=$false,ParameterSetName="External Database")]
     [string]$DbType="sqlserver2014",
     [Parameter(Mandatory=$true,ParameterSetName="External Database")]
