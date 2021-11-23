@@ -4,7 +4,7 @@ $ec2LaunchConfigFile = Join-Path $ec2LaunchPath "LaunchConfig.json"
 $ec2EventLogConfigFile = Join-Path $ec2LaunchPath "EventLogConfig.json"
 $ec2DriveLetterMappingConfigFile = Join-Path $ec2LaunchPath "DriveLetterMappingConfig.json"
 
-$config = Get-Content -Path $ec2LaunchConfigFile -Raw|ConvertFrom-Json
+$config = Get-Content -Path $ec2LaunchConfigFile -Raw | ConvertFrom-Json
 
 $config.setComputerName=$true
 

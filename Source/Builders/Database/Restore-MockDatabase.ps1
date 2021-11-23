@@ -1,6 +1,6 @@
 ﻿param(
     [Parameter(Mandatory=$true)]
-    [ValidateSet("12.0.3","12.0.4","13.0.0","13.0.1","13.0.2","14.0.0","14.0.1","14.0.2","14.0.3","14.0.4","15.0.0")]
+    [ValidateSet("12.0.3","12.0.4","13.0.0","13.0.1","13.0.2","14.0.0","14.0.1","14.0.2","14.0.3","15.0.0")]
     [string]$ISHVersion,
     [Parameter(Mandatory=$false)]
     [switch]$EmptyDB
@@ -26,7 +26,7 @@ Push-Location -StackName "SQL"
 
 # Test if SQLPS module is already available.
 # Normally the installer modifies the system variables $env:PSModulePath but for them to take effect a restart is needed.
-Write-Host "Importing module SQLPS"
+Write-Host "Importing module SQLPS"    
 if(-not (Get-Module SQLPS -ListAvailable))
 {
     Import-Module "$sqlServerPath\Tools\PowerShell\Modules\SQLPS\SQLPS.PSD1" -Force
@@ -82,7 +82,7 @@ END
 GO
 "@
 
-Invoke-Sqlcmd -Query $sqlRestoreDBCmd
+Invoke-Sqlcmd -Query $sqlRestoreDBCmd 
 
 Pop-Location -StackName "SQL"
 

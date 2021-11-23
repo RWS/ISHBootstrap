@@ -1,6 +1,6 @@
 ﻿param(
     [Parameter(Mandatory=$true,ParameterSetName="Database")]
-    [ValidateSet("12.0.3","12.0.4","13.0.0","13.0.1","13.0.2","14.0.0","14.0.1","14.0.2","14.0.3","14.0.4","15.0.0")]
+    [ValidateSet("12.0.3","12.0.4","13.0.0","13.0.1","13.0.2","14.0.0","14.0.1","14.0.2","14.0.3","15.0.0")]
     [string]$ISHVersion,
     [Parameter(Mandatory=$false,ParameterSetName="Database")]
     [string]$MockConnectionString=$null
@@ -29,7 +29,7 @@ if($mockDatabase)
     switch -regex ($ISHVersion) {
         '12.0.3|12.0.4' {$sql_express_download_url= $sql_express_2014_download_url}
         '13.0.0|13.0.1' {$sql_express_download_url= $sql_express_2016_download_url}
-        '13.0.2|14.0.0|14.0.1|14.0.2|14.0.3|14.0.4|15.0.0' {$sql_express_download_url= $sql_express_2017_download_url}
+        '13.0.2|14.0.0|14.0.1|14.0.2|14.0.3|15.0.0' {$sql_express_download_url= $sql_express_2017_download_url}
         default         {$sql_express_download_url= $sql_express_2017_download_url}
     }
     $sqlExpressPath=Join-Path $PSScriptRoot "sqlexpress.exe"
@@ -48,17 +48,17 @@ if($mockDatabase)
     Remove-Item -Recurse -Force $sqlExpressPath, $setupPath
 
     # Configure tcp settings and login mode for ISHSQLEXPRESS
-    Write-Host "Configuring tcp settings and login mode for ISHSQLEXPRESS"
+    Write-Host "Configuring tcp settings and login mode for ISHSQLEXPRESS" 
     Stop-Service MSSQL`$ISHSQLEXPRESS
     Set-ItemProperty -Path 'HKLM:\software\microsoft\microsoft sql server\mssql1*.ISHSQLEXPRESS/mssqlserver/supersocketnetlib/tcp' -Name Enabled -Value '1'
     Set-ItemProperty -Path 'HKLM:\software\microsoft\microsoft sql server\mssql1*.ISHSQLEXPRESS/mssqlserver/supersocketnetlib/tcp/ipall' -Name tcpdynamicports -Value ''
     Set-ItemProperty -Path 'HKLM:\software\microsoft\microsoft sql server\mssql1*.ISHSQLEXPRESS/mssqlserver/supersocketnetlib/tcp/ipall' -Name tcpport -Value 1433
     Set-ItemProperty -Path 'HKLM:\software\microsoft\microsoft sql server\mssql1*.ISHSQLEXPRESS/mssqlserver/' -Name LoginMode -Value 2
-    Start-Service MSSQL`$ISHSQLEXPRESS
+    Start-Service MSSQL`$ISHSQLEXPRESS  
 }
 else
 {
-    Write-Warning "Skipping installation of SQL Server Express. No 'MockConnectionString' provided"
+    Write-Warning "Skipping installation of SQL Server Express. No 'MockConnectionString' provided" 
 }
 
 Write-Separator -Invocation $MyInvocation -Footer

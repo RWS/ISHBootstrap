@@ -1,0 +1,69 @@
+#!/usr/bin/env groovy
+
+def pwsh(command) {
+    println 'About to run pwsh Command'
+    println '---------------------------------------------------'
+    println command
+    println '---------------------------------------------------'
+
+    def filename = UUID.randomUUID().toString() + '.ps1'
+    writeFile file: filename, text: command
+    // CLIXML output --> https://github.com/PowerShell/PowerShell/issues/5912
+    sh "pwsh -NonInteractive -NoProfile -OutputFormat Text -Command \" & './${filename}' \""
+}
+
+pipeline {
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '5'))
+        durabilityHint('PERFORMANCE_OPTIMIZED')
+        timeout(time: 1, unit: 'HOURS')
+    }
+
+    agent {
+        dockerfile {
+            dir 'Automation'
+            filename 'Dockerfile'
+            label 'docker'
+            args '-u root'
+        }
+    }
+
+    triggers {
+        cron('H 2 * * *')
+    }
+
+    parameters {
+        choice(choices: ['Nexus', 'PSGallery'], description: 'Select the repository the modules should be published to: Nexus(.sdl.com) or PSGallery', name: 'Repository')
+    }
+
+    stages {
+        stage('Publish the ISHBootstrap Module') {
+            when {
+                beforeAgent true
+                anyOf {
+                    triggeredBy cause: 'UserIdCause';
+                    triggeredBy cause: 'TimerTriggerCause';
+                }
+            }
+            steps {
+                wrap([$class: 'BuildUser']) {
+                    withCredentials([string(credentialsId: "NexusApiKey", variable: "APIKEY")]) {
+                        pwsh "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; & ./Automation/Publish-ISHBootstrapModule.ps1 -Repository '${params.Repository}'"
+                    }
+                }
+            }
+        }
+    }
+    post {
+        always {
+            script {
+                currentBuild.result = currentBuild.result ?: 'SUCCESS'
+                notifyBitbucket()
+            }
+        }
+        cleanup {
+            sh 'chmod -R 777 .'
+            deleteDir()
+        }
+    }
+}
