@@ -294,7 +294,7 @@ function Set-ISHCoreConfiguration {
 
         # Default role exists in code to make sure we remove it the first time because it's part of Vanilla
         # CloudFormation Architecture expects Single,Multi,Custom1 and Custom2 background task roles
-        foreach ($role in (Get-ISHTag -Name ISHComponent-BackgroundTask).Split(',')) {
+        foreach ($role in ((Get-ISHTag -Name ISHComponent-BackgroundTask) -split ',')) {
             $backgroundTask = "BackgroundTask$role"
             Write-Debug "configurationData.Service.$backgroundTask.Count=$($configurationData.Service."$backgroundTask".Count)"
             if ($configurationData.Service."$backgroundTask".Count -gt 0) {
@@ -379,7 +379,7 @@ function Set-ISHCoreConfiguration {
             Write-Verbose "Disabled TranslationOrganizer component"
         }
 
-        foreach ($role in (Get-ISHTag -Name ISHComponent-BackgroundTask).Split(',')) {
+        foreach ($role in ((Get-ISHTag -Name ISHComponent-BackgroundTask) -split ',')) {
             $backgroundTask = "BackgroundTask$role"
             Write-Debug "configurationData.Service.$backgroundTask.Count=$($configurationData.Service."$backgroundTask".Count)"
             if ($configurationData.Service."$backgroundTask".Count -gt 0) {
