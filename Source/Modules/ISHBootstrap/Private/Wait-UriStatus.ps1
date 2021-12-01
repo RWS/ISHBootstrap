@@ -69,7 +69,7 @@ Function Wait-UriStatus {
                 Write-Verbose "'$lastStatus' is not expected '$Status'. Sleeping"
                 if ($clock.elapsed -ge $timer)
                 {
-                    throw "'$Uri' returned unexpected status '$Status'"
+                    throw "'$Uri' returned unexpected status '$lastStatus'"
                 }
             }
         }

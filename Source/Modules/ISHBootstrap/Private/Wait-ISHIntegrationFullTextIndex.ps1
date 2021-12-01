@@ -44,7 +44,7 @@ Function Wait-ISHIntegrationFullTextIndex {
       Write-Debug "fullTextIndexUri=$fullTextIndexUri"
 
       Write-Verbose "Waiting for $fullTextIndexUri to respond with status 200."
-      Wait-UriStatus -Uri $fullTextIndexUri -Status 200 -Seconds 10
+      Wait-UriStatus -Uri $fullTextIndexUri -Status 200 -Seconds 10 -Timeout 600
       Write-Verbose "Remote FullTextIndex uri at $fullTextIndexUri is ready."
   }
 
