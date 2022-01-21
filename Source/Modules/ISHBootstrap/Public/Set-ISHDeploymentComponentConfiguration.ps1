@@ -58,7 +58,6 @@ Function Set-ISHDeploymentComponentConfiguration {
         }
 
         $componentsKV = [pscustomobject]@{
-            "BackgroundTask-Publish" = @{Count = 1 }
             "BackgroundTask-Single"  = @{Count = 1 }
             "BackgroundTask-Multi"   = @{Count = 1 }
             Crawler                  = @{Count = 1 }

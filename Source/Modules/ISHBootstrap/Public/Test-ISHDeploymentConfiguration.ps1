@@ -86,17 +86,11 @@ Function Test-ISHDeploymentConfiguration {
       if (-not $keyValues.$ISHBootstrapVersion.Project.$Project.$Stage.ISH.Component) {
          throw "Key $Project/$Stage/ISH/Component does not exist."
       }
-      if (-not $keyValues.$ISHBootstrapVersion.Project.$Project.$Stage.ISH.Component."Single") {
-         throw "Key $Project/$Stage/ISH/Component/Single does not exist."
+      if (-not $keyValues.$ISHBootstrapVersion.Project.$Project.$Stage.ISH.Component."BackgroundTask-Single") {
+         throw "Key $Project/$Stage/ISH/Component/BackgroundTask-Single does not exist."
       }
-      if (-not $keyValues.$ISHBootstrapVersion.Project.$Project.$Stage.ISH.Component."Single".Count) {
-         throw "Key $Project/$Stage/ISH/Component/Single/Count does not exist."
-      }
-      if (-not $keyValues.$ISHBootstrapVersion.Project.$Project.$Stage.ISH.Component."Publish") {
-         throw "Key $Project/$Stage/ISH/Component/Publish does not exist."
-      }
-      if (-not $keyValues.$ISHBootstrapVersion.Project.$Project.$Stage.ISH.Component."Publish".Count) {
-         throw "Key $Project/$Stage/ISH/Component/Publish/Count does not exist."
+      if (-not $keyValues.$ISHBootstrapVersion.Project.$Project.$Stage.ISH.Component."BackgroundTask-Single".Count) {
+         throw "Key $Project/$Stage/ISH/Component/BackgroundTask-Single/Count does not exist."
       }
       if (-not $keyValues.$ISHBootstrapVersion.Project.$Project.$Stage.ISH.Component."BackgroundTask-Multi") {
          throw "Key $Project/$Stage/ISH/Component/BackgroundTask-Multi does not exist."
@@ -120,6 +114,18 @@ Function Test-ISHDeploymentConfiguration {
       }
       if (-not $keyValues.$ISHBootstrapVersion.Project.$Project.$Stage.ISH.Component."TranslationOrganizer".Count) {
          throw "Key $Project/$Stage/ISH/Component/TranslationOrganizer/Count does not exist."
+      }
+      if (-not $keyValues.$ISHBootstrapVersion.Project.$Project.$Stage.ISH.Credentials) {
+         throw "Key $Project/$Stage/ISH/Credentials does not exist."
+      }
+      if (-not $keyValues.$ISHBootstrapVersion.Project.$Project.$Stage.ISH.Credentials.ServiceAdmin) {
+         throw "Key $Project/$Stage/ISH/Credentials/ServiceAdmin does not exist."
+      }
+      if (-not $keyValues.$ISHBootstrapVersion.Project.$Project.$Stage.ISH.Credentials.ServiceAdmin.Username) {
+         throw "Key $Project/$Stage/ISH/Credentials/ServiceAdmin/Username does not exist."
+      }
+      if (-not $keyValues.$ISHBootstrapVersion.Project.$Project.$Stage.ISH.Credentials.ServiceAdmin.Password) {
+         throw "Key $Project/$Stage/ISH/Credentials/ServiceAdmin/Password does not exist."
       }
    }
    end {

@@ -19,7 +19,7 @@
 .VERSION 0.1
 #>
 
-New-Variable -Name 'ISHDeploymentConfigFilePath' -Value "$env:ProgramData\ISHBootstrap\config-docs-project.json" -Scope Script -Force
+New-Variable -Name 'ISHDeploymentConfigFilePath' -Value "$env:ProgramData\ISHBootstrap\{0}\config-docs-project.json" -Scope Script -Force
 
 $public  = @( Get-ChildItem -Path $PSScriptRoot\Public\*.ps1 -Exclude @("*NotReady*","*.Tests.ps1"))
 $private = @( Get-ChildItem -Path $PSScriptRoot\Private\*.ps1 -Exclude @("*NotReady*","*.Tests.ps1"))

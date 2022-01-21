@@ -26,7 +26,9 @@ function Get-JSONContent {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true)]
-        [string]$Type
+        [string]$Type,
+        [Parameter(Mandatory = $false)]
+        [string]$ISHDeployment
     )
 
     begin {

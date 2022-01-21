@@ -39,7 +39,7 @@ Function Update-ISHDB {
     }
 
     process {
-        if (Test-ISHComponent -Name DatabaseUpgrade) {
+        if (Test-ISHComponent -Name DatabaseUpgrade @ISHDeploymentSplat) {
             Invoke-ISHDBUpgradeTool -Upgrade @ISHDeploymentSplat
         }
         else {

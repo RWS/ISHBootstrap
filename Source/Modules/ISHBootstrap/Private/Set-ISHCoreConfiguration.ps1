@@ -41,7 +41,7 @@ function Set-ISHCoreConfiguration {
     }
 
     process {
-        $configurationData = Get-ISHCoreConfiguration
+        $configurationData = Get-ISHCoreConfiguration @ISHDeploymentSplat
         $testData = Test-ISHCoreConfiguration -ConfigurationData $configurationData @ISHDeploymentSplat
 
         #region logging
@@ -246,13 +246,13 @@ function Set-ISHCoreConfiguration {
             # Workaround for the execution timeout of 3 seconds for testing the database connection.
             # https://stash.sdl.com/projects/TS/repos/ishdeploy/diff/Source/ISHDeploy/Data/Managers/DatabaseManager.cs?until=eaf9bfa444709210449c5431d0837f576ab97020
             $a = 1
-            $max = 5
+            $max = 30
             $sleep = 10
             Do {
                 If ($a -gt $max) { break }
                 Write-Verbose "Configuring Database integration - Attempt $($a) of $($max)"
                 try {
-                    Set-ISHIntegrationDB -ConnectionString $configurationData.Database.ConnectionString -Engine $configurationData.Database.Type -Raw @ISHDeploymentSplat
+                    Set-ISHIntegrationDB -ConnectionString $configurationData.Database.ConnectionString -Engine $configurationData.Database.Type @ISHDeploymentSplat
                     Write-Verbose "Configured Database integration - Attempt $($a) of $($max) - Successful"
                     break
                 }
@@ -260,15 +260,14 @@ function Set-ISHCoreConfiguration {
                     Write-Verbose "Configuring Database integration - Attempt $($a) of $($max) - Failed"
                     write-Verbose "Exception Type: $($_.Exception.GetType().FullName)"
                     write-Verbose "Exception Message: $($_.Exception.Message)"
-                    Write-Verbose "Going to sleep for $($sleep) seconds"
-                    Start-Sleep -Seconds $sleep
+                    Write-Verbose "Going to sleep for $($sleep + $a) seconds"
+                    Start-Sleep -Seconds ($sleep + $a)
                 }
                 finally {
                     $a++
                 }
             } While ($a -le $max)
 
-            #Set-ISHIntegrationDB -ConnectionString $configurationData.Database.ConnectionString -Engine $configurationData.Database.Type -Raw
             Write-Verbose "Configured Database integration"
         }
 
@@ -294,7 +293,13 @@ function Set-ISHCoreConfiguration {
 
         # Default role exists in code to make sure we remove it the first time because it's part of Vanilla
         # CloudFormation Architecture expects Single,Multi,Custom1 and Custom2 background task roles
-        foreach ($role in ((Get-ISHTag -Name ISHComponent-BackgroundTask) -split ',')) {
+        $roles = (Get-ISHTag -Name ISHComponent-BackgroundTask @ISHDeploymentSplat) -split ','
+        Get-ISHServiceBackgroundTask @ISHDeploymentSplat | ForEach-Object { 
+            if(-not($_.role -in $roles)){
+                Remove-ISHServiceBackgroundTask -Role $_.role @ISHDeploymentSplat
+            }
+        }
+        foreach ($role in $roles) {
             $backgroundTask = "BackgroundTask$role"
             Write-Debug "configurationData.Service.$backgroundTask.Count=$($configurationData.Service."$backgroundTask".Count)"
             if ($configurationData.Service."$backgroundTask".Count -gt 0) {
@@ -312,10 +317,10 @@ function Set-ISHCoreConfiguration {
         #region Component
 
         if (
-            (Test-ISHComponent -Name CM) -or
-            (Test-ISHComponent -Name CS) -or
-            (Test-ISHComponent -Name WS) -or
-            (Test-ISHComponent -Name STS)
+            (Test-ISHComponent -Name CM @ISHDeploymentSplat) -or
+            (Test-ISHComponent -Name CS @ISHDeploymentSplat) -or
+            (Test-ISHComponent -Name WS @ISHDeploymentSplat) -or
+            (Test-ISHComponent -Name STS @ISHDeploymentSplat)
         ) {
             Enable-ISHIISAppPool  @ISHDeploymentSplat
             Write-Verbose "Enabled IIS ISH Application pools"
@@ -328,7 +333,7 @@ function Set-ISHCoreConfiguration {
         Enable-ISHCOMPlus  @ISHDeploymentSplat
         Write-Verbose "Enabled COM+"
 
-        if (Test-ISHComponent -Name Crawler) {
+        if (Test-ISHComponent -Name Crawler @ISHDeploymentSplat) {
             Enable-ISHServiceCrawler  @ISHDeploymentSplat
             Write-Verbose "Enabled Crawler component"
         }
@@ -337,10 +342,10 @@ function Set-ISHCoreConfiguration {
             Write-Verbose "Disabled Crawler component"
         }
 
-        if (Test-ISHComponent -Name FullTextIndex) {
+        if (Test-ISHComponent -Name FullTextIndex @ISHDeploymentSplat) {
             #region Initialize the ports for FullTextIndex
 
-            if (-not (Test-ISHRequirement -Marker -Name "ISH.InitializedNetFullTextIndex")) {
+            if (-not (Test-ISHRequirement -Marker -Name "ISH.InitializedNetFullTextIndex" @ISHDeploymentSplat)) {
                 Initialize-ISHNetFullTextIndex  @ISHDeploymentSplat
                 Write-Verbose "Initialized network connectivity for FullTextIndex"
             }
@@ -361,7 +366,7 @@ function Set-ISHCoreConfiguration {
             Write-Verbose "Configured FullTextIndex integration to $fullTextIndexUri"
         }
 
-        if (Test-ISHComponent -Name TranslationBuilder) {
+        if (Test-ISHComponent -Name TranslationBuilder @ISHDeploymentSplat) {
             Enable-ISHServiceTranslationBuilder @ISHDeploymentSplat
             Write-Verbose "Enabled TranslationBuilder component"
         }
@@ -370,7 +375,7 @@ function Set-ISHCoreConfiguration {
             Write-Verbose "Disabled TranslationBuilder component"
         }
 
-        if (Test-ISHComponent -Name TranslationOrganizer) {
+        if (Test-ISHComponent -Name TranslationOrganizer @ISHDeploymentSplat) {
             Enable-ISHServiceTranslationOrganizer @ISHDeploymentSplat
             Write-Verbose "Enabled TranslationOrganizer component"
         }
@@ -379,7 +384,7 @@ function Set-ISHCoreConfiguration {
             Write-Verbose "Disabled TranslationOrganizer component"
         }
 
-        foreach ($role in ((Get-ISHTag -Name ISHComponent-BackgroundTask) -split ',')) {
+        foreach ($role in ((Get-ISHTag -Name ISHComponent-BackgroundTask @ISHDeploymentSplat) -split ',')) {
             $backgroundTask = "BackgroundTask$role"
             Write-Debug "configurationData.Service.$backgroundTask.Count=$($configurationData.Service."$backgroundTask".Count)"
             if ($configurationData.Service."$backgroundTask".Count -gt 0) {

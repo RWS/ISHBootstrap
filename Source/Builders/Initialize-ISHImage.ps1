@@ -1,4 +1,4 @@
- #reguires -runasadministrator
+﻿#reguires -runasadministrator
 
 <#
 # Script developed for Windows Server 2016 
@@ -112,7 +112,7 @@ switch($PSCmdlet.ParameterSetName) {
 
 if ($InstallISHPrerequisites)
 {
-    #region 1. Download and install pre-requisites
+    #region 1. Download and install prerequisites
     $blockName="Installing ISH prerequisities"
     Write-Progress @scriptProgress -Status $blockName
     Write-Host $blockName

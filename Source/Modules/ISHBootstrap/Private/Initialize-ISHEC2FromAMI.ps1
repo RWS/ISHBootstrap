@@ -34,17 +34,16 @@ Function Initialize-ISHEC2FromAMI {
     begin {
         Write-Debug "Testing if the EC2 host has been once initialized from AMI"
         # This cmdlet cannot execute twice on the same host
-
-        if (Test-ISHRequirement -Marker -Name "ISH.EC2InitializedFromAMI") {
-            throw "EC2 is already initialized from AMI"
-        }
-        Write-Debug "EC2 host has not been once initialized from AMI"
         $ISHDeploymentSplat = @{}
         $ISHDeploymentNameSplat = @{}
         if ($ISHDeployment) {
             $ISHDeploymentSplat = @{ISHDeployment = $ISHDeployment}
             $ISHDeploymentNameSplat = @{Name = $ISHDeployment}
         }
+        if (Test-ISHRequirement -Marker -Name "ISH.EC2InitializedFromAMI" @ISHDeploymentSplat) {
+            throw "EC2 is already initialized from AMI"
+        }
+        Write-Debug "EC2 host has not been once initialized from AMI"
     }
 
     process {
@@ -116,7 +115,7 @@ Function Initialize-ISHEC2FromAMI {
 
         # Add files from Program Files install folder
         $installToolInputParameters = Get-ChildItem -Path (Join-Path ${env:ProgramFiles(x86)} "Trisoft\InstallTool") -Filter inputparameters.xml -Recurse | Select-Object -ExpandProperty FullName
-        $backupPath = Get-StageFolderPath -BackupName $PSCmdlet.MyInvocation.MyCommand.Name
+        $backupPath = Get-StageFolderPath -BackupName $PSCmdlet.MyInvocation.MyCommand.Name @ISHDeploymentSplat
         Write-Debug "backupPath=$backupPath"
         $installToolInputParameters | ForEach-Object {
             Write-Debug "Copying $_ to $backupPath"
@@ -200,7 +199,7 @@ Function Initialize-ISHEC2FromAMI {
         #endregion
 
         Write-Debug "Setting marker ISH.EC2InitializedFromAMI, to avoid re-execution on the same host"
-        Set-ISHMarker -Name "ISH.EC2InitializedFromAMI"
+        Set-ISHMarker -Name "ISH.EC2InitializedFromAMI" @ISHDeploymentSplat
     }
     end {
 

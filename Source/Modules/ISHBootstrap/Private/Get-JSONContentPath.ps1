@@ -26,12 +26,19 @@ function Get-JSONContentPath {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true)]
-        [string]$Type
+        [string]$Type,
+        [Parameter(Mandatory = $false)]
+        [string]$ISHDeployment
     )
 
     begin {
         Write-Debug "Type=$Type"
-        $moduleStagePath = Get-StageFolderPath
+        Write-Debug "Type=$ISHDeployment"
+        $ISHDeploymentSplat = @{}
+        if ($ISHDeployment) {
+            $ISHDeploymentSplat = @{ISHDeployment = $ISHDeployment}
+        }
+        $moduleStagePath = Get-StageFolderPath @ISHDeploymentSplat
         Write-Debug "moduleStagePath=$moduleStagePath"
     }
 

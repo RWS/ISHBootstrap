@@ -62,69 +62,78 @@ Function Remove-ISHComponent {
         [Parameter(Mandatory = $false)]
         [switch]$All = $false,
         [Parameter(Mandatory = $false)]
-        [string]$ISHVersion=$(Get-ISHDeploymentParameters -Name softwareversion  -ValueOnly)
+        [string]$ISHVersion,
+        [Parameter(Mandatory = $false)]
+        [string]$ISHDeployment
     )
 
     begin {
         Write-Debug "PSCmdlet.ParameterSetName=$($PSCmdlet.ParameterSetName)"
         foreach ($psbp in $PSBoundParameters.GetEnumerator()) { Write-Debug "$($psbp.Key)=$($psbp.Value)" }
+        $ISHDeploymentSplat = @{}
+        if ($ISHDeployment) {
+            $ISHDeploymentSplat = @{ISHDeployment = $ISHDeployment}
+        }
+        if(-not $ISHVersion){
+            $ISHVersion = Get-ISHDeploymentParameters -Name softwareversion -ValueOnly @ISHDeploymentSplat
+        }
     }
 
     process {
         $tagNamePrefix = "ISHComponent"
         if ($DatabaseUpgrade -or $All) {
-            Remove-Tag -Name "$tagNamePrefix-DatabaseUpgrade"
+            Remove-Tag -Name "$tagNamePrefix-DatabaseUpgrade" @ISHDeploymentSplat
         }
         if ($Web -or $All) {
-            Remove-Tag -Name "$tagNamePrefix-CM"
-            Remove-Tag -Name "$tagNamePrefix-WS"
-            Remove-Tag -Name "$tagNamePrefix-STS"
+            Remove-Tag -Name "$tagNamePrefix-CM" @ISHDeploymentSplat
+            Remove-Tag -Name "$tagNamePrefix-WS" @ISHDeploymentSplat
+            Remove-Tag -Name "$tagNamePrefix-STS" @ISHDeploymentSplat
         }
         if ($WebCS -or $All) {
-            Remove-Tag -Name "$tagNamePrefix-CS"
+            Remove-Tag -Name "$tagNamePrefix-CS" @ISHDeploymentSplat
         }
         if ($Crawler -or $All) {
-            Remove-Tag -Name "$tagNamePrefix-Crawler"
+            Remove-Tag -Name "$tagNamePrefix-Crawler" @ISHDeploymentSplat
         }
         if ($FullTextIndex -or $All) {
-            Remove-Tag -Name "$tagNamePrefix-FullTextIndex"
+            Remove-Tag -Name "$tagNamePrefix-FullTextIndex" @ISHDeploymentSplat
         }
         if ($TranslationBuilder -or $All) {
-            Remove-Tag -Name "$tagNamePrefix-TranslationBuilder"
+            Remove-Tag -Name "$tagNamePrefix-TranslationBuilder" @ISHDeploymentSplat
         }
         if ($TranslationOrganizer -or $All) {
-            Remove-Tag -Name "$tagNamePrefix-TranslationOrganizer"
+            Remove-Tag -Name "$tagNamePrefix-TranslationOrganizer" @ISHDeploymentSplat
         }
         if ($TranslationJob -or $All) {
-            Remove-Tag -Name "$tagNamePrefix-TranslationJob"
+            Remove-Tag -Name "$tagNamePrefix-TranslationJob" @ISHDeploymentSplat
         }
         if ($FontoContentQuality -or $All) {
-            Remove-Tag -Name "$tagNamePrefix-FontoContentQuality"
+            Remove-Tag -Name "$tagNamePrefix-FontoContentQuality" @ISHDeploymentSplat
         }
         if ($FontoDeltaXml -or $All) {
             if ($ISHVersion -eq '14.0.2')
             {
-                Remove-Tag -Name "$tagNamePrefix-FontoDeltaXml"
+                Remove-Tag -Name "$tagNamePrefix-FontoDeltaXml" @ISHDeploymentSplat
             }
-            else
+            elseif($FontoDeltaXml)
             {
                 throw "FontoDeltaXml is not supported on ish version: $ISHVersion"
             }
         }
         if ($FontoDocumentHistory -or $All) {
-            Remove-Tag -Name "$tagNamePrefix-FontoDocumentHistory"
+            Remove-Tag -Name "$tagNamePrefix-FontoDocumentHistory" @ISHDeploymentSplat
         }
         if ($FontoReview -or $All) {
-            Remove-Tag -Name "$tagNamePrefix-FontoReview"
+            Remove-Tag -Name "$tagNamePrefix-FontoReview" @ISHDeploymentSplat
         }
         if ($FontoSpellChecker -or $All) {
-            Remove-Tag -Name "$tagNamePrefix-FontoSpellChecker"
+            Remove-Tag -Name "$tagNamePrefix-FontoSpellChecker" @ISHDeploymentSplat
         }
         if ($BackgroundTask -or $All) {
-            Remove-Tag -Name "$tagNamePrefix-BackgroundTask"
+            Remove-Tag -Name "$tagNamePrefix-BackgroundTask" @ISHDeploymentSplat
         }
         if ($All) {
-            Get-ISHTag | Where-Object { $_.Name -Like 'ISHComponent-*' } | ForEach-Object { Remove-Tag -Name $_.Name }
+            Get-ISHTag @ISHDeploymentSplat | Where-Object { $_.Name -Like 'ISHComponent-*' } | ForEach-Object { Remove-Tag -Name $_.Name @ISHDeploymentSplat }
         }
     }
 

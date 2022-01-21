@@ -26,16 +26,19 @@ function Remove-Tag {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true)]
-        [string]$Name
+        [string]$Name,
+        [Parameter(Mandatory = $false)]
+        [string]$ISHDeployment
     )
 
     begin {
         Write-Debug "PSCmdlet.ParameterSetName=$($PSCmdlet.ParameterSetName)"
         foreach ($psbp in $PSBoundParameters.GetEnumerator()) { Write-Debug "$($psbp.Key)=$($psbp.Value)" }
+        $null = $newBoundParameters.Remove('Name')
     }
 
     process {
-        $useEC2Tag = (Test-RunOnEC2) -and (-not (Test-JSONContent -Type Tag))
+        $useEC2Tag = (Test-RunOnEC2) -and (-not (Test-JSONContent @newBoundParameters -Type Tag))
         Write-Debug "useEC2Tag=$useEC2Tag"
 
         if ($useEC2Tag) {

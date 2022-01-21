@@ -27,22 +27,22 @@ Function Test-Tag {
     [OutputType([Boolean])]
     param(
         [Parameter(Mandatory = $true)]
-        [string]$Name
+        [string]$Name,
+        [Parameter(Mandatory = $false)]
+        [string]$ISHDeployment
     )
 
     begin {
         Write-Debug "PSCmdlet.ParameterSetName=$($PSCmdlet.ParameterSetName)"
         foreach ($psbp in $PSBoundParameters.GetEnumerator()) { Write-Debug "$($psbp.Key)=$($psbp.Value)" }
+        $ISHDeploymentSplat = @{}
+        if ($ISHDeployment) {
+            $ISHDeploymentSplat = @{ISHDeployment = $ISHDeployment}
+        }
     }
 
     process {
-        $tags = Get-ISHTag
-        if ($tags | Where-Object -Property Name -EQ $Name) {
-            $true
-        }
-        else {
-            $false
-        }
+        Get-ISHTag @ISHDeploymentSplat | Where-Object -Property Name -EQ $Name
     }
 
     end {

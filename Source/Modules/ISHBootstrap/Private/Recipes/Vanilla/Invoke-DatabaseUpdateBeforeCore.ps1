@@ -13,7 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #>
-
+$ISHDeployment=$args[0]
+$ISHDeploymentSplat = @{}
+if ($ISHDeployment) {
+    $ISHDeploymentSplat = @{ISHDeployment = $ISHDeployment}
+}
 Write-Debug "PSCmdlet.ParameterSetName=$($PSCmdlet.ParameterSetName)"
 foreach($psbp in $PSBoundParameters.GetEnumerator()){Write-Debug "$($psbp.Key)=$($psbp.Value)"}
 
@@ -21,6 +25,6 @@ foreach($psbp in $PSBoundParameters.GetEnumerator()){Write-Debug "$($psbp.Key)=$
 # Resubmit Xml Settings is idempotent, force resubmit always from prepared EnterViaUI folder
 $ps1FilePath = "$PSScriptRoot\Settings\Set-XmlSettings.ps1"
 Write-Debug ("Calling[$ps1FilePath]")
-& $ps1FilePath
+& $ps1FilePath @ISHDeploymentSplat
 
 #endregion Implementation

@@ -22,6 +22,8 @@
     Marker values can be used in the Recipe to drive specific customizations and/or configuration changes.
 .PARAMETER Name
     Marker name. Return all markers available if not specified.
+.PARAMETER ISHDeployment
+    Specifies the name or instance of the Content Manager deployment. See Get-ISHDeployment for more details.
 .EXAMPLE
     Get-ISHMarker
 .EXAMPLE
@@ -31,7 +33,9 @@ Function Get-ISHMarker {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $false)]
-        [string]$Name = $null
+        [string]$Name = $null,
+        [Parameter(Mandatory = $false)]
+        [string]$ISHDeployment
     )
 
     begin {

@@ -88,6 +88,10 @@ try
     {
         Install-ISHDotNetHosting 
     }
+    if($ISHServerVersion -eq "15" -or $ISHServerVersion -eq "14")
+    {
+        Install-ISHToolMSOLEDBSQL 
+    }
     Write-Progress @scriptProgress -Status "Initializing"
     Initialize-ISHLocale
     Initialize-ISHIIS

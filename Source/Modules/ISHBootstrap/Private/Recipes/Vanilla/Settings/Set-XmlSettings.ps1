@@ -1,10 +1,16 @@
+$ISHDeployment=$args[0]
+$ISHDeploymentSplat = @{}
+if ($ISHDeployment) {
+    $ISHDeploymentSplat = @{ISHDeployment = $ISHDeployment}
+}
+
 Write-Debug "PSCmdlet.ParameterSetName=$($PSCmdlet.ParameterSetName)"
 foreach ($psbp in $PSBoundParameters.GetEnumerator()) { Write-Debug "$($psbp.Key)=$($psbp.Value)" }
 
 Write-Debug "Creating new ISHRemote IshSession"
-$ishSession = New-ISHWSSession -ServiceAdmin
+$ishSession = New-ISHWSSession -ServiceAdmin @ISHDeploymentSplat
 
-$settingsFolderPath = (Get-ISHDeploymentPath -EnterViaUI).AbsolutePath
+$settingsFolderPath = (Get-ISHDeploymentPath -EnterViaUI @ISHDeploymentSplat).AbsolutePath
 
 Write-Verbose "Submitting Xml Settings from $settingsFolderPath"
 $filePath = Join-Path -Path $settingsFolderPath -ChildPath "Admin.XMLInboxConfiguration.xml"

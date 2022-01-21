@@ -30,8 +30,9 @@ Function Get-JSON {
         [Parameter(Mandatory = $false)]
         [string]$Name = $null,
         [Parameter(Mandatory = $true)]
-        [string]$Type
-
+        [string]$Type,
+        [Parameter(Mandatory = $false)]
+        [string]$ISHDeployment
     )
 
     begin {
@@ -39,6 +40,7 @@ Function Get-JSON {
         $null = $commonJSONParameters.Remove("Name")
         Write-Debug "Name=$Name"
         Write-Debug "Type=$Type"
+        Write-Debug "ISHDeployment=$ISHDeployment"
     }
 
     process {

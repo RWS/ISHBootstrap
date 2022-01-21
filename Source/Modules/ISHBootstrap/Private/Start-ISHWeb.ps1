@@ -42,8 +42,8 @@ Function Start-ISHWeb {
 
     process {
 
-        Get-ISHDeploymentParameters @ISHDeploymentSplat| Where-Object -Property Name -Like "infoshare*webappname" | ForEach-Object {
-            $appPoolName = "TrisoftAppPool$($_.Value)"
+        Get-ISHIISAppPool @ISHDeploymentSplat| Where-Object -Property Status -eq "Stopped" | ForEach-Object {
+            $appPoolName = $_.ApplicationPoolName
             Write-Debug "appPoolName=$appPoolName"
 
             Write-Debug "Starting web app pool $appPoolName"

@@ -27,7 +27,9 @@ Function Test-ISHMarker {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
-        [string]$Name
+        [string]$Name,
+        [Parameter(Mandatory = $false)]
+        [string]$ISHDeployment
     )
 
     begin {
