@@ -34,13 +34,13 @@ Function Initialize-ISHNetFullTextIndex {
     begin {
         Write-Debug "PSCmdlet.ParameterSetName=$($PSCmdlet.ParameterSetName)"
         foreach ($psbp in $PSBoundParameters.GetEnumerator()) { Write-Debug "$($psbp.Key)=$($psbp.Value)" }
-        if (Test-ISHRequirement -Marker -Name "ISH.InitializedNetFullTextIndex") {
-            throw "Node is already initialized ISH FullTextIndex Network Connectivity"
-        }
         Write-Debug "Node has not been once initialized from AMI"
         $ISHDeploymentSplat = @{}
         if ($ISHDeployment) {
             $ISHDeploymentSplat = @{ISHDeployment = $ISHDeployment}
+        }
+        if (Test-ISHRequirement -Marker -Name "ISH.InitializedNetFullTextIndex" @ISHDeploymentSplat) {
+            throw "Node is already initialized ISH FullTextIndex Network Connectivity"
         }
     }
 
@@ -84,7 +84,7 @@ Function Initialize-ISHNetFullTextIndex {
         #endregion
 
         Write-Debug "Setting marker ISH.InitializedNetFullTextIndex, to avoid re-execution on the same host"
-        Set-ISHMarker -Name "ISH.InitializedNetFullTextIndex"
+        Set-ISHMarker -Name "ISH.InitializedNetFullTextIndex" @ISHDeploymentSplat
     }
 
     end {

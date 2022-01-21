@@ -23,6 +23,8 @@
     Fore example for setting components. See Get-ISHComponents.
 .PARAMETER Name
     Tag name. Return all tags available if not specified.
+.PARAMETER ISHDeployment
+    Specifies the name or instance of the Content Manager deployment. See Get-ISHDeployment for more details.
 .EXAMPLE
     Get-ISHTag
 .EXAMPLE
@@ -32,23 +34,27 @@ function Get-ISHTag {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $false)]
-        [string]$Name = $null
+        [string]$Name = $null,
+        [Parameter(Mandatory = $false)]
+        [string]$ISHDeployment
     )
 
     begin {
         Write-Debug "PSCmdlet.ParameterSetName=$($PSCmdlet.ParameterSetName)"
         foreach ($psbp in $PSBoundParameters.GetEnumerator()) { Write-Debug "$($psbp.Key)=$($psbp.Value)" }
+        $newBoundParameters = @{ } + $PSBoundParameters
+        $null = $newBoundParameters.Remove('Name')
     }
 
     process {
-        $useEC2Tag = (Test-RunOnEC2) -and (-not (Test-JSONContent -Type Tag))
+        $useEC2Tag = (Test-RunOnEC2) -and (-not (Test-JSONContent @newBoundParameters -Type Tag))
         Write-Debug "useEC2Tag=$useEC2Tag"
 
         if ($useEC2Tag) {
             $tags = Get-TagEC2
         }
         else {
-            $tags = Get-JSON -Type Tag
+            $tags = Get-JSON @newBoundParameters -Type Tag
         }
 
         if ($Name) {

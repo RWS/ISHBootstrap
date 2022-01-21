@@ -28,7 +28,9 @@ function Get-StageFolderPath {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $false)]
-        [string]$BackupName
+        [string]$BackupName,
+        [Parameter(Mandatory = $false)]
+        [string]$ISHDeployment
     )
 
     begin {
@@ -56,7 +58,9 @@ function Get-StageFolderPath {
         Write-Debug "moduleName=$moduleName"
 
         $path = Join-Path $env:ProgramData $moduleName
-
+        if($ISHDeployment -and ($ISHDeployment -ne "InfoShare")){
+            $path = Join-Path $path $ISHDeployment
+        }
         if ($BackupName) {
             $path = Join-Path -Path $path -ChildPath "Backup"
             $path = Join-Path -Path $path -ChildPath $BackupName

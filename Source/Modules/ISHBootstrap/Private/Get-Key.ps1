@@ -37,18 +37,26 @@ Function Get-Key {
         [Parameter(Mandatory = $true, ParameterSetName = "ISH")]
         [switch]$ISH,
         [Parameter(Mandatory = $true, ParameterSetName = "Custom")]
-        [switch]$Custom
+        [switch]$Custom,
+        [Parameter(Mandatory = $false, ParameterSetName = "DebugReroute")]
+        [Parameter(Mandatory = $false, ParameterSetName = "Project+Stage")]
+        [Parameter(Mandatory = $false, ParameterSetName = "ISH")]
+        [Parameter(Mandatory = $false, ParameterSetName = "Custom")]
+        [string]$ISHDeployment
     )
 
     begin {
         Write-Debug "PSCmdlet.ParameterSetName=$($PSCmdlet.ParameterSetName)"
         foreach ($psbp in $PSBoundParameters.GetEnumerator()) { Write-Debug "$($psbp.Key)=$($psbp.Value)" }
-
-        $codeVersion = Get-ISHTag -Name "CodeVersion"
+        $ISHDeploymentSplat = @{}
+        if ($ISHDeployment) {
+            $ISHDeploymentSplat = @{ISHDeployment = $ISHDeployment}
+        }
+        $codeVersion = Get-ISHTag -Name "CodeVersion" @ISHDeploymentSplat
         Write-Debug "codeVersion=$codeVersion"
         if ($PSCmdlet.ParameterSetName -ne "DebugReroute") {
-            $project = Get-ISHTag -Name "Project"
-            $stage = Get-ISHTag -Name "Stage"
+            $project = Get-ISHTag -Name "Project" @ISHDeploymentSplat
+            $stage = Get-ISHTag -Name "Stage" @ISHDeploymentSplat
             Write-Debug "project=$project"
             Write-Debug "stage=$stage"
         }

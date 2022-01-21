@@ -54,6 +54,8 @@
     Backgroud task role.
 .PARAMETER ISHVersion
     Product version, by default softwareversion deployment parameter will be used.
+.PARAMETER ISHDeployment
+    Specifies the name or instance of the Content Manager deployment. See Get-ISHDeployment for more details.
 .EXAMPLE
     Set-ISHComponent -DatabaseUpgrade
 .EXAMPLE
@@ -100,49 +102,60 @@ Function Set-ISHComponent {
         [switch]$All = $false,
         [Parameter(Mandatory = $false, ParameterSetName = "Not BackgroundTask")]
         [Parameter(Mandatory = $false, ParameterSetName = "All")]
-        [string]$ISHVersion=$(Get-ISHDeploymentParameters -Name softwareversion  -ValueOnly)
+        [string]$ISHVersion,
+        [Parameter(Mandatory = $false, ParameterSetName = "All")]
+        [Parameter(Mandatory = $false, ParameterSetName = "Not BackgroundTask")]
+        [Parameter(Mandatory = $false, ParameterSetName = "BackgroundTask")]
+        [string]$ISHDeployment
     )
 
     begin {
         Write-Debug "PSCmdlet.ParameterSetName=$($PSCmdlet.ParameterSetName)"
         foreach ($psbp in $PSBoundParameters.GetEnumerator()) { Write-Debug "$($psbp.Key)=$($psbp.Value)" }
+        $ISHDeploymentSplat = @{}
+        if ($ISHDeployment) {
+            $ISHDeploymentSplat = @{ISHDeployment = $ISHDeployment}
+        }
+        if(-not $ISHVersion -and -not $BackgroundTask){
+            $ISHVersion = Get-ISHDeploymentParameters -Name softwareversion -ValueOnly @ISHDeploymentSplat
+        }
     }
 
     process {
         $tagNamePrefix = "ISHComponent"
         if ($DatabaseUpgrade -or $All) {
-            Set-Tag -Name "$tagNamePrefix-DatabaseUpgrade"
+            Set-Tag -Name "$tagNamePrefix-DatabaseUpgrade" @ISHDeploymentSplat
         }
         if ($Web -or $All) {
-            Set-Tag -Name "$tagNamePrefix-CM"
-            Set-Tag -Name "$tagNamePrefix-WS"
-            Set-Tag -Name "$tagNamePrefix-STS"
+            Set-Tag -Name "$tagNamePrefix-CM" @ISHDeploymentSplat
+            Set-Tag -Name "$tagNamePrefix-WS" @ISHDeploymentSplat
+            Set-Tag -Name "$tagNamePrefix-STS" @ISHDeploymentSplat
         }
         if ($WebCS -or $All) {
-            Set-Tag -Name "$tagNamePrefix-CS"
+            Set-Tag -Name "$tagNamePrefix-CS" @ISHDeploymentSplat
         }
         if ($Crawler -or $All) {
-            Set-Tag -Name "$tagNamePrefix-Crawler"
+            Set-Tag -Name "$tagNamePrefix-Crawler" @ISHDeploymentSplat
         }
         if ($FullTextIndex -or $All) {
-            Set-Tag -Name "$tagNamePrefix-FullTextIndex"
+            Set-Tag -Name "$tagNamePrefix-FullTextIndex" @ISHDeploymentSplat
         }
         if ($TranslationBuilder -or $All) {
-            Set-Tag -Name "$tagNamePrefix-TranslationBuilder"
+            Set-Tag -Name "$tagNamePrefix-TranslationBuilder" @ISHDeploymentSplat
         }
         if ($TranslationOrganizer -or $All) {
-            Set-Tag -Name "$tagNamePrefix-TranslationOrganizer"
+            Set-Tag -Name "$tagNamePrefix-TranslationOrganizer" @ISHDeploymentSplat
         }
         if ($TranslationJob -or $All) {
-            Set-Tag -Name "$tagNamePrefix-TranslationJob"
+            Set-Tag -Name "$tagNamePrefix-TranslationJob" @ISHDeploymentSplat
         }
         if ($FontoContentQuality -or $All) {
-            Set-Tag -Name "$tagNamePrefix-FontoContentQuality"
+            Set-Tag -Name "$tagNamePrefix-FontoContentQuality" @ISHDeploymentSplat
         }
         if ($FontoDeltaXml -or $All) {
             if ($ISHVersion -eq '14.0.2')
             {
-                Set-Tag -Name "$tagNamePrefix-FontoDeltaXml"
+                Set-Tag -Name "$tagNamePrefix-FontoDeltaXml" @ISHDeploymentSplat
             }
             elseif($FontoDeltaXml)
             {
@@ -150,16 +163,16 @@ Function Set-ISHComponent {
             }
         }
         if ($FontoDocumentHistory -or $All) {
-            Set-Tag -Name "$tagNamePrefix-FontoDocumentHistory"
+            Set-Tag -Name "$tagNamePrefix-FontoDocumentHistory" @ISHDeploymentSplat
         }
         if ($FontoReview -or $All) {
-            Set-Tag -Name "$tagNamePrefix-FontoReview"
+            Set-Tag -Name "$tagNamePrefix-FontoReview" @ISHDeploymentSplat
         }
         if ($FontoSpellChecker -or $All) {
-            Set-Tag -Name "$tagNamePrefix-FontoSpellChecker"
+            Set-Tag -Name "$tagNamePrefix-FontoSpellChecker" @ISHDeploymentSplat
         }
         if ($BackgroundTask -or $All) {
-            Set-Tag -Name "$tagNamePrefix-BackgroundTask" -Value ($Role -join ',')
+            Set-Tag -Name "$tagNamePrefix-BackgroundTask" -Value ($Role -join ',') @ISHDeploymentSplat
         }
     }
 

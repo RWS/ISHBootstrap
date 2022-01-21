@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #>
-
+$ISHDeployment=$args[0]
 Write-Debug "PSCmdlet.ParameterSetName=$($PSCmdlet.ParameterSetName)"
 foreach($psbp in $PSBoundParameters.GetEnumerator()){Write-Debug "$($psbp.Key)=$($psbp.Value)"}
 

@@ -36,7 +36,7 @@ Pop-Location -StackName "SQL"
 
 #region 2. Build connection string
 $dbName="InfoShare"
-"Provider=SQLOLEDB.1;Integrated Security=SSPI;Persist Security Info=False;Initial Catalog=$dbName;Data Source=$serverName"
+"Provider=MSOLEDBSQL.1;Integrated Security=SSPI;Persist Security Info=False;Initial Catalog=$dbName;Data Source=$serverName"
 #endregion
 
 

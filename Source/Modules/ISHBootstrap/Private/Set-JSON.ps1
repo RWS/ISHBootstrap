@@ -32,7 +32,9 @@ Function Set-JSON {
         [Parameter(Mandatory = $false)]
         $Value = $null,
         [Parameter(Mandatory = $true)]
-        [string]$Type
+        [string]$Type,
+        [Parameter(Mandatory = $false)]
+        [string]$ISHDeployment
     )
 
     begin {

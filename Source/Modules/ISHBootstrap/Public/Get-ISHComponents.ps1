@@ -21,24 +21,30 @@
     This cmdlet returns a list of components that are configured for current system.
     Each component represent separate feature of the product.
     See Set-ISHComponent for more details about components.
+.PARAMETER ISHDeployment
+    Specifies the name or instance of the Content Manager deployment. See Get-ISHDeployment for more details.
 .EXAMPLE
     Get-ISHComponents
 #>
 Function Get-ISHComponents {
     [CmdletBinding()]
     param(
-
+        [Parameter(Mandatory = $false)]
+        [string]$ISHDeployment
     )
 
     begin {
         Write-Debug "PSCmdlet.ParameterSetName=$($PSCmdlet.ParameterSetName)"
         foreach($psbp in $PSBoundParameters.GetEnumerator()){Write-Debug "$($psbp.Key)=$($psbp.Value)"}
-
+        $ISHDeploymentSplat = @{}
+        if ($ISHDeployment) {
+            $ISHDeploymentSplat = @{ISHDeployment = $ISHDeployment}
+        }
         $tagNamePrefix="ISHComponent-"
     }
 
     process {
-        Get-ISHTag | Where-Object {$_.Name.StartsWith("$($tagNamePrefix)")} | ForEach-Object {
+        Get-ISHTag @ISHDeploymentSplat | Where-Object {$_.Name.StartsWith("$($tagNamePrefix)")} | ForEach-Object {
             if($_.Name -eq "$($tagNamePrefix)BackgroundTask")
             {
                 # This is background task component and we need to extract the role also

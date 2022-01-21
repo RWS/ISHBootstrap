@@ -34,12 +34,14 @@
     Configuration key value.
 .PARAMETER FilePath
     Path to the file where configuration value is stored. Fore example certificate private key.
+.PARAMETER ISHDeployment
+    Specifies the name or instance of the Content Manager deployment. See Get-ISHDeployment for more details.
 #>
 Function Set-ISHDeploymentCustomConfiguration {
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory = $true, ParameterSetName = "Single Key/Value")]
-        [Parameter(Mandatory = $true, ParameterSetName = "File Key/Blob")]
+        [Parameter(Mandatory = $false, ParameterSetName = "Single Key/Value")]
+        [Parameter(Mandatory = $false, ParameterSetName = "File Key/Blob")]
         [ValidateScript( { Test-Path $_ })]
         [string]$ConfigFilePath,
         [Parameter(Mandatory = $true, ParameterSetName = "Single Key/Value")]
@@ -60,12 +62,18 @@ Function Set-ISHDeploymentCustomConfiguration {
         [string]$Value = $null,
         [Parameter(Mandatory = $true, ParameterSetName = "File Key/Blob")]
         [ValidateScript( { Test-Path $_ })]
-        [string]$FilePath
+        [string]$FilePath,
+        [Parameter(Mandatory = $false, ParameterSetName = "Single Key/Value")]
+        [Parameter(Mandatory = $false, ParameterSetName = "File Key/Blob")]
+        [string]$ISHDeployment
     )
 
     begin {
         Write-Debug "PSCmdlet.ParameterSetName=$($PSCmdlet.ParameterSetName)"
         foreach ($psbp in $PSBoundParameters.GetEnumerator()) { Write-Debug "$($psbp.Key)=$($psbp.Value)" }
+        if(-not $ConfigFilePath){
+            $ConfigFilePath = (Get-Variable -Name "ISHDeploymentConfigFilePath").Value -f ($ISHDeployment  -replace "^InfoShare$")
+        }
     }
 
     process {

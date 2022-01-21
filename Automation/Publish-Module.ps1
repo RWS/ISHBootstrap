@@ -31,6 +31,7 @@ param(
 Set-StrictMode -Version latest
 
 Import-Module -Name PowerShellGet -Version 2.2.5 -Force
+Install-Module -Name SemVerPS
 
 $moduleNameToPublish = "ISHBootstrap"
 switch ($PSCmdlet.ParameterSetName) {
@@ -83,7 +84,7 @@ try {
     }
     $sourceMajor = [int]$Matches["Major"]
     $sourceMinor = [int]$Matches["Minor"]
-    $sourcePatch = [int]$Matches["Patch"]
+    $sourcePatch = [int]$Matches["Build"]
     $sourcePreRelease = "update"
     $sourceVersion = "$sourceMajor.$sourceMinor.$sourcePatch"
     $sourceVersionToCompare = [semver]$sourceVersion
@@ -156,7 +157,6 @@ try {
         "PoshPrivilege"
         "WcfPS"
         "PSHosts"
-        "SemVerPS"
     )
     $externalModules = @(
         "Pester"
@@ -164,7 +164,6 @@ try {
         "PoshPrivilege"
         "WcfPS"
         "PSHosts"
-        "SemVerPS"
     )
 
     # Generating module release notes from the latest changes from the CHANGELOG.md

@@ -35,21 +35,25 @@ function Test-RunOnEC2 {
 
     process {
         <#  Conditions of being on Run on EC2
+            ISH.AMI Marker  was set by Packer
             AWSPowerShell module is installed
             EC2 metadata is reachable
         #>
-        $isAWSToolInstalled = $null -ne (Get-Module -Name AWSPowerShell -ListAvailable)
-        Write-Debug "isAWSToolInstalled=$isAWSToolInstalled"
+        
+        if (Test-ISHMarker -Name ISH.AMI) {
+            try {
+                $ec2MetadataPointReachable = $null -ne (Get-EC2InstanceMetadata -Category AmiId)
 
-        if ($isAWSToolInstalled) {
-            $ec2MetadataPointReachable = $null -ne (Get-EC2InstanceMetadata -Category AmiId)
+                Write-Debug "ec2MetadataPointReachable=$ec2MetadataPointReachable"
 
-            Write-Debug "ec2MetadataPointReachable=$ec2MetadataPointReachable"
-
-            if ($ec2MetadataPointReachable) {
-                if (Get-TagEC2 | Where-Object -Property Name -EQ 'ISHStackConfiguration') {
-                    return $true
+                if ($ec2MetadataPointReachable) {
+                    if (Get-TagEC2 | Where-Object -Property Name -EQ 'ISHStackConfiguration') {
+                        return $true
+                    }
                 }
+            }
+            catch {
+                return $false
             }
         }
         return $false

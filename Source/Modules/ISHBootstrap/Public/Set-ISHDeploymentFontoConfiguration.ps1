@@ -38,6 +38,8 @@
     Enable review space feature.
 .PARAMETER DocumentHistoryForReviewSpace
     Enable document history for review space feature.
+.PARAMETER ISHDeployment
+    Specifies the name or instance of the Content Manager deployment. See Get-ISHDeployment for more details.
 .EXAMPLE
     Set-ISHDeploymentFontoConfiguration -Project project -Stage stage
 .EXAMPLE
@@ -48,9 +50,9 @@ Function Set-ISHDeploymentFontoConfiguration {
     param(
         [Parameter(Mandatory = $false)]
         [ValidateScript( { Test-Path $_ })]
-        [string]$ConfigFilePath = $((Get-Variable -Name "ISHDeploymentConfigFilePath").Value),
+        [string]$ConfigFilePath,
         [Parameter(Mandatory = $false)]
-        [string]$ISHBootstrapVersion = "ISHBootstrap.2.0.0",
+        [string]$ISHBootstrapVersion = "2.0",
         [Parameter(Mandatory = $true)]
         [string]$Project,
         [Parameter(Mandatory = $true, HelpMessage = "The Tridion Docs stage (environment), e.g. Development, Acceptance, Production")]
@@ -66,12 +68,24 @@ Function Set-ISHDeploymentFontoConfiguration {
         [ValidateScript( { $ReviewSpace.IsPresent })]
         [switch]$DocumentHistoryForReviewSpace,
         [Parameter(Mandatory = $false)]
-        [string]$ISHVersion=$(Get-ISHDeploymentParameters -Name softwareversion -ValueOnly)
+        [string]$ISHVersion,
+        [Parameter(Mandatory = $false)]
+        [string]$ISHDeployment
     )
 
     begin {
         Write-Debug "PSCmdlet.ParameterSetName=$($PSCmdlet.ParameterSetName)"
         foreach ($psbp in $PSBoundParameters.GetEnumerator()) { Write-Debug "$($psbp.Key)=$($psbp.Value)" }
+        $ISHDeploymentSplat = @{}
+        if ($ISHDeployment) {
+            $ISHDeploymentSplat = @{ISHDeployment = $ISHDeployment}
+        }
+        if(-not $ISHVersion){
+            $ISHVersion = Get-ISHDeploymentParameters -Name softwareversion -ValueOnly @ISHDeploymentSplat
+        }
+        if(-not $ConfigFilePath){
+            $ConfigFilePath = (Get-Variable -Name "ISHDeploymentConfigFilePath").Value -f ($ISHDeployment  -replace "^InfoShare$")
+        }
     }
 
     process {

@@ -48,7 +48,7 @@ Function Invoke-ISHCrawlerReIndex {
 
         Write-Debug "Testing if the reindex has happened already once."
 
-        if (-not (Test-ISHRequirement -Marker -Name "ISH.EC2InvokedCrawlerReindex")) {
+        if (-not (Test-ISHRequirement -Marker -Name "ISH.EC2InvokedCrawlerReindex" @ISHDeploymentSplat)) {
             # Reindex has never been invoked by this host
             Invoke-ISHMaintenance -Crawler -ReIndex @ISHDeploymentSplat
 
@@ -75,7 +75,7 @@ Function Invoke-ISHCrawlerReIndex {
             Write-Verbose "Issued a fulltextindex reindex"
 
             Write-Debug "Setting marker ISH.EC2InvokedCrawlerReindex, to avoid re-execution on the same host"
-            Set-ISHMarker -Name "ISH.EC2InvokedCrawlerReindex"
+            Set-ISHMarker -Name "ISH.EC2InvokedCrawlerReindex" @ISHDeploymentSplat
         }
         else {
             Write-Debug "Reindex has already happened once from this host. No taking any action"

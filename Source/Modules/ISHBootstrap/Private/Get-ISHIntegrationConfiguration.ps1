@@ -30,15 +30,19 @@ function Get-ISHIntegrationConfiguration {
     )
 
     begin {
-        $projectStageKey = Get-Key -ProjectStage
-        $ishKey = Get-Key -ISH
+        $ISHDeploymentSplat = @{}
+        if ($ISHDeployment) {
+            $ISHDeploymentSplat = @{ISHDeployment = $ISHDeployment}
+        }
+        $projectStageKey = Get-Key -ProjectStage @ISHDeploymentSplat
+        $ishKey = Get-Key -ISH @ISHDeploymentSplat
         Write-Debug "projectStageKey=$projectStageKey"
         Write-Debug "ishKey=$ishKey"
         $ISHDeploymentSplat = @{}
         if ($ISHDeployment) {
             $ISHDeploymentSplat = @{ISHDeployment = $ISHDeployment}
         }
-        $deploymentConfig = (Get-Variable -Name "ISHDeploymentConfigFilePath").Value
+        $deploymentConfig = (Get-Variable -Name "ISHDeploymentConfigFilePath").Value -f ($ISHDeployment  -replace "^InfoShare$")
         Write-Debug "deploymentConfig=$deploymentConfig"
         $ISHVersion = Get-ISHDeploymentParameters -Name softwareversion -ValueOnly @ISHDeploymentSplat
     }

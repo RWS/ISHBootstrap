@@ -61,12 +61,9 @@ Function Get-ISHCredential {
                 -Password ($deploymentParameters | Where-Object -Property Name -Like 'servicepassword').Value
             }
             'ServiceAdmin' {
-                $coreConfiguration = Get-ISHCoreConfiguration
+                $coreConfiguration = Get-ISHCoreConfiguration @ISHDeploymentSplat
                 if ($coreConfiguration.ServiceAdmin) {
                     $coreConfiguration.ServiceAdmin.Credential
-                }
-                else {
-                    New-PSCredential -Username 'admin' -Password 'admin'
                 }
             }
         }

@@ -88,8 +88,10 @@ Function Test-ISHRequirement {
         Write-Debug "PSCmdlet.ParameterSetName=$($PSCmdlet.ParameterSetName)"
         foreach ($psbp in $PSBoundParameters.GetEnumerator()) { Write-Debug "$($psbp.Key)=$($psbp.Value)" }
         $ISHDeploymentNameSplat = @{}
+        $ISHDeploymentSplat = @{}
         if ($ISHDeployment) {
             $ISHDeploymentNameSplat = @{Name = $ISHDeployment}
+            $ISHDeploymentSplat = @{ISHDeployment = $ISHDeployment}
         }
     }
 
@@ -111,9 +113,9 @@ Function Test-ISHRequirement {
                 }
             }
             'Marker' {
-                if (Test-ISHMarker -Name $Name) {
+                if (Test-ISHMarker -Name $Name @ISHDeploymentSplat) {
                     if ($Value) {
-                        (Get-ISHMarker -Name $Name) -eq $Value
+                        (Get-ISHMarker -Name $Name @ISHDeploymentSplat) -eq $Value
                     }
                     else {
                         $true
@@ -124,9 +126,9 @@ Function Test-ISHRequirement {
                 }
             }
             'Tag' {
-                if (Test-Tag -Name $Name) {
+                if (Test-Tag -Name $Name @ISHDeploymentSplat) {
                     if ($Value) {
-                        (Get-ISHTag -Name $Name) -eq $Value
+                        (Get-ISHTag -Name $Name @ISHDeploymentSplat) -eq $Value
                     }
                     else {
                         $true
@@ -137,10 +139,10 @@ Function Test-ISHRequirement {
                 }
             }
             'ISH Component' {
-                Test-ISHComponent -Name $Name
+                Test-ISHComponent -Name $Name @ISHDeploymentSplat
             }
             'ISH BackgroundTask' {
-                Test-ISHComponent -Name BackgroundTask -Role $Name -ErrorAction SilentlyContinue
+                Test-ISHComponent -Name BackgroundTask -Role $Name -ErrorAction SilentlyContinue @ISHDeploymentSplat
             }
             'ISH Version' {
                 $deployment = Get-ISHDeployment @ISHDeploymentNameSplat

@@ -34,24 +34,29 @@ Function Test-ISHComponent {
         [ValidateSet("DatabaseUpgrade", "CM", "CS", "WS", "STS", "Crawler", "FullTextIndex", "TranslationBuilder", "TranslationOrganizer", "BackgroundTask", "FontoContentQuality", "FontoDeltaXml", "FontoDocumentHistory", "FontoReview", "FontoSpellChecker")]
         [string]$Name,
         [Parameter(Mandatory = $true, ParameterSetName = "BackgroundTask")]
-        [string]$Role
+        [string]$Role,
+        [Parameter(Mandatory = $false)]
+        [string]$ISHDeployment
     )
 
     begin {
         Write-Debug "PSCmdlet.ParameterSetName=$($PSCmdlet.ParameterSetName)"
         foreach ($psbp in $PSBoundParameters.GetEnumerator()) { Write-Debug "$($psbp.Key)=$($psbp.Value)" }
-
+        $ISHDeploymentSplat = @{}
+        if ($ISHDeployment) {
+            $ISHDeploymentSplat = @{ISHDeployment = $ISHDeployment}
+        }
         $tagNamePrefix = "ISHComponent-"
     }
 
     process {
         switch ($PSCmdlet.ParameterSetName) {
             'Not BackgroundTask' {
-                Test-Tag -Name "$tagNamePrefix$Name"
+                Test-Tag -Name "$tagNamePrefix$Name" @ISHDeploymentSplat
             }
             'BackgroundTask' {
-                if (Test-Tag -Name "$tagNamePrefix$Name") {
-                    $roles = (Get-ISHTag -Name "$tagNamePrefix$Name") -split ','
+                if (Test-Tag -Name "$tagNamePrefix$Name" @ISHDeploymentSplat) {
+                    $roles = (Get-ISHTag -Name "$tagNamePrefix$Name" @ISHDeploymentSplat) -split ','
                 }
                 $roles -contains $Role
             }
