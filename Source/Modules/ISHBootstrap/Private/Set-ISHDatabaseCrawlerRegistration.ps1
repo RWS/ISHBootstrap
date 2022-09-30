@@ -1,5 +1,5 @@
 <#
-# Copyright (c) 2021 All Rights Reserved by the RWS Group for and on behalf of its affiliates and subsidiaries.
+# Copyright (c) 2022 All Rights Reserved by the RWS Group for and on behalf of its affiliates and subsidiaries.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -62,17 +62,27 @@ FROM ISH_CRAWLER
 WHERE HOSTNAME='InfoShare' AND CATALOG='InfoShare'
 "@
         Write-Debug "sqlValidCrawlerRegistrationCount=$(($sqlValidCrawlerRegistrationCount -split [System.Environment]::NewLine) -join ' ')"
+        $ishDB = Get-ISHIntegrationDB @ISHDeploymentSplat
+        $engin = $ishDB | Select-Object -ExpandProperty Engine
+        $connectionString = $ishDB | Select-Object -ExpandProperty RawConnectionString
+        if ( $engin -eq 'oracle' ) {
+            [int]$cralweRegistrationCount = (Invoke-OracleQuery -Sql $sqlCrawlerRegistrationCount -ConnectionString $connectionString)[0]
+            Write-Debug "cralweRegistrationCount=$cralweRegistrationCount"
 
-        #region TODO Invoke-SqlServerQuery@InvokeQuery
-        $invokeSqlServerQuerySplat = New-SqlServerQuerySplat @ISHDeploymentSplat
-        #endregion
+            [int]$validCralweRegistrationCount = (Invoke-OracleQuery -Sql $sqlValidCrawlerRegistrationCount -ConnectionString $connectionString)[0]
+            Write-Debug "validCralweRegistrationCount=$validCralweRegistrationCount"
+        }
+        else {
+            #region TODO Invoke-SqlServerQuery@InvokeQuery
+            $invokeSqlServerQuerySplat = New-SqlServerQuerySplat -ConnectionString $connectionString  @ISHDeploymentSplat
+            #endregion
 
-        [int]$cralweRegistrationCount = Invoke-SqlServerQuery -Sql $sqlCrawlerRegistrationCount -NoTrans -Scalar @invokeSqlServerQuerySplat
-        Write-Debug "cralweRegistrationCount=$cralweRegistrationCount"
+            [int]$cralweRegistrationCount = Invoke-SqlServerQuery -Sql $sqlCrawlerRegistrationCount -NoTrans -Scalar @invokeSqlServerQuerySplat
+            Write-Debug "cralweRegistrationCount=$cralweRegistrationCount"
 
-        $validCralweRegistrationCount = Invoke-SqlServerQuery -Sql $sqlValidCrawlerRegistrationCount -NoTrans -Scalar @invokeSqlServerQuerySplat
-        Write-Debug "validCralweRegistrationCount=$validCralweRegistrationCount"
-
+            [int]$validCralweRegistrationCount = Invoke-SqlServerQuery -Sql $sqlValidCrawlerRegistrationCount -NoTrans -Scalar @invokeSqlServerQuerySplat
+            Write-Debug "validCralweRegistrationCount=$validCralweRegistrationCount"
+        }
         if ($cralweRegistrationCount -gt 1) {
             Write-Warning "More than 1 crawer registrations found in database"
             Invoke-ISHMaintenance -Crawler -UnRegisterAll @ISHDeploymentSplat
