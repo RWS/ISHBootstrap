@@ -1,5 +1,5 @@
 <#
-# Copyright (c) 2021 All Rights Reserved by the RWS Group for and on behalf of its affiliates and subsidiaries.
+# Copyright (c) 2022 All Rights Reserved by the RWS Group for and on behalf of its affiliates and subsidiaries.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -40,20 +40,41 @@ Function Get-ISHDatabaseVersion {
 
     # TODO - Replace SQL Server query with DBUT SaveInfoShareVersionHistoryXML (SCTCCM-300)
     process {
-        $sql = @"
+        $ishDB = Get-ISHIntegrationDB @ISHDeploymentSplat
+        $engin = $ishDB | Select-Object -ExpandProperty Engine
+        $connectionString = $ishDB | Select-Object -ExpandProperty RawConnectionString
+
+        if ( $engin -eq 'oracle' ) {
+            $sql = @"
+SELECT * FROM 
+(
+    SELECT VERSION 
+    FROM ISH_SETUP_HISTORY 
+    WHERE STATUS = 'Completed' AND ACTION = 'DatabaseUpgrade' 
+    ORDER BY CREATIONDATE DESC
+) 
+WHERE 
+    ROWNUM = 1
+"@
+            $ishDBVersion = Invoke-OracleQuery -Sql $sql -ConnectionString $connectionString
+            $ishDBVersion.VERSION
+        }
+        else {
+            $sql = @"
 SELECT Top 1 [VERSION]
 FROM [dbo].[ISH_SETUP_HISTORY]
 WHERE STATUS = 'Completed' AND ACTION = 'DatabaseUpgrade'
 ORDER BY CREATIONDATE DESC
 "@
 
-        #region TODO Invoke-SqlServerQuery@InvokeQuery
-        $invokeSqlServerQuerySplat = New-SqlServerQuerySplat @ISHDeploymentSplat
-        #endregion
+            #region TODO Invoke-SqlServerQuery@InvokeQuery
+            $invokeSqlServerQuerySplat = New-SqlServerQuerySplat -ConnectionString $connectionString
+            #endregion
 
-        $ishDBVersion = Invoke-SqlServerQuery -Sql $sql -NoTrans -Scalar @invokeSqlServerQuerySplat
-        Write-Debug "ishDBVersion=$ishDBVersion"
-        $ishDBVersion
+            $ishDBVersion = Invoke-SqlServerQuery -Sql $sql -NoTrans -Scalar @invokeSqlServerQuerySplat
+            Write-Debug "ishDBVersion=$ishDBVersion"
+            $ishDBVersion
+        }
     }
 
     end {

@@ -1,5 +1,5 @@
 <#
-# Copyright (c) 2021 All Rights Reserved by the RWS Group for and on behalf of its affiliates and subsidiaries.
+# Copyright (c) 2022 All Rights Reserved by the RWS Group for and on behalf of its affiliates and subsidiaries.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -30,7 +30,10 @@ function Get-ISHDeploymentPath {
         [switch]$EnterViaUI,
         [Parameter(Mandatory = $true, ParameterSetName = "JettyIPAccess")]
         [switch]$JettyIPAccess,
+        [Parameter(Mandatory = $true, ParameterSetName = "SolrInCmd")]
+        [switch]$SolrInCmd,
         [Parameter(Mandatory = $false,ParameterSetName = "JettyIPAccess")]
+        [Parameter(Mandatory = $false,ParameterSetName = "SolrInCmd")]
         [Parameter(Mandatory = $false,ParameterSetName = "EnterViaUI")]
         [string]$ISHDeployment
     )
@@ -56,6 +59,10 @@ function Get-ISHDeploymentPath {
             }
             'JettyIPAccess' {
                 $relativePath = "Utilities\SolrLucene\Jetty\etc\jetty-ipaccess.xml"
+                $absolutePath = Join-Path -Path $deployment.AppPath -ChildPath $relativePath
+            }
+            'SolrInCmd' {
+                $relativePath = "Utilities\SolrLucene\bin\solr.in.cmd"
                 $absolutePath = Join-Path -Path $deployment.AppPath -ChildPath $relativePath
             }
         }

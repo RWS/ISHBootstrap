@@ -1,5 +1,5 @@
 <#
-# Copyright (c) 2021 All Rights Reserved by the RWS Group for and on behalf of its affiliates and subsidiaries.
+# Copyright (c) 2022 All Rights Reserved by the RWS Group for and on behalf of its affiliates and subsidiaries.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -48,31 +48,48 @@ Function Initialize-ISHNetFullTextIndex {
         #region Adapt Jetty IPAccess configuration
 
         $jettyIPAccessPath = Get-ISHDeploymentPath -JettyIPAccess @ISHDeploymentSplat
-        Write-Debug "jettyIPAccessPath.AbsolutePath=$($jettyIPAccessPath.AbsolutePath)"
-        Write-Debug "jettyIPAccessPath.RelativePath=$($jettyIPAccessPath.RelativePath)"
-        $filePath = $jettyIPAccessPath.AbsolutePath
-        Write-Debug "filePath=$filePath"
-        Backup-ISHDeployment -Path $jettyIPAccessPath.RelativePath -App @ISHDeploymentSplat
+        $SolrInCmdPath = Get-ISHDeploymentPath -SolrInCmd @ISHDeploymentSplat
 
-        [xml]$xml = Get-Content -Path $filePath -Raw
-        # <Item>172.0-255.0-255.0-255</Item>
+        if (Test-Path $jettyIPAccessPath.AbsolutePath) {
+            Write-Debug "jettyIPAccessPath.AbsolutePath=$($jettyIPAccessPath.AbsolutePath)"
+            Write-Debug "jettyIPAccessPath.RelativePath=$($jettyIPAccessPath.RelativePath)"
+            $filePath = $jettyIPAccessPath.AbsolutePath
+            Write-Debug "filePath=$filePath"
+            Backup-ISHDeployment -Path $jettyIPAccessPath.RelativePath -App @ISHDeploymentSplat
 
-        $xpathArrayWhiteList = 'Configure[@id="Server"]/Set[@name="handler"]/New[@id="IPAccessHandler"]/Set[@name="white"]/Array'
-        $xpathArrayWhiteListJetty93Up = 'Configure[@id="Server"]/Call[@name="insertHandler"]/Arg/New[@id="IPAccessHandler"]/Set[@name="white"]/Array'
-        Write-Debug "xpathArrayWhiteList=$xpathArrayWhiteList"
+            [xml]$xml = Get-Content -Path $filePath -Raw
+            # <Item>172.0-255.0-255.0-255</Item>
 
-        $nodeArrayWhiteList = $xml.SelectSingleNode($xpathArrayWhiteList)
-        if (-not $nodeArrayWhiteList) {
-            Write-Debug "xpathArrayWhiteListJetty93Up=$xpathArrayWhiteListJetty93Up"
-            $nodeArrayWhiteList = $xml.SelectSingleNode($xpathArrayWhiteListJetty93Up)
+            $xpathArrayWhiteList = 'Configure[@id="Server"]/Set[@name="handler"]/New[@id="IPAccessHandler"]/Set[@name="white"]/Array'
+            $xpathArrayWhiteListJetty93Up = 'Configure[@id="Server"]/Call[@name="insertHandler"]/Arg/New[@id="IPAccessHandler"]/Set[@name="white"]/Array'
+            Write-Debug "xpathArrayWhiteList=$xpathArrayWhiteList"
+
+            $nodeArrayWhiteList = $xml.SelectSingleNode($xpathArrayWhiteList)
+            if (-not $nodeArrayWhiteList) {
+                Write-Debug "xpathArrayWhiteListJetty93Up=$xpathArrayWhiteListJetty93Up"
+                $nodeArrayWhiteList = $xml.SelectSingleNode($xpathArrayWhiteListJetty93Up)
+            }
+            $commentExplanation = $xml.CreateComment("Automation changes: Allow incomming connections from all ip ranges");
+            $nodeItem = $xml.CreateElement("Item")
+            $null = $nodeItem.InsertAfter($xml.CreateTextNode("0-255.0-255.0-255.0-255"), $null)
+            $null = $nodeArrayWhiteList.InsertAfter($nodeItem, $null)
+            $null = $nodeArrayWhiteList.InsertAfter($commentExplanation, $null)
+
+            $xml.Save($filePath)
         }
-        $commentExplanation = $xml.CreateComment("Automation changes: Allow incomming connections from all ip ranges");
-        $nodeItem = $xml.CreateElement("Item")
-        $null = $nodeItem.InsertAfter($xml.CreateTextNode("0-255.0-255.0-255.0-255"), $null)
-        $null = $nodeArrayWhiteList.InsertAfter($nodeItem, $null)
-        $null = $nodeArrayWhiteList.InsertAfter($commentExplanation, $null)
-
-        $xml.Save($filePath)
+        if (Test-Path $SolrInCmdPath.AbsolutePath) {
+            Write-Debug "SolrInCmdPath.AbsolutePath=$($SolrInCmdPath.AbsolutePath)"
+            Write-Debug "SolrInCmdPath.RelativePath=$($SolrInCmdPath.RelativePath)"
+            Backup-ISHDeployment -Path $SolrInCmdPath.RelativePath -App @ISHDeploymentSplat
+            $fileContent = Get-Content -Path $SolrInCmdPath.AbsolutePath -Raw
+			$fileContent += @"
+set SOLR_OPTS=%SOLR_OPTS% -Dsolr.dns.prevent.reverse.lookup=true
+set SOLR_JETTY_HOST=0.0.0.0
+set SOLR_IP_ALLOWLIST=0.0.0.0/0, 127.0.0.1, 127.0.0.2/*.html
+"@
+            Set-Content -Path $SolrInCmdPath.AbsolutePath -Value $fileContent
+            $filePath = $SolrInCmdPath.AbsolutePath
+        }
         Write-Verbose "$filePath adapted to allow incomming connection from all ips"
 
         #endregion

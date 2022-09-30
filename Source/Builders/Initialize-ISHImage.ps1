@@ -41,7 +41,10 @@ param(
     [bool]$InstallISHPrerequisites=$true,
     [Parameter(Mandatory=$false,ParameterSetName="From FTP")]
     [Parameter(Mandatory=$false,ParameterSetName="From AWS S3")]
-    [bool]$InstallISHApplicationServer=$true
+    [bool]$InstallISHApplicationServer=$true,
+    [Parameter(Mandatory=$false,ParameterSetName="From FTP")]
+    [Parameter(Mandatory=$false,ParameterSetName="From AWS S3")]
+    [string]$AMConnectionString=$null
 )
 
 $cmdletsPaths="$PSScriptRoot\..\Cmdlets"
@@ -210,6 +213,7 @@ if ($InstallISHApplicationServer)
         LocalServiceHostName="MockLocalServiceHostName"
         MachineName="MockMachineName"
         ConnectionString=$ConnectionString
+        AMConnectionString=$AMConnectionString
     }
 
     & $serverScriptsPath\Install\Install-ISHDeployment.ps1 @installHash
@@ -222,8 +226,8 @@ if ($InstallISHApplicationServer)
 
     # Web Application pools
     Import-Module WebAdministration
-    Get-ISHDeploymentParameters| Where-Object -Property Name -Like "infoshare*webappname"| ForEach-Object {
-        Stop-WebAppPool -Name "TrisoftAppPool$($_.Value)" -ErrorAction SilentlyContinue
+    Get-ISHIISAppPool | ForEach-Object {
+            Stop-WebAppPool -Name $_.ApplicationPoolName -ErrorAction SilentlyContinue
     }
 
     # Windows services

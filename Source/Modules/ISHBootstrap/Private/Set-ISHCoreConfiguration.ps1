@@ -1,5 +1,5 @@
 <#
-# Copyright (c) 2021 All Rights Reserved by the RWS Group for and on behalf of its affiliates and subsidiaries.
+# Copyright (c) 2022 All Rights Reserved by the RWS Group for and on behalf of its affiliates and subsidiaries.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -107,7 +107,6 @@ function Set-ISHCoreConfiguration {
             $filePath = Join-Path $env:TEMP "HTTPS.$($thumbprint).pfx"
             Write-Debug "filePath=$filePath"
             if (-not (Test-Path -Path "Cert:\LocalMachine\My\$thumbprint")) {
-                $pfxPassword = ConvertTo-SecureString -String $configurationData.Certificate.HTTPS.PfxPassword -AsPlainText -Force
                 Write-Debug "Saving certificate to $filePath"
                 if ($null -ne $configurationData.Certificate.HTTPS.PfxBlob) {
                     [System.IO.File]::WriteAllBytes($filePath, $configurationData.Certificate.HTTPS.PfxBlob)
@@ -116,7 +115,8 @@ function Set-ISHCoreConfiguration {
                     $null = Read-S3Object -BucketName $configurationData.Certificate.HTTPS.PfxBase64BucketName -Key $configurationData.Certificate.HTTPS.PfxBase64Key -File $filePath
                 }
                 Write-Debug "Installing certificate from $filePath"
-                $certificate = Import-PfxCertificate -FilePath $filePath -CertStoreLocation Cert:\LocalMachine\My -Password $pfxPassword
+                certutil -f -p $configurationData.Certificate.HTTPS.PfxPassword -ImportPfx $filePath
+                Set-CertificateTrusted -Thumbprint $thumbprint
                 Write-Verbose "Installed certificate from $filePath"
             }
 
@@ -134,7 +134,6 @@ function Set-ISHCoreConfiguration {
             $filePath = Join-Path $env:TEMP "ISHSTS.$($thumbprint).pfx"
             Write-Debug "filePath=$filePath"
             if (-not (Test-Path -Path "Cert:\LocalMachine\My\$thumbprint")) {
-                $pfxPassword = ConvertTo-SecureString -String $configurationData.Certificate.ISHSTS.PfxPassword -AsPlainText -Force
                 Write-Debug "Saving certificate to $filePath"
                 if ($null -ne $configurationData.Certificate.ISHSTS.PfxBlob) {
                     [System.IO.File]::WriteAllBytes($filePath, $configurationData.Certificate.ISHSTS.PfxBlob)
@@ -143,7 +142,8 @@ function Set-ISHCoreConfiguration {
                     $null = Read-S3Object -BucketName $configurationData.Certificate.ISHSTS.PfxBase64BucketName -Key $configurationData.Certificate.ISHSTS.PfxBase64Key -File $filePath
                 }
                 Write-Debug "Installing certificate from $filePath"
-                $certificate = Import-PfxCertificate -FilePath $filePath -CertStoreLocation Cert:\LocalMachine\My -Password $pfxPassword
+                certutil -f -p $configurationData.Certificate.ISHSTS.PfxPassword -ImportPfx $filePath
+                Set-CertificateTrusted -Thumbprint $thumbprint
                 Write-Verbose "Installed certificate from $filePath"
             }
 
@@ -166,7 +166,6 @@ function Set-ISHCoreConfiguration {
             $filePath = Join-Path $env:TEMP "ISHWS.$($thumbprint).pfx"
             Write-Debug "filePath=$filePath"
             if (-not (Test-Path -Path "Cert:\LocalMachine\My\$thumbprint")) {
-                $pfxPassword = ConvertTo-SecureString -String $configurationData.Certificate.ISHWS.PfxPassword -AsPlainText -Force
                 Write-Debug "Saving certificate to $filePath"
                 if ($null -ne $configurationData.Certificate.ISHWS.PfxBlob) {
                     [System.IO.File]::WriteAllBytes($filePath, $configurationData.Certificate.ISHWS.PfxBlob)
@@ -175,7 +174,8 @@ function Set-ISHCoreConfiguration {
                     $null = Read-S3Object -BucketName $configurationData.Certificate.ISHWS.PfxBase64BucketName -Key $configurationData.Certificate.ISHWS.PfxBase64Key -File $filePath
                 }
                 Write-Debug "Installing certificate from $filePath"
-                $certificate = Import-PfxCertificate -FilePath $filePath -CertStoreLocation Cert:\LocalMachine\My -Password $pfxPassword
+                certutil -f -p $configurationData.Certificate.ISHWS.PfxPassword -ImportPfx $filePath
+                Set-CertificateTrusted -Thumbprint $thumbprint
                 Write-Verbose "Installed certificate from $filePath"
             }
 
@@ -247,7 +247,7 @@ function Set-ISHCoreConfiguration {
             # https://stash.sdl.com/projects/TS/repos/ishdeploy/diff/Source/ISHDeploy/Data/Managers/DatabaseManager.cs?until=eaf9bfa444709210449c5431d0837f576ab97020
             $a = 1
             $max = 30
-            $sleep = 10
+            $sleep = 30
             Do {
                 If ($a -gt $max) { break }
                 Write-Verbose "Configuring Database integration - Attempt $($a) of $($max)"
