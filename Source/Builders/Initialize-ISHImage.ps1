@@ -84,7 +84,16 @@ if($ISHCDFolder.EndsWith("/"))
 }
 switch($PSCmdlet.ParameterSetName) {
     'From AWS S3' {
-        $s3Region = Get-S3BucketLocation -BucketName $BucketName
+        $hash=@{
+            BucketName=$BucketName
+        }
+        if($AccessKey){
+            $hash.AccessKey=$AccessKey
+        }
+        if($SecretKey){
+            $hash.SecretKey=$SecretKey
+        }
+        $s3Region = Get-S3BucketLocation @hash
         if ( $s3Region.Value ) {
             $Region = $s3Region.Value
         } else {
