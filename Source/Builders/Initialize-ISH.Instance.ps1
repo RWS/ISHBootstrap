@@ -285,12 +285,14 @@ $replacementMatrix=@(
         CurrentValue=$deploymentParameters|Where-Object -Property Name -EQ databasetype|Select-Object -ExpandProperty Value
         NewValue=$DbType
     }
-    @{
+)
+
+if ($AMConnectionString){
+    $replacementMatrix+=@{
         CurrentValue=$deploymentParameters|Where-Object -Property Name -EQ ishamconnectstring|Select-Object -ExpandProperty Value
         NewValue=$AMConnectionString
     }
-)
-
+}
 Write-Verbose "Replacement matrix is:"
 
 $foldersToScan |ForEach-Object {
