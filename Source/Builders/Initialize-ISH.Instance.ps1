@@ -232,6 +232,7 @@ $extensions=@(
     "*.ps1"
     "*.psm1"
     "*.bat"
+    "*.json"
 )
 
 $foldersToScan=@(
