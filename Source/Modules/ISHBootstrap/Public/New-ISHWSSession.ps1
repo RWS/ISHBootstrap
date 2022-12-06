@@ -80,8 +80,6 @@ Function New-ISHWSSession {
 
         $newIshSessionSplat = @{
             WsBaseUrl           = $ishWSUrl
-            WsTrustIssuerUrl    = $ishSTSIssuerUrl
-            WsTrustIssuerMexUrl = $ishSTSIssuerMexUrl
             PSCredential        = $Credential
         }
 

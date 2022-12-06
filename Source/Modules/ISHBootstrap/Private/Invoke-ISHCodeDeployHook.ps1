@@ -211,10 +211,6 @@ Function Invoke-ISHCodeDeployHook {
                 Write-Verbose "Executing core's Start-ISH"
                 Start-ISH @ISHDeploymentSplat
 
-                #region TODO COMPLUS-Occasional-Unpredictable-Fail
-                Restart-ISHComponentCOMPlus @ISHDeploymentSplat
-                #endregion
-
                 Write-Verbose "Executing recipe's StartAfterCore"
                 Invoke-ISHManifestEvent -ManifestHash $recipeManifest -EventName "StartAfterCore" @ISHDeploymentSplat
 
