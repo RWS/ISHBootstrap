@@ -1,5 +1,5 @@
 <#
-# Copyright (c) 2021 All Rights Reserved by the RWS Group for and on behalf of its affiliates and subsidiaries.
+# Copyright (c) 2022 All Rights Reserved by the RWS Group for and on behalf of its affiliates and subsidiaries.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -40,8 +40,8 @@ Function Stop-ISHWeb {
 
     process {
 
-        Get-ISHDeploymentParameters @ISHDeploymentSplat | Where-Object -Property Name -Like "infoshare*webappname" | ForEach-Object {
-            $appPoolName = "TrisoftAppPool$($_.Value)"
+        Get-ISHIISAppPool @ISHDeploymentSplat | Where-Object -Property Status -eq "Started" | ForEach-Object {
+            $appPoolName = $_.ApplicationPoolName
             Write-Debug "appPoolName=$appPoolName"
 
             Write-Debug "Stopping web app pool $appPoolName"

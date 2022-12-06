@@ -1,5 +1,5 @@
 <#
-# Copyright (c) 2021 All Rights Reserved by the RWS Group for and on behalf of its affiliates and subsidiaries.
+# Copyright (c) 2022 All Rights Reserved by the RWS Group for and on behalf of its affiliates and subsidiaries.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,14 +25,20 @@
 function Get-ISHCoreConfiguration {
     [CmdletBinding()]
     param(
+        [Parameter(Mandatory = $false)]
+        [string]$ISHDeployment
     )
 
     begin {
-        $projectStageKey = Get-Key -ProjectStage
-        $ishKey = Get-Key -ISH
+        $ISHDeploymentSplat = @{}
+        if ($ISHDeployment) {
+            $ISHDeploymentSplat = @{ISHDeployment = $ISHDeployment}
+        }
+        $projectStageKey = Get-Key -ProjectStage @ISHDeploymentSplat
+        $ishKey = Get-Key -ISH @ISHDeploymentSplat
         Write-Debug "projectStageKey=$projectStageKey"
         Write-Debug "ishKey=$ishKey"
-        $deploymentConfig = (Get-Variable -Name "ISHDeploymentConfigFilePath").Value
+        $deploymentConfig = (Get-Variable -Name "ISHDeploymentConfigFilePath").Value -f ($ISHDeployment  -replace "^InfoShare$")
         Write-Debug "deploymentConfig=$deploymentConfig"
     }
 
@@ -65,9 +71,6 @@ function Get-ISHCoreConfiguration {
                 BackgroundTaskDefault = @{
                     Count = 0
                 }
-                BackgroundTaskPublish = @{
-                    Count = $configurationValues | Where-Object -Property Key -EQ "$ishKey/Component/BackgroundTask-Publish/Count" | Select-Object -ExpandProperty Value
-                }
                 BackgroundTaskSingle  = @{
                     Count = $configurationValues | Where-Object -Property Key -EQ "$ishKey/Component/BackgroundTask-Single/Count" | Select-Object -ExpandProperty Value
                 }
@@ -79,13 +82,14 @@ function Get-ISHCoreConfiguration {
             Certificate = @{}
         }
 
-        # SQLOLEDB
-        # E.g.Provider=SQLOLEDB.1;Password=isource;Persist Security Info=True;User ID=isource;Initial Catalog=ISH12PROD;Data Source=MECDEVDB05\SQL2014SP1
-        $hash.Database.ConnectionString = "Provider=SQLOLEDB.1;Data Source=$($hash.Database.DataSource);Initial Catalog=$($hash.Database.InitialCatalog);Persist Security Info=True;User ID=$($hash.Database.Username);Password=$($hash.Database.Password)"
         # MSOLEDBSQL
-        # E.g.Provider=MSOLEDBSQL.1;Password=isource;Persist Security Info=True;User ID=isource;Initial Catalog=ISH14DEV;Data Source=MECDEVDB05\SQL2017
-        # $hash.Database.ConnectionString="Provider=MSOLEDBSQL.1;Data Source=$($hash.Database.DataSource);Initial Catalog=$($hash.Database.InitialCatalog);Persist Security Info=True;User ID=$($hash.Database.Username);Password=$($hash.Database.Password)"
-
+        # E.g.Provider=MSOLEDBSQL.1;Password=*****;Persist Security Info=True;User ID=isource;Initial Catalog=ISH14DEV;Data Source=MECDEVDB05\SQL2017
+        if ( $hash.Database.Type -eq 'oracle' ){
+            $hash.Database.ConnectionString = "Provider=OraOLEDB.Oracle.1;Data Source=$($hash.Database.DataSource);Persist Security Info=True;User ID=$($hash.Database.Username);Password=$($hash.Database.Password)"
+        }
+        else {
+            $hash.Database.ConnectionString="Provider=MSOLEDBSQL.1;Data Source=$($hash.Database.DataSource);Initial Catalog=$($hash.Database.InitialCatalog);Persist Security Info=True;User ID=$($hash.Database.Username);Password=$($hash.Database.Password)"
+        }
         #Credetnials
         if (Test-KeyValuePS -Folder "$ishKey/Credentials/OSUser" -FilePath $deploymentConfig) {
             $hash.OSUser = @{

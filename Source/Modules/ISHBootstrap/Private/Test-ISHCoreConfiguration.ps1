@@ -1,5 +1,5 @@
 <#
-# Copyright (c) 2021 All Rights Reserved by the RWS Group for and on behalf of its affiliates and subsidiaries.
+# Copyright (c) 2022 All Rights Reserved by the RWS Group for and on behalf of its affiliates and subsidiaries.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -42,14 +42,14 @@ function Test-ISHCoreConfiguration {
 
     process {
         if (-not $ConfigurationData) {
-            $ConfigurationData = Get-ISHCoreConfiguration
+            $ConfigurationData = Get-ISHCoreConfiguration @ISHDeploymentSplat
         }
 
         $hash = @{
             EC2InitializedFromAMI = Test-ISHRequirement -Marker -Name "ISH.EC2InitializedFromAMI"
 
             #Database
-            Database              = (Get-ISHDeploymentParameters -Name connectstring -ValueOnly @ISHDeploymentSplat) -eq $ConfigurationData.Database.ConnectionString
+            Database              = -not (Compare-Object ((Get-ISHDeploymentParameters -Name connectstring -ValueOnly @ISHDeploymentSplat) -split ";") ($ConfigurationData.Database.ConnectionString -split ";"))
             OSUser                = (($null -eq $ConfigurationData.OSUser) -or (((Get-ISHDeploymentParameters -Name osuser -ValueOnly @ISHDeploymentSplat) -eq $ConfigurationData.OSUser.NormalizedUsername) -and ((Get-ISHDeploymentParameters -Name ospassword -ValueOnly -ShowPassword @ISHDeploymentSplat) -eq $ConfigurationData.OSUser.Password)))
             ServiceUser           = (($null -eq $ConfigurationData.ServiceUser) -or (((Get-ISHDeploymentParameters -Name serviceusername -ValueOnly @ISHDeploymentSplat) -eq $ConfigurationData.ServiceUser.Username) -and ((Get-ISHDeploymentParameters -Name servicepassword -ValueOnly -ShowPassword @ISHDeploymentSplat) -eq $ConfigurationData.ServiceUser.Password)))
             Crawler               = ($ConfigurationData.Service.Crawler.Count) -eq ((Get-ISHServiceCrawler @ISHDeploymentSplat).Count)

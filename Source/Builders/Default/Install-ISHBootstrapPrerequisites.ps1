@@ -46,7 +46,6 @@ $moduleNames=@(
     "WcfPS"
     "XWrite"
     "PSHosts"
-    "SemVerPS"
 )
 if(-not $DebugISHServer)
 {

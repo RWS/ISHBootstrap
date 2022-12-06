@@ -1,5 +1,5 @@
 <#
-# Copyright (c) 2021 All Rights Reserved by the RWS Group for and on behalf of its affiliates and subsidiaries.
+# Copyright (c) 2022 All Rights Reserved by the RWS Group for and on behalf of its affiliates and subsidiaries.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -30,7 +30,9 @@ Function Remove-JSON {
         [Parameter(Mandatory = $true)]
         [string]$Name,
         [Parameter(Mandatory = $true)]
-        [string]$Type
+        [string]$Type,
+        [Parameter(Mandatory = $false)]
+        [string]$ISHDeployment
     )
 
     begin {

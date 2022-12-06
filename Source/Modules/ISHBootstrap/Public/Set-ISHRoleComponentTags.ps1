@@ -1,5 +1,5 @@
 <#
-# Copyright (c) 2021 All Rights Reserved by the RWS Group for and on behalf of its affiliates and subsidiaries.
+# Copyright (c) 2022 All Rights Reserved by the RWS Group for and on behalf of its affiliates and subsidiaries.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -31,6 +31,8 @@
     Backend where background with Single role is running.
 .PARAMETER ISHVersion
     Product version, by default softwareversion deployment parameter will be used.
+.PARAMETER ISHDeployment
+    Specifies the name or instance of the Content Manager deployment. See Get-ISHDeployment for more details.
 .EXAMPLE
     Set-ISHRoleComponentTags -AllInOne
 .EXAMPLE
@@ -53,80 +55,91 @@ Function Set-ISHRoleComponentTags {
         [Parameter(Mandatory = $false, ParameterSetName = "AllInOne")]
         [Parameter(Mandatory = $false, ParameterSetName = "OneBE-MultipleFE")]
         [Parameter(Mandatory = $false, ParameterSetName = "MultipleBEMulti-OneBESingle-MultipleFE")]
-        [string]$ISHVersion=$(Get-ISHDeploymentParameters -Name softwareversion  -ValueOnly)
+        [string]$ISHVersion,
+        [Parameter(Mandatory = $false, ParameterSetName = "AllInOne")]
+        [Parameter(Mandatory = $false, ParameterSetName = "OneBE-MultipleFE")]
+        [Parameter(Mandatory = $false, ParameterSetName = "MultipleBEMulti-OneBESingle-MultipleFE")]
+        [string]$ISHDeployment
     )
 
     begin {
         Write-Debug "PSCmdlet.ParameterSetName=$($PSCmdlet.ParameterSetName)"
         foreach ($psbp in $PSBoundParameters.GetEnumerator()) { Write-Debug "$($psbp.Key)=$($psbp.Value)" }
+        $ISHDeploymentSplat = @{}
+        if ($ISHDeployment) {
+            $ISHDeploymentSplat = @{ISHDeployment = $ISHDeployment}
+        }
+        if(-not $ISHVersion){
+            $ISHVersion = Get-ISHDeploymentParameters -Name softwareversion -ValueOnly @ISHDeploymentSplat
+        }
     }
 
     process {
         if ($AllInOne) {
-            Set-ISHComponent -All
-            Set-ISHComponent -BackgroundTask -Role @("Multi", "Single")
-            Set-Tag -Name "ISHRole" -Value "AllInOne"
+            Set-ISHComponent -All -ISHVersion $ISHVersion @ISHDeploymentSplat
+            Set-ISHComponent -BackgroundTask -Role @("Multi", "Single") @ISHDeploymentSplat
+            Set-Tag -Name "ISHRole" -Value "AllInOne" @ISHDeploymentSplat
         }
 
         if ($OneBE) {
-            Set-ISHComponent -All
-            Set-ISHComponent -BackgroundTask -Role @("Multi", "Single")
+            Set-ISHComponent -All -ISHVersion $ISHVersion @ISHDeploymentSplat
+            Set-ISHComponent -BackgroundTask -Role @("Multi", "Single") @ISHDeploymentSplat
 
-            Set-Tag -Name "ISHRole" -Value "OneBE"
+            Set-Tag -Name "ISHRole" -Value "OneBE" @ISHDeploymentSplat
         }
 
         if ($MultipleFE) {
-            Set-ISHComponent -Web
-            Set-ISHComponent -WebCS
-            Set-ISHComponent -FontoContentQuality
+            Set-ISHComponent -Web -ISHVersion $ISHVersion @ISHDeploymentSplat
+            Set-ISHComponent -WebCS -ISHVersion $ISHVersion @ISHDeploymentSplat
+            Set-ISHComponent -FontoContentQuality -ISHVersion $ISHVersion @ISHDeploymentSplat
             if ($ISHVersion -eq '14.0.2')
             {
-                Set-ISHComponent -FontoDeltaXml
+                Set-ISHComponent -FontoDeltaXml -ISHVersion $ISHVersion @ISHDeploymentSplat
             }
-            Set-ISHComponent -FontoDocumentHistory
-            Set-ISHComponent -FontoReview
-            Set-ISHComponent -FontoSpellChecker
+            Set-ISHComponent -FontoDocumentHistory -ISHVersion $ISHVersion @ISHDeploymentSplat
+            Set-ISHComponent -FontoReview -ISHVersion $ISHVersion @ISHDeploymentSplat
+            Set-ISHComponent -FontoSpellChecker -ISHVersion $ISHVersion @ISHDeploymentSplat
 
-            Set-Tag -Name "ISHRole" -Value "MultipleFE"
+            Set-Tag -Name "ISHRole" -Value "MultipleFE" @ISHDeploymentSplat
         }
 
         if ($MultipleBEMulti) {
-            Set-ISHComponent -Web
-            Set-ISHComponent -WebCS
-            Set-ISHComponent -FontoContentQuality
+            Set-ISHComponent -Web -ISHVersion $ISHVersion @ISHDeploymentSplat
+            Set-ISHComponent -WebCS -ISHVersion $ISHVersion @ISHDeploymentSplat
+            Set-ISHComponent -FontoContentQuality -ISHVersion $ISHVersion @ISHDeploymentSplat
             if ($ISHVersion -eq '14.0.2')
             {
-                Set-ISHComponent -FontoDeltaXml
+                Set-ISHComponent -FontoDeltaXml -ISHVersion $ISHVersion @ISHDeploymentSplat
             }
-            Set-ISHComponent -FontoDocumentHistory
-            Set-ISHComponent -FontoReview
-            Set-ISHComponent -FontoSpellChecker
-            Set-ISHComponent -TranslationBuilder
-            Set-ISHComponent -TranslationOrganizer
-            Set-ISHComponent -All
-            Set-ISHComponent -BackgroundTask -Role 'Multi'
+            Set-ISHComponent -FontoDocumentHistory -ISHVersion $ISHVersion @ISHDeploymentSplat
+            Set-ISHComponent -FontoReview -ISHVersion $ISHVersion @ISHDeploymentSplat
+            Set-ISHComponent -FontoSpellChecker -ISHVersion $ISHVersion @ISHDeploymentSplat
+            Set-ISHComponent -TranslationBuilder -ISHVersion $ISHVersion @ISHDeploymentSplat
+            Set-ISHComponent -TranslationOrganizer -ISHVersion $ISHVersion @ISHDeploymentSplat
+            Set-ISHComponent -All -ISHVersion $ISHVersion @ISHDeploymentSplat
+            Set-ISHComponent -BackgroundTask -Role 'Multi' @ISHDeploymentSplat
 
-            Set-Tag -Name "ISHRole" -Value "MultipleBEMulti"
+            Set-Tag -Name "ISHRole" -Value "MultipleBEMulti" @ISHDeploymentSplat
         }
 
         if ($OneBESingle) {
-            Set-ISHComponent -Web
-            Set-ISHComponent -WebCS
-            Set-ISHComponent -FontoContentQuality
+            Set-ISHComponent -Web -ISHVersion $ISHVersion @ISHDeploymentSplat
+            Set-ISHComponent -WebCS -ISHVersion $ISHVersion @ISHDeploymentSplat
+            Set-ISHComponent -FontoContentQuality -ISHVersion $ISHVersion @ISHDeploymentSplat
             if ($ISHVersion -eq '14.0.2')
             {
-                Set-ISHComponent -FontoDeltaXml
+                Set-ISHComponent -FontoDeltaXml -ISHVersion $ISHVersion @ISHDeploymentSplat
             }
-            Set-ISHComponent -FontoDocumentHistory
-            Set-ISHComponent -FontoReview
-            Set-ISHComponent -FontoSpellChecker
-            Set-ISHComponent -DatabaseUpgrade
-            Set-ISHComponent -FullTextIndex
-            Set-ISHComponent -Crawler
-            Set-ISHComponent -All
-            Set-ISHComponent -BackgroundTask -Role 'Single'
+            Set-ISHComponent -FontoDocumentHistory -ISHVersion $ISHVersion @ISHDeploymentSplat
+            Set-ISHComponent -FontoReview -ISHVersion $ISHVersion @ISHDeploymentSplat
+            Set-ISHComponent -FontoSpellChecker -ISHVersion $ISHVersion @ISHDeploymentSplat
+            Set-ISHComponent -DatabaseUpgrade -ISHVersion $ISHVersion @ISHDeploymentSplat
+            Set-ISHComponent -FullTextIndex -ISHVersion $ISHVersion @ISHDeploymentSplat
+            Set-ISHComponent -Crawler -ISHVersion $ISHVersion @ISHDeploymentSplat
+            Set-ISHComponent -All -ISHVersion $ISHVersion @ISHDeploymentSplat
+            Set-ISHComponent -BackgroundTask -Role 'Single' @ISHDeploymentSplat
 
-            Set-Tag -Name "ISHRole" -Value "OneBESingle"
+            Set-Tag -Name "ISHRole" -Value "OneBESingle" @ISHDeploymentSplat
         }
 
     }

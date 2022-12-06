@@ -1,5 +1,5 @@
 <#
-# Copyright (c) 2021 All Rights Reserved by the RWS Group for and on behalf of its affiliates and subsidiaries.
+# Copyright (c) 2022 All Rights Reserved by the RWS Group for and on behalf of its affiliates and subsidiaries.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -30,13 +30,21 @@ function Get-DebugReroute {
         [Parameter(Mandatory = $true, ParameterSetName = "ISH")]
         [switch]$ISH,
         [Parameter(Mandatory = $true, ParameterSetName = "Custom")]
-        [switch]$Custom
+        [switch]$Custom,
+        [Parameter(Mandatory = $false, ParameterSetName = "Project")]
+        [Parameter(Mandatory = $false, ParameterSetName = "ISH")]
+        [Parameter(Mandatory = $false, ParameterSetName = "Custom")]
+        [string]$ISHDeployment
     )
 
     begin {
-        $debugKey = Get-Key -DebugReroute
+        $ISHDeploymentSplat = @{}
+        if ($ISHDeployment) {
+            $ISHDeploymentSplat = @{ISHDeployment = $ISHDeployment}
+        }
+        $debugKey = Get-Key -DebugReroute @ISHDeploymentSplat
         Write-Debug "debugKey=$debugKey"
-        $deploymentConfigFilePath = (Get-Variable -Name "ISHDeploymentConfigFilePath").Value
+        $deploymentConfigFilePath = (Get-Variable -Name "ISHDeploymentConfigFilePath").Value -f ($ISHDeployment  -replace "^InfoShare$")
         Write-Debug "deploymentConfig=$deploymentConfigFilePath"
     }
 

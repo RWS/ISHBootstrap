@@ -1,5 +1,5 @@
 <#
-# Copyright (c) 2021 All Rights Reserved by the RWS Group for and on behalf of its affiliates and subsidiaries.
+# Copyright (c) 2022 All Rights Reserved by the RWS Group for and on behalf of its affiliates and subsidiaries.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -35,6 +35,8 @@
     Version of ISHCM. By default softwareversion form Deployment parameters will be set.
 .PARAMETER Description
     Deployent configuration description.
+.PARAMETER ISHDeployment
+    Specifies the name or instance of the Content Manager deployment. See Get-ISHDeployment for more details.
 .EXAMPLE
     New-ISHDeploymentConfiguration -ConfigFilePath ConfigFilePath -Project project -Stage stage
 #>
@@ -42,24 +44,39 @@ Function New-ISHDeploymentConfiguration {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $false)]
-        [string]$ConfigFilePath=$((Get-Variable -Name "ISHDeploymentConfigFilePath").Value),
+        [string]$ConfigFilePath,
         [Parameter(Mandatory = $false)]
-        [string]$ISHBootstrapVersion="ISHBootstrap.2.0.0",
+        [string]$ISHBootstrapVersion="2.0",
         [Parameter(Mandatory = $true)]
         [string]$Project,
         [Parameter(Mandatory = $true, HelpMessage = "The Tridion Docs stage (environment), e.g. Development, Acceptance, Production")]
         [string]$Stage,
         [Parameter(Mandatory = $false)]
-        [string]$Hostname=$(Get-ISHDeploymentParameters -Name basehostname).Value,
+        [string]$Hostname,
         [Parameter(Mandatory = $false)]
-        [string]$ISHVersion=$(Get-ISHDeploymentParameters -Name softwareversion).Value,
+        [string]$ISHVersion,
         [Parameter(Mandatory = $false)]
-        [string]$Description = $null
+        [string]$Description = $null,
+        [Parameter(Mandatory = $false)]
+        [string]$ISHDeployment
     )
 
     begin {
         Write-Debug "PSCmdlet.ParameterSetName=$($PSCmdlet.ParameterSetName)"
         foreach ($psbp in $PSBoundParameters.GetEnumerator()) { Write-Debug "$($psbp.Key)=$($psbp.Value)" }
+        if(-not $ConfigFilePath){
+            $ConfigFilePath = (Get-Variable -Name "ISHDeploymentConfigFilePath").Value -f ($ISHDeployment  -replace "^InfoShare$")
+        }
+        $ISHDeploymentSplat = @{}
+        if ($ISHDeployment) {
+            $ISHDeploymentSplat = @{ISHDeployment = $ISHDeployment}
+        }
+        if(-not $Hostname) {
+            $Hostname = Get-ISHDeploymentParameters -Name basehostname -ValueOnly @ISHDeploymentSplat
+        }
+        if(-not $ISHVersion) {
+            $ISHVersion = Get-ISHDeploymentParameters -Name softwareversion -ValueOnly @ISHDeploymentSplat
+        }
     }
 
     process {
@@ -85,6 +102,12 @@ Function New-ISHDeploymentConfiguration {
             Hostname    = $Hostname
             ISH         = @{
                 ProductVersion = $ISHVersion
+                Credentials    = @{
+                    ServiceAdmin = @{
+                        Password = "admin"
+                        Username = "admin"
+                    }
+                }
             }
         }
 
@@ -107,9 +130,8 @@ Function New-ISHDeploymentConfiguration {
 
         }
 
-        Set-ISHDeploymentConfiguration @projectStageHash
+        Set-ISHDeploymentConfiguration @projectStageHash @ISHDeploymentSplat
         Set-ISHDeploymentComponentConfiguration @projectStageHash
-        Set-ISHDeploymentConfigurationLocation -Path $ConfigFilePath
     }
 
     end {

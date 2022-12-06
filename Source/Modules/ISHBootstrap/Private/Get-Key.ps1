@@ -1,5 +1,5 @@
 <#
-# Copyright (c) 2021 All Rights Reserved by the RWS Group for and on behalf of its affiliates and subsidiaries.
+# Copyright (c) 2022 All Rights Reserved by the RWS Group for and on behalf of its affiliates and subsidiaries.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -37,18 +37,26 @@ Function Get-Key {
         [Parameter(Mandatory = $true, ParameterSetName = "ISH")]
         [switch]$ISH,
         [Parameter(Mandatory = $true, ParameterSetName = "Custom")]
-        [switch]$Custom
+        [switch]$Custom,
+        [Parameter(Mandatory = $false, ParameterSetName = "DebugReroute")]
+        [Parameter(Mandatory = $false, ParameterSetName = "Project+Stage")]
+        [Parameter(Mandatory = $false, ParameterSetName = "ISH")]
+        [Parameter(Mandatory = $false, ParameterSetName = "Custom")]
+        [string]$ISHDeployment
     )
 
     begin {
         Write-Debug "PSCmdlet.ParameterSetName=$($PSCmdlet.ParameterSetName)"
         foreach ($psbp in $PSBoundParameters.GetEnumerator()) { Write-Debug "$($psbp.Key)=$($psbp.Value)" }
-
-        $codeVersion = Get-ISHTag -Name "CodeVersion"
+        $ISHDeploymentSplat = @{}
+        if ($ISHDeployment) {
+            $ISHDeploymentSplat = @{ISHDeployment = $ISHDeployment}
+        }
+        $codeVersion = Get-ISHTag -Name "CodeVersion" @ISHDeploymentSplat
         Write-Debug "codeVersion=$codeVersion"
         if ($PSCmdlet.ParameterSetName -ne "DebugReroute") {
-            $project = Get-ISHTag -Name "Project"
-            $stage = Get-ISHTag -Name "Stage"
+            $project = Get-ISHTag -Name "Project" @ISHDeploymentSplat
+            $stage = Get-ISHTag -Name "Stage" @ISHDeploymentSplat
             Write-Debug "project=$project"
             Write-Debug "stage=$stage"
         }

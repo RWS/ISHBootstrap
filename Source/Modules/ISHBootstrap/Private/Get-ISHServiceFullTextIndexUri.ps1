@@ -1,5 +1,5 @@
 <#
-# Copyright (c) 2021 All Rights Reserved by the RWS Group for and on behalf of its affiliates and subsidiaries.
+# Copyright (c) 2022 All Rights Reserved by the RWS Group for and on behalf of its affiliates and subsidiaries.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -39,13 +39,13 @@ Function Get-ISHServiceFullTextIndexUri {
     }
 
     process {
-        $dependency = Get-ISHFullTextIndexExternalDependency
+        $dependency = Get-ISHFullTextIndexExternalDependency @ISHDeploymentNameSplat
         Write-Debug "dependency=$dependency"
         switch ($dependency) {
             'ExternalEC2' {
                 $hostname = Get-ISHDeployment  @ISHDeploymentNameSplat | Select-Object -ExpandProperty AccessHostName
-                $project = Get-ISHTag -Name "Project"
-                $stage = Get-ISHTag -Name "Stage"
+                $project = Get-ISHTag -Name "Project" @ISHDeploymentNameSplat
+                $stage = Get-ISHTag -Name "Stage" @ISHDeploymentNameSplat
 
                 $fullTextIndexUri = "http://backendsingle.ish.internal.$($project)-$($stage).$($hostname):8078/solr/"
 

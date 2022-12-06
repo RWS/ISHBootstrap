@@ -1,5 +1,5 @@
 <#
-# Copyright (c) 2021 All Rights Reserved by the RWS Group for and on behalf of its affiliates and subsidiaries.
+# Copyright (c) 2022 All Rights Reserved by the RWS Group for and on behalf of its affiliates and subsidiaries.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -30,26 +30,31 @@
 Function Update-ISHAdminBackgroundTaskFile {
     [CmdletBinding()]
     param(
-
+        [Parameter(Mandatory = $false)]
+        [string]$ISHDeployment
     )
 
     begin {
         Write-Debug "PSCmdlet.ParameterSetName=$($PSCmdlet.ParameterSetName)"
         foreach($psbp in $PSBoundParameters.GetEnumerator()){Write-Debug "$($psbp.Key)=$($psbp.Value)"}
+        $ISHDeploymentSplat = @{}
+        if ($ISHDeployment) {
+            $ISHDeploymentSplat = @{ISHDeployment = $ISHDeployment}
+        }
     }
 
     process {
         # Debug alternative
         # $enterViaUIPath="C:\InfoShare\13.0.0\ISH\WebSQL\Author\EnterViaUI"
 
-        $enterViaUIPath=Get-ISHDeploymentPath -EnterViaUI
+        $enterViaUIPath=Get-ISHDeploymentPath -EnterViaUI @ISHDeploymentSplat
         Write-Debug "enterViaUIPath.AbsolutePath=$($enterViaUIPath.AbsolutePath)"
         Write-Debug "enterViaUIPath.RelativePath=$($enterViaUIPath.RelativePath)"
         $filePath=Join-Path -Path $enterViaUIPath.AbsolutePath -ChildPath "Admin.XMLBackgroundTaskConfiguration.xml"
         $backupRelativePath="$($enterViaUIPath.RelativePath)\Admin.XMLBackgroundTaskConfiguration.xml"
         Write-Debug "filePath=$filePath"
         Write-Debug "backupRelativePath=$backupRelativePath"
-        Backup-ISHDeployment -Path $backupRelativePath -Web
+        Backup-ISHDeployment -Path $backupRelativePath -Web @ISHDeploymentSplat
 
         [xml]$xml=Get-Content -Path $filePath -Raw
 

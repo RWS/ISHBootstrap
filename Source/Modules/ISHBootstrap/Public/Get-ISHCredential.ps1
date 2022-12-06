@@ -1,5 +1,5 @@
 <#
-# Copyright (c) 2021 All Rights Reserved by the RWS Group for and on behalf of its affiliates and subsidiaries.
+# Copyright (c) 2022 All Rights Reserved by the RWS Group for and on behalf of its affiliates and subsidiaries.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -61,12 +61,9 @@ Function Get-ISHCredential {
                 -Password ($deploymentParameters | Where-Object -Property Name -Like 'servicepassword').Value
             }
             'ServiceAdmin' {
-                $coreConfiguration = Get-ISHCoreConfiguration
+                $coreConfiguration = Get-ISHCoreConfiguration @ISHDeploymentSplat
                 if ($coreConfiguration.ServiceAdmin) {
                     $coreConfiguration.ServiceAdmin.Credential
-                }
-                else {
-                    New-PSCredential -Username 'admin' -Password 'admin'
                 }
             }
         }

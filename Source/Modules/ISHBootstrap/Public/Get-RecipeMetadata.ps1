@@ -1,5 +1,5 @@
 <#
-# Copyright (c) 2021 All Rights Reserved by the RWS Group for and on behalf of its affiliates and subsidiaries.
+# Copyright (c) 2022 All Rights Reserved by the RWS Group for and on behalf of its affiliates and subsidiaries.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -43,12 +43,12 @@ function Get-RecipeMetadata
             [pscustomobject]@{
                 Type=Get-Item -Path ENV:\ISHBootstrap_Recipe_Type|Select-Object -ExpandProperty Value
                 Name=Get-Item -Path ENV:\ISHBootstrap_Recipe_Name|Select-Object -ExpandProperty Value
-                Version=Get-Item -Path ENV:\ISHBootstrap_Recipe_Version|Select-Object -ExpandProperty Value|ConvertTo-SemVer
+                Version=[Version](Get-Item -Path ENV:\ISHBootstrap_Recipe_Version|Select-Object -ExpandProperty Value)
             }
         }
         else
         {
-            Write-Warning "Recipe Context is not set because either no recipe was set or the cmdlet is invoked ourside of the execution context of Invoke-CodeDeployHook"
+            Write-Warning "Recipe Context is not set because either no recipe was set or the cmdlet is invoked ourside of the execution context of Invoke-ISHCodeDeployHook"
         }
     }
 

@@ -1,5 +1,5 @@
 <#
-# Copyright (c) 2021 All Rights Reserved by the RWS Group for and on behalf of its affiliates and subsidiaries.
+# Copyright (c) 2022 All Rights Reserved by the RWS Group for and on behalf of its affiliates and subsidiaries.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ param(
 Set-StrictMode -Version latest
 
 Import-Module -Name PowerShellGet -Version 2.2.5 -Force
+Install-Module -Name SemVerPS
 
 $moduleNameToPublish = "ISHBootstrap"
 switch ($PSCmdlet.ParameterSetName) {
@@ -71,6 +72,9 @@ try {
     Write-Verbose "Temporary working folder $modulePath is ready"
 
     Copy-Item -Path "$PSScriptRoot\..\Source\Modules\ISHBootstrap\*" -Destination $modulePath -Recurse
+    Copy-Item -Path "$PSScriptRoot\..\LICENSE" -Destination $modulePath
+    Copy-Item -Path "$PSScriptRoot\..\THIRD_PARTY_LICENSES" -Destination $modulePath
+
     Get-ChildItem -Path $modulePath -Filter "ISHBootstrap.psm1" | Where-Object -Property Name -Ne "$($moduleName).psm1" | remove-Item -Force
 
     $psm1Path = Join-Path $modulePath "$moduleName.psm1"
@@ -83,7 +87,7 @@ try {
     }
     $sourceMajor = [int]$Matches["Major"]
     $sourceMinor = [int]$Matches["Minor"]
-    $sourcePatch = [int]$Matches["Patch"]
+    $sourcePatch = [int]$Matches["Build"]
     $sourcePreRelease = "update"
     $sourceVersion = "$sourceMajor.$sourceMinor.$sourcePatch"
     $sourceVersionToCompare = [semver]$sourceVersion
@@ -156,7 +160,6 @@ try {
         "PoshPrivilege"
         "WcfPS"
         "PSHosts"
-        "SemVerPS"
     )
     $externalModules = @(
         "Pester"
@@ -164,7 +167,6 @@ try {
         "PoshPrivilege"
         "WcfPS"
         "PSHosts"
-        "SemVerPS"
     )
 
     # Generating module release notes from the latest changes from the CHANGELOG.md

@@ -1,5 +1,5 @@
 <#
-# Copyright (c) 2021 All Rights Reserved by the RWS Group for and on behalf of its affiliates and subsidiaries.
+# Copyright (c) 2022 All Rights Reserved by the RWS Group for and on behalf of its affiliates and subsidiaries.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,16 +26,19 @@ function Remove-Tag {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true)]
-        [string]$Name
+        [string]$Name,
+        [Parameter(Mandatory = $false)]
+        [string]$ISHDeployment
     )
 
     begin {
         Write-Debug "PSCmdlet.ParameterSetName=$($PSCmdlet.ParameterSetName)"
         foreach ($psbp in $PSBoundParameters.GetEnumerator()) { Write-Debug "$($psbp.Key)=$($psbp.Value)" }
+        $null = $newBoundParameters.Remove('Name')
     }
 
     process {
-        $useEC2Tag = (Test-RunOnEC2) -and (-not (Test-JSONContent -Type Tag))
+        $useEC2Tag = (Test-RunOnEC2) -and (-not (Test-JSONContent @newBoundParameters -Type Tag))
         Write-Debug "useEC2Tag=$useEC2Tag"
 
         if ($useEC2Tag) {

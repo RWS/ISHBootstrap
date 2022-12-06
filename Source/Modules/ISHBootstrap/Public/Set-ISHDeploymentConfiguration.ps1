@@ -1,5 +1,5 @@
 <#
-# Copyright (c) 2021 All Rights Reserved by the RWS Group for and on behalf of its affiliates and subsidiaries.
+# Copyright (c) 2022 All Rights Reserved by the RWS Group for and on behalf of its affiliates and subsidiaries.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -38,6 +38,8 @@
     Database user password. By default databasepassword deployment parameter will be used.
 .PARAMETER Type
     Database type. By default databasetype deployment parameter will be used.
+.PARAMETER ISHDeployment
+    Specifies the name or instance of the Content Manager deployment. See Get-ISHDeployment for more details.
 .EXAMPLE
     Set-ISHDeploymentConfiguration -ConfigFilePath configfilepath -ISHBootstrapVersion 2.0 -Project project -Stage stage
 .EXAMPLE
@@ -48,28 +50,52 @@ Function Set-ISHDeploymentConfiguration {
     param(
         [Parameter(Mandatory = $false)]
         [ValidateScript( { Test-Path $_ })]
-        [string]$ConfigFilePath = $((Get-Variable -Name "ISHDeploymentConfigFilePath").Value),
+        [string]$ConfigFilePath,
         [Parameter(Mandatory = $false)]
-        [string]$ISHBootstrapVersion = "ISHBootstrap.2.0.0",
+        [string]$ISHBootstrapVersion = "2.0",
         [Parameter(Mandatory = $true)]
         [string]$Project,
         [Parameter(Mandatory = $true, HelpMessage = "The Tridion Docs stage (environment), e.g. Development, Acceptance, Production")]
         [string]$Stage,
         [Parameter(Mandatory = $false)]
-        [string]$DataSource = $(Get-ISHDeploymentParameters -Name databasesource).Value,
+        [string]$DataSource,
         [Parameter(Mandatory = $false)]
-        [string]$InitialCatalog = $(Get-ISHDeploymentParameters -Name databasename).Value,
+        [string]$InitialCatalog,
         [Parameter(Mandatory = $false)]
-        [string]$Username = $(Get-ISHDeploymentParameters -Name databaseuser).Value,
+        [string]$Username,
         [Parameter(Mandatory = $false)]
-        [string]$Password = $(Get-ISHDeploymentParameters -Name databasepassword -ShowPassword).Value,
+        [string]$Password,
         [Parameter(Mandatory = $false)]
-        [string]$Type = $(Get-ISHDeploymentParameters -Name databasetype).Value
+        [string]$Type,
+        [Parameter(Mandatory = $false)]
+        [string]$ISHDeployment
     )
 
     begin {
         Write-Debug "PSCmdlet.ParameterSetName=$($PSCmdlet.ParameterSetName)"
         foreach ($psbp in $PSBoundParameters.GetEnumerator()) { Write-Debug "$($psbp.Key)=$($psbp.Value)" }
+        $ISHDeploymentSplat = @{}
+        if ($ISHDeployment) {
+            $ISHDeploymentSplat = @{ISHDeployment = $ISHDeployment}
+        }
+        if(-not $DataSource){
+            $DataSource = Get-ISHDeploymentParameters -Name databasesource -ValueOnly @ISHDeploymentSplat
+        }
+        if(-not $InitialCatalog){
+            $InitialCatalog = Get-ISHDeploymentParameters -Name databasename -ValueOnly @ISHDeploymentSplat
+        }
+        if(-not $Username){
+            $Username = Get-ISHDeploymentParameters -Name databaseuser -ValueOnly @ISHDeploymentSplat
+        }
+        if(-not $Password){
+            $Password = Get-ISHDeploymentParameters -Name databasepassword -ShowPassword -ValueOnly @ISHDeploymentSplat
+        }
+        if(-not $Type){
+            $Type = Get-ISHDeploymentParameters -Name databasetype -ValueOnly @ISHDeploymentSplat
+        }
+        if(-not $ConfigFilePath){
+            $ConfigFilePath = (Get-Variable -Name "ISHDeploymentConfigFilePath").Value -f ($ISHDeployment  -replace "^InfoShare$")
+        }
     }
 
     process {
@@ -99,9 +125,9 @@ Function Set-ISHDeploymentConfiguration {
         ConvertTo-Json $keyValues -Depth 30 | Format-Json | Out-File -FilePath $ConfigFilePath
         Write-Verbose "Updated $ConfigFilePath"
 
-        Set-Tag -Name "CodeVersion" -Value $ISHBootstrapVersion
-        Set-Tag -Name "Project" -Value $Project
-        Set-Tag -Name "Stage" -Value $Stage
+        Set-Tag -Name "CodeVersion" -Value $ISHBootstrapVersion @ISHDeploymentSplat
+        Set-Tag -Name "Project" -Value $Project @ISHDeploymentSplat
+        Set-Tag -Name "Stage" -Value $Stage @ISHDeploymentSplat
     }
 
     end {

@@ -18,7 +18,7 @@ Example output:
 
 ```
 {
-  "ISHBootstrap.2.0.0": {
+  "2.0": {
     "Project": {
       "customer1": {
         "dev1403": {

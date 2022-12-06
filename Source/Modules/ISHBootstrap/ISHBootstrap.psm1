@@ -1,5 +1,5 @@
 <#
-# Copyright (c) 2021 All Rights Reserved by the RWS Group for and on behalf of its affiliates and subsidiaries.
+# Copyright (c) 2022 All Rights Reserved by the RWS Group for and on behalf of its affiliates and subsidiaries.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 .VERSION 0.1
 #>
 
-New-Variable -Name 'ISHDeploymentConfigFilePath' -Value "$env:ProgramData\ISHBootstrap\config-docs-project.json" -Scope Script -Force
+New-Variable -Name 'ISHDeploymentConfigFilePath' -Value "$env:ProgramData\ISHBootstrap\{0}\config-docs-project.json" -Scope Script -Force
 
 $public  = @( Get-ChildItem -Path $PSScriptRoot\Public\*.ps1 -Exclude @("*NotReady*","*.Tests.ps1"))
 $private = @( Get-ChildItem -Path $PSScriptRoot\Private\*.ps1 -Exclude @("*NotReady*","*.Tests.ps1"))

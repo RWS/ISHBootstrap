@@ -19,7 +19,9 @@ param(
     [string]$HostName=$null,
     [Parameter(Mandatory=$false,ParameterSetName="External Database")]
     [Parameter(Mandatory=$false,ParameterSetName="Demo Database")]
-    [switch]$InContainer=$false
+    [switch]$InContainer=$false,
+    [Parameter(Mandatory=$false,ParameterSetName="External Database")]
+    [string]$AMConnectionString
 )
 
 $cmdletsPaths="$PSScriptRoot\..\Cmdlets"
@@ -69,8 +71,8 @@ Write-Progress @scriptProgress -Status $blockName
 Write-Host $blockName
 
 # Web Application pools
-$ishAppPools=Get-ISHDeploymentParameters| Where-Object -Property Name -Like "infoshare*webappname"|ForEach-Object {
-    Get-Item "IIS:\AppPools\TrisoftAppPool$($_.Value)"
+$ishAppPools=Get-ISHIISAppPool|ForEach-Object {
+    Get-Item "IIS:\AppPools\$($_.ApplicationPoolName)"
 
     # There is something wrong with Get-IISAppPool|Set-Item
     # Import-Module IISAdministration
@@ -79,7 +81,7 @@ $ishAppPools=Get-ISHDeploymentParameters| Where-Object -Property Name -Like "inf
 
 # Web Sites
 $ishWebSites=Get-ISHDeploymentParameters| Where-Object -Property Name -Like "infoshare*webappname"|ForEach-Object {
-    Get-Item "IIS:\Sites\Default Web Site\$($_.Value)"
+    Get-Item "IIS:\Sites\Default Web Site\$($_.Value)" -ErrorAction SilentlyContinue
 }
 
 # Windows services
@@ -230,6 +232,7 @@ $extensions=@(
     "*.ps1"
     "*.psm1"
     "*.bat"
+    "*.json"
 )
 
 $foldersToScan=@(
@@ -285,6 +288,12 @@ $replacementMatrix=@(
     }
 )
 
+if ($AMConnectionString){
+    $replacementMatrix+=@{
+        CurrentValue=$deploymentParameters|Where-Object -Property Name -EQ ishamconnectstring|Select-Object -ExpandProperty Value
+        NewValue=$AMConnectionString
+    }
+}
 Write-Verbose "Replacement matrix is:"
 
 $foldersToScan |ForEach-Object {

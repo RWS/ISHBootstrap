@@ -1,5 +1,5 @@
 <#
-# Copyright (c) 2021 All Rights Reserved by the RWS Group for and on behalf of its affiliates and subsidiaries.
+# Copyright (c) 2022 All Rights Reserved by the RWS Group for and on behalf of its affiliates and subsidiaries.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,6 +24,8 @@
     Marker name
 .PARAMETER Value
     Marker value. Usually empty.
+.PARAMETER ISHDeployment
+    Specifies the name or instance of the Content Manager deployment. See Get-ISHDeployment for more details.
 .EXAMPLE
     Set-ISHMarker -Name name
 .EXAMPLE
@@ -35,7 +37,9 @@ Function Set-ISHMarker {
         [Parameter(Mandatory = $true)]
         [string]$Name,
         [Parameter(Mandatory = $false)]
-        $Value = $null
+        $Value = $null,
+        [Parameter(Mandatory = $false)]
+        [string]$ISHDeployment
     )
 
     begin {

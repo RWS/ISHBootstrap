@@ -1,4 +1,4 @@
- #reguires -runasadministrator
+﻿#reguires -runasadministrator
 
 <#
 # Script developed for Windows Server 2016 
@@ -41,7 +41,10 @@ param(
     [bool]$InstallISHPrerequisites=$true,
     [Parameter(Mandatory=$false,ParameterSetName="From FTP")]
     [Parameter(Mandatory=$false,ParameterSetName="From AWS S3")]
-    [bool]$InstallISHApplicationServer=$true
+    [bool]$InstallISHApplicationServer=$true,
+    [Parameter(Mandatory=$false,ParameterSetName="From FTP")]
+    [Parameter(Mandatory=$false,ParameterSetName="From AWS S3")]
+    [string]$AMConnectionString=$null
 )
 
 $cmdletsPaths="$PSScriptRoot\..\Cmdlets"
@@ -81,15 +84,32 @@ if($ISHCDFolder.EndsWith("/"))
 }
 switch($PSCmdlet.ParameterSetName) {
     'From AWS S3' {
+        $hash=@{
+            BucketName=$BucketName
+        }
+        if($AccessKey){
+            $hash.AccessKey=$AccessKey
+        }
+        if($SecretKey){
+            $hash.SecretKey=$SecretKey
+        }
+        $s3Region = Get-S3BucketLocation @hash
+        if ( $s3Region.Value ) {
+            $Region = $s3Region.Value
+        } else {
+            $Region = 'us-east-1'
+        }
         $ishCDHash=@{
             BucketName=$BucketName
             Key="$ISHCDFolder/$ISHCDFileName"
+            Region=$Region
             AccessKey=$AccessKey
             SecretKey=$SecretKey
         }
         $ishServerPrerequisitesHash=@{
             BucketName=$BucketName
             FolderKey=$ISHServerFolder
+            Region=$Region
             AccessKey=$AccessKey
             SecretKey=$SecretKey
         }
@@ -112,7 +132,7 @@ switch($PSCmdlet.ParameterSetName) {
 
 if ($InstallISHPrerequisites)
 {
-    #region 1. Download and install pre-requisites
+    #region 1. Download and install prerequisites
     $blockName="Installing ISH prerequisities"
     Write-Progress @scriptProgress -Status $blockName
     Write-Host $blockName
@@ -210,6 +230,7 @@ if ($InstallISHApplicationServer)
         LocalServiceHostName="MockLocalServiceHostName"
         MachineName="MockMachineName"
         ConnectionString=$ConnectionString
+        AMConnectionString=$AMConnectionString
     }
 
     & $serverScriptsPath\Install\Install-ISHDeployment.ps1 @installHash
@@ -222,8 +243,8 @@ if ($InstallISHApplicationServer)
 
     # Web Application pools
     Import-Module WebAdministration
-    Get-ISHDeploymentParameters| Where-Object -Property Name -Like "infoshare*webappname"| ForEach-Object {
-        Stop-WebAppPool -Name "TrisoftAppPool$($_.Value)" -ErrorAction SilentlyContinue
+    Get-ISHIISAppPool | ForEach-Object {
+            Stop-WebAppPool -Name $_.ApplicationPoolName -ErrorAction SilentlyContinue
     }
 
     # Windows services
