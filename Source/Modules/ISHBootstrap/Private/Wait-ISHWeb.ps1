@@ -47,10 +47,6 @@ Function Wait-ISHWeb {
                 Status = 200
             }
             @{
-                Uri    = "https://localhost/$($deployment.WebAppNameCM)/"
-                Status = 302
-            }
-            @{
                 Uri    = "https://localhost/$($deployment.WebAppNameWS)/ConnectionConfiguration.xml"
                 Status = 200
             }
@@ -76,6 +72,15 @@ Function Wait-ISHWeb {
                 }
             )
         }
+        if ($deployment.SoftwareVersion.Major -lt 15) {
+            $urisToWaitFor += @(
+                @{
+                    Uri    = "https://localhost/$($deployment.WebAppNameCM)/"
+                    Status = 302
+                }
+            )
+        }
+        #TODO add ISHCS/DraftSpace/ ISHCS/OrganizeSpace/ ISHCS/ReviewSpace/
         $urisToWaitFor | ForEach-Object {
             Write-Verbose "Waiting for $($_.Uri) to respond with status $($_.Status)."
             $splat = $_
