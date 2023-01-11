@@ -167,9 +167,11 @@ $ishServices|ForEach-Object {
     $svcD=gwmi win32_service -filter "name like '%$($_.Name)%'" 
     $svcD.change($null,$null,$null,$null,$null,$null,$osUserName,$osUserPassword,$null,$null,$null) 
 }
-$trisoftInfoShareAuthorApplication.Value("Identity") = $osUserName
-$trisoftInfoShareAuthorApplication.Value("Password") = $osUserPassword
-$applications.SaveChanges();
+if ($trisoftInfoShareAuthorApplication) {
+    $trisoftInfoShareAuthorApplication.Value("Identity") = $osUserName
+    $trisoftInfoShareAuthorApplication.Value("Password") = $osUserPassword
+    $applications.SaveChanges();
+}
 #endregion
 
 #region 6. Change the database connection
