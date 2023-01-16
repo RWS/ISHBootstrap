@@ -18,6 +18,7 @@ $ISHDeploymentSplat = @{}
 if ($ISHDeployment) {
     $ISHDeploymentSplat = @{ISHDeployment = $ISHDeployment}
 }
+$deployment = Get-ISHDeployment @ISHDeploymentSplat
 Write-Debug "PSCmdlet.ParameterSetName=$($PSCmdlet.ParameterSetName)"
 foreach ($psbp in $PSBoundParameters.GetEnumerator()) { Write-Debug "$($psbp.Key)=$($psbp.Value)" }
 
@@ -47,7 +48,9 @@ Copy-ISHFile -Force -ishCD "$PSScriptRoot\CustomerSpecificFiles\FilesToCopy\" @I
 $ISHData = Get-ISHIntegrationConfiguration @ISHDeploymentSplat
 
 if (Test-ISHComponent -Name 'CM' @ISHDeploymentSplat) {
-    Enable-ISHUITranslationJob @ISHDeploymentSplat
+    if ($deployment.SoftwareVersion.Major -lt 15) {
+        Enable-ISHUITranslationJob @ISHDeploymentSplat
+    }
     Enable-ISHExternalPreview @ISHDeploymentSplat
 }
 
