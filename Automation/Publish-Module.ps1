@@ -154,7 +154,6 @@ try {
 
     $requiredModules = @(
         "Pester"
-        "ISHDeploy"
         "ISHRemote"
         "InvokeQuery"
         "PoshPrivilege"

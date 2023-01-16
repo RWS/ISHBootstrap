@@ -329,9 +329,11 @@ function Set-ISHCoreConfiguration {
             Disable-ISHIISAppPool  @ISHDeploymentSplat
             Write-Verbose "Disabled IIS ISH Application pools"
         }
-
-        Enable-ISHCOMPlus  @ISHDeploymentSplat
-        Write-Verbose "Enabled COM+"
+        $deployment = Get-ISHDeployment @ISHDeploymentSplat
+        if ($deployment.SoftwareVersion.Major -lt 15) {
+            Enable-ISHCOMPlus  @ISHDeploymentSplat
+            Write-Verbose "Enabled COM+"
+        }
 
         if (Test-ISHComponent -Name Crawler @ISHDeploymentSplat) {
             Enable-ISHServiceCrawler  @ISHDeploymentSplat
