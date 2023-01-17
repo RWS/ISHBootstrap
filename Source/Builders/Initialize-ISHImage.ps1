@@ -255,9 +255,10 @@ if ($InstallISHApplicationServer)
     $catalog = New-Object -com COMAdmin.COMAdminCatalog 
     $applications = $catalog.getcollection("Applications") 
     $applications.populate()
-
-    $comAdmin.ShutdownApplication("Trisoft-InfoShare-Author")
-
+    $trisoftInfoShareAuthorApplication=$applications|Where-Object -Property Name -EQ "Trisoft-InfoShare-Author"
+    if ($trisoftInfoShareAuthorApplication) {
+        $comAdmin.ShutdownApplication("Trisoft-InfoShare-Author")
+    }
     #endregion
 
     #region 9. Clean up 
