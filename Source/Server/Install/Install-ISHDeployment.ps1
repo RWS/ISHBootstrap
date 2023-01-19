@@ -120,6 +120,8 @@ $newParameterScriptBlock={
     $inputParameters["connectstring"]=$ConnectionString
     if($major -ge 15){
         $inputParameters["ishamconnectstring"]=$AMConnectionString
+        $inputParameters["serviceaccountclientsecret"]="MockServiceAccountClientSecret"
+        $inputParameters["serviceaccountclientid"]="MockServiceAccountClientId"
     }
     
     if($IsOracle)

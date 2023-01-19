@@ -112,7 +112,13 @@ function Set-ISHCoreConfiguration {
                     [System.IO.File]::WriteAllBytes($filePath, $configurationData.Certificate.HTTPS.PfxBlob)
                 }
                 else {
-                    $null = Read-S3Object -BucketName $configurationData.Certificate.HTTPS.PfxBase64BucketName -Key $configurationData.Certificate.HTTPS.PfxBase64Key -File $filePath
+                    $s3Region = Get-S3BucketLocation $configurationData.Certificate.HTTPS.PfxBase64BucketName 
+                    if ( $s3Region.Value ) {
+                        $Region = $s3Region.Value
+                    } else {
+                        $Region = 'us-east-1'
+                    }
+                    $null = Read-S3Object -BucketName $configurationData.Certificate.HTTPS.PfxBase64BucketName -Key $configurationData.Certificate.HTTPS.PfxBase64Key -File $filePath -Region $Region
                 }
                 Write-Debug "Installing certificate from $filePath"
                 certutil -f -p $configurationData.Certificate.HTTPS.PfxPassword -ImportPfx $filePath
