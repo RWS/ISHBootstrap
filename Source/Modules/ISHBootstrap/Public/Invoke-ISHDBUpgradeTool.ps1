@@ -121,9 +121,15 @@ Function Invoke-ISHDBUpgradeTool {
                 if ($ishDBVersionMajor -lt 12) {
                     throw "Database's version $ishDBVersion must be at least 12.0.0"
                 }
-
-                #region TODO ISH Unreleased
-                if ($ishDBVersionMajor -lt $deployment.SoftwareVersion.Major) {
+                $configurationData = Get-ISHCoreConfiguration @ISHDeploymentSplat                #region TODO ISH Unreleased
+                if ($configurationData.Database.FromVersion) {
+                    $mustExecuteDBUpgradeTool = $true
+                    $dbUpgradeToolArgs += @(
+                        "--fromversion"
+                        $configurationData.Database.FromVersion
+                    )
+                }
+                elseif ($ishDBVersionMajor -lt $deployment.SoftwareVersion.Major) {
                     # Database version is behind deployment's
                     $mustExecuteDBUpgradeTool = $true
                 }

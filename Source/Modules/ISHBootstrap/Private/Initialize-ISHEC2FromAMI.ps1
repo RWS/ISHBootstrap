@@ -179,12 +179,6 @@ Function Initialize-ISHEC2FromAMI {
         }
         #endregion
 
-        #region Routing the hostname to 127.0.0.1
-        # TODO StayLocal
-        $null = Add-HostEntry -Name $HostName -Address 127.0.0.1 -Comment "From $($PSCmdlet.MyInvocation.MyCommand.Name)"
-        Write-Verbose "Add host entry for routing $HostName to 127.0.0.1"
-        #endregion
-
         #region Clean ISHDeploy's folder structure
         $packagesPath = Get-ISHPackageFolderPath @ISHDeploymentSplat
         Write-Debug "packagesPath=$packagesPath"

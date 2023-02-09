@@ -139,7 +139,9 @@ function Get-ISHCoreConfiguration {
                 Thumbprint          = $configurationValues | Where-Object -Property Key -EQ "$projectStageKey/Certificate/ISHSTS/Thumbprint" | Select-Object -ExpandProperty Value
             }
         }
-
+        if (Test-KeyValuePS -Key "$ishKey/Initialize/Database/Restore/FromVersion" -FilePath $deploymentConfig) {
+            $hash.Database.FromVersion = $configurationValues | Where-Object -Property Key -EQ "$ishKey/Initialize/Database/Restore/FromVersion" | Select-Object -ExpandProperty Value
+        }
         Write-Debug "Hash ready"
 
         New-Object -TypeName PSObject -Property $hash
