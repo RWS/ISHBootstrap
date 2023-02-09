@@ -145,7 +145,13 @@ function Set-ISHCoreConfiguration {
                     [System.IO.File]::WriteAllBytes($filePath, $configurationData.Certificate.ISHSTS.PfxBlob)
                 }
                 else {
-                    $null = Read-S3Object -BucketName $configurationData.Certificate.ISHSTS.PfxBase64BucketName -Key $configurationData.Certificate.ISHSTS.PfxBase64Key -File $filePath
+                    $s3Region = Get-S3BucketLocation $configurationData.Certificate.ISHSTS.PfxBase64BucketName
+                    if ( $s3Region.Value ) {
+                        $Region = $s3Region.Value
+                    } else {
+                        $Region = 'us-east-1'
+                    }
+                    $null = Read-S3Object -BucketName $configurationData.Certificate.ISHSTS.PfxBase64BucketName -Key $configurationData.Certificate.ISHSTS.PfxBase64Key -File $filePath -Region $Region
                 }
                 Write-Debug "Installing certificate from $filePath"
                 certutil -f -p $configurationData.Certificate.ISHSTS.PfxPassword -ImportPfx $filePath
@@ -177,7 +183,13 @@ function Set-ISHCoreConfiguration {
                     [System.IO.File]::WriteAllBytes($filePath, $configurationData.Certificate.ISHWS.PfxBlob)
                 }
                 else {
-                    $null = Read-S3Object -BucketName $configurationData.Certificate.ISHWS.PfxBase64BucketName -Key $configurationData.Certificate.ISHWS.PfxBase64Key -File $filePath
+                    $s3Region = Get-S3BucketLocation $configurationData.Certificate.ISHWS.PfxBase64BucketName 
+                    if ( $s3Region.Value ) {
+                        $Region = $s3Region.Value
+                    } else {
+                        $Region = 'us-east-1'
+                    }
+                    $null = Read-S3Object -BucketName $configurationData.Certificate.ISHWS.PfxBase64BucketName -Key $configurationData.Certificate.ISHWS.PfxBase64Key -File $filePath -Region $Region
                 }
                 Write-Debug "Installing certificate from $filePath"
                 certutil -f -p $configurationData.Certificate.ISHWS.PfxPassword -ImportPfx $filePath
