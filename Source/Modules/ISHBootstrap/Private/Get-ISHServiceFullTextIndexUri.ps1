@@ -41,21 +41,28 @@ Function Get-ISHServiceFullTextIndexUri {
     process {
         $dependency = Get-ISHFullTextIndexExternalDependency @ISHDeploymentNameSplat
         Write-Debug "dependency=$dependency"
+        $deployment = Get-ISHDeployment  @ISHDeploymentNameSplat
+        if ($deployment.SoftwareVersion.Major -ge 15) {
+            $protocol = 'https'
+        }
+        else {
+            $protocol = 'http'
+        }
         switch ($dependency) {
             'ExternalEC2' {
-                $hostname = Get-ISHDeployment  @ISHDeploymentNameSplat | Select-Object -ExpandProperty AccessHostName
+                $hostname = $deployment | Select-Object -ExpandProperty AccessHostName
                 $project = Get-ISHTag -Name "Project" @ISHDeploymentNameSplat
                 $stage = Get-ISHTag -Name "Stage" @ISHDeploymentNameSplat
 
-                $fullTextIndexUri = "http://backendsingle.ish.internal.$($project)-$($stage).$($hostname):8078/solr/"
+                $fullTextIndexUri = "$($protocol)://backendsingle.ish.internal.$($project)-$($stage).$($hostname):8078/solr/"
 
             }
             'Local' {
-                $fullTextIndexUri = "http://127.0.0.1:8078/solr/"
+                $fullTextIndexUri = "$($protocol)://127.0.0.1:8078/solr/"
 
             }
             'None' {
-                $fullTextIndexUri = "http://127.0.0.1:8078/solr/"
+                $fullTextIndexUri = "$($protocol)://127.0.0.1:8078/solr/"
             }
         }
 

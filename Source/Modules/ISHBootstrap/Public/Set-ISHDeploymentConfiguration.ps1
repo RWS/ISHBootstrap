@@ -36,6 +36,24 @@
     Database user name. By default databaseuser deployment parameter will be used.
 .PARAMETER Password
     Database user password. By default databasepassword deployment parameter will be used.
+.PARAMETER AmInitialCatalog
+    Database name. By default value from ishamconnectstring deployment parameter will be used.
+.PARAMETER AmUsername
+    Database user name. By default value from ishamconnectstring deployment parameter will be used.
+.PARAMETER AmPassword
+    Database user password. By default value from ishamconnectstring deployment parameter will be used.
+.PARAMETER BffInitialCatalog
+    Database name. By default value from ishbffconnectstring deployment parameter will be used.
+.PARAMETER BffUsername
+    Database user name. By default value from ishbffconnectstring deployment parameter will be used.
+.PARAMETER BffPassword
+    Database user password. By default value from ishbffconnectstring deployment parameter will be used.
+.PARAMETER IdInitialCatalog
+    Database name. By default value from ishidconnectstring deployment parameter will be used.
+.PARAMETER IdUsername
+    Database user name. By default value from ishidconnectstring deployment parameter will be used.
+.PARAMETER IdPassword
+    Database user password. By default value from ishidconnectstring deployment parameter will be used.
 .PARAMETER Type
     Database type. By default databasetype deployment parameter will be used.
 .PARAMETER ISHDeployment
@@ -65,6 +83,24 @@ Function Set-ISHDeploymentConfiguration {
         [string]$Username,
         [Parameter(Mandatory = $false)]
         [string]$Password,
+        [Parameter(Mandatory = $false)]
+        [string]$AmInitialCatalog,
+        [Parameter(Mandatory = $false)]
+        [string]$AmUsername,
+        [Parameter(Mandatory = $false)]
+        [string]$AmPassword,
+        [Parameter(Mandatory = $false)]
+        [string]$BffInitialCatalog,
+        [Parameter(Mandatory = $false)]
+        [string]$BffUsername,
+        [Parameter(Mandatory = $false)]
+        [string]$BffPassword,
+        [Parameter(Mandatory = $false)]
+        [string]$IdInitialCatalog,
+        [Parameter(Mandatory = $false)]
+        [string]$IdUsername,
+        [Parameter(Mandatory = $false)]
+        [string]$IdPassword,
         [Parameter(Mandatory = $false)]
         [string]$Type,
         [Parameter(Mandatory = $false)]
@@ -96,6 +132,45 @@ Function Set-ISHDeploymentConfiguration {
         if(-not $ConfigFilePath){
             $ConfigFilePath = (Get-Variable -Name "ISHDeploymentConfigFilePath").Value -f ($ISHDeployment  -replace "^InfoShare$")
         }
+        $deployment = Get-ISHDeployment @ISHDeploymentSplat
+        if ($deployment.SoftwareVersion.Major -ge 15) {
+            $ishamconnectstring = Get-ISHDeploymentParameters -Name ishamconnectstring -ValueOnly @ISHDeploymentSplat
+            $amdb = New-Object System.Data.Common.DbConnectionStringBuilder
+            $amdb.set_ConnectionString($ishamconnectstring)
+            $ishbffconnectstring = Get-ISHDeploymentParameters -Name ishbffconnectstring -ValueOnly @ISHDeploymentSplat
+            $bffdb = New-Object System.Data.Common.DbConnectionStringBuilder
+            $bffdb.set_ConnectionString($ishbffconnectstring)
+            $ishidconnectstring = Get-ISHDeploymentParameters -Name ishidconnectstring -ValueOnly @ISHDeploymentSplat
+            $iddb = New-Object System.Data.Common.DbConnectionStringBuilder
+            $iddb.set_ConnectionString($ishidconnectstring)
+            if(-not $AmInitialCatalog -and $Type -eq "sqlserver"){
+                $AmInitialCatalog = $amdb.'initial catalog'
+            }
+            if(-not $AmUsername){
+                $AmUsername = $amdb.'user id'
+            }
+            if(-not $AmPassword){
+                $AmPassword = $amdb.password
+            }
+            if(-not $BffInitialCatalog -and $Type -eq "sqlserver"){
+                $BffInitialCatalog = $bffdb.'initial catalog'
+            }
+            if(-not $BffUsername){
+                $BffUsername = $bffdb.'user id'
+            }
+            if(-not $BffPassword){
+                $BffPassword = $bffdb.password
+            }
+            if(-not $IdInitialCatalog -and $Type -eq "sqlserver"){
+                $IdInitialCatalog = $iddb.'initial catalog'
+            }
+            if(-not $IdUsername){
+                $IdUsername = $iddb.'user id'
+            }
+            if(-not $IdPassword){
+                $IdPassword = $iddb.password
+            }
+        }
     }
 
     process {
@@ -113,6 +188,19 @@ Function Set-ISHDeploymentConfiguration {
             Type           = $Type
         }
 
+        if ($deployment.SoftwareVersion.Major -ge 15) {
+            $dbKV += @{
+                AmInitialCatalog = $AmInitialCatalog
+                AmUsername       = $AmUsername
+                AmPassword       = $AmPassword
+                BffInitialCatalog= $BffInitialCatalog
+                BffUsername      = $BffUsername
+                BffPassword      = $BffPassword
+                IdInitialCatalog = $IdInitialCatalog
+                IdUsername       = $IdUsername
+                IdPassword       = $IdPassword
+            }
+        }
         $path = $keyValues.$ISHBootstrapVersion.Project.$Project.$Stage.ISH
         foreach ($i in @('Integration', 'Database', 'SQLServer')) {
             if (-not $path.$i) {

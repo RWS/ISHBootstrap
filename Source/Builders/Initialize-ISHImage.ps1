@@ -44,7 +44,13 @@ param(
     [bool]$InstallISHApplicationServer=$true,
     [Parameter(Mandatory=$false,ParameterSetName="From FTP")]
     [Parameter(Mandatory=$false,ParameterSetName="From AWS S3")]
-    [string]$AMConnectionString=$null
+    [string]$AMConnectionString=$null,
+    [Parameter(Mandatory=$false,ParameterSetName="From FTP")]
+    [Parameter(Mandatory=$false,ParameterSetName="From AWS S3")]
+    [string]$BFFConnectionString=$null,
+    [Parameter(Mandatory=$false,ParameterSetName="From FTP")]
+    [Parameter(Mandatory=$false,ParameterSetName="From AWS S3")]
+    [string]$IDConnectionString=$null
 )
 
 $cmdletsPaths="$PSScriptRoot\..\Cmdlets"
@@ -231,6 +237,8 @@ if ($InstallISHApplicationServer)
         MachineName="MockMachineName"
         ConnectionString=$ConnectionString
         AMConnectionString=$AMConnectionString
+        BFFConnectionString=$BFFConnectionString
+        IDConnectionString=$IDConnectionString
     }
 
     & $serverScriptsPath\Install\Install-ISHDeployment.ps1 @installHash

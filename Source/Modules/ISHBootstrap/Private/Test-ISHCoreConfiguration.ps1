@@ -44,12 +44,15 @@ function Test-ISHCoreConfiguration {
         if (-not $ConfigurationData) {
             $ConfigurationData = Get-ISHCoreConfiguration @ISHDeploymentSplat
         }
-
+        $deployment = Get-ISHDeployment @ISHDeploymentSplat
         $hash = @{
             EC2InitializedFromAMI = Test-ISHRequirement -Marker -Name "ISH.EC2InitializedFromAMI"
 
             #Database
             Database              = -not (Compare-Object ((Get-ISHDeploymentParameters -Name connectstring -ValueOnly @ISHDeploymentSplat) -split ";") ($ConfigurationData.Database.ConnectionString -split ";"))
+            AMDatabase            = -not (($deployment.SoftwareVersion.Major -ge 15) -and (Compare-Object ((Get-ISHDeploymentParameters -Name ishamconnectstring -ValueOnly @ISHDeploymentSplat) -split ";") ($ConfigurationData.Database.AMConnectionString -split ";")))
+            BFFDatabase           = -not (($deployment.SoftwareVersion.Major -ge 15) -and (Compare-Object ((Get-ISHDeploymentParameters -Name ishbffconnectstring -ValueOnly @ISHDeploymentSplat) -split ";") ($ConfigurationData.Database.BFFConnectionString -split ";")))
+            IDDatabase            = -not (($deployment.SoftwareVersion.Major -ge 15) -and (Compare-Object ((Get-ISHDeploymentParameters -Name ishidconnectstring -ValueOnly @ISHDeploymentSplat) -split ";") ($ConfigurationData.Database.IDConnectionString -split ";")))
             OSUser                = (($null -eq $ConfigurationData.OSUser) -or (((Get-ISHDeploymentParameters -Name osuser -ValueOnly @ISHDeploymentSplat) -eq $ConfigurationData.OSUser.NormalizedUsername) -and ((Get-ISHDeploymentParameters -Name ospassword -ValueOnly -ShowPassword @ISHDeploymentSplat) -eq $ConfigurationData.OSUser.Password)))
             ServiceUser           = (($null -eq $ConfigurationData.ServiceUser) -or (((Get-ISHDeploymentParameters -Name serviceusername -ValueOnly @ISHDeploymentSplat) -eq $ConfigurationData.ServiceUser.Username) -and ((Get-ISHDeploymentParameters -Name servicepassword -ValueOnly -ShowPassword @ISHDeploymentSplat) -eq $ConfigurationData.ServiceUser.Password)))
             Crawler               = ($ConfigurationData.Service.Crawler.Count) -eq ((Get-ISHServiceCrawler @ISHDeploymentSplat).Count)

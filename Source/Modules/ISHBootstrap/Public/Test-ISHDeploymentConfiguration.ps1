@@ -39,6 +39,7 @@ Function Test-ISHDeploymentConfiguration {
    begin {
       Write-Debug "PSCmdlet.ParameterSetName=$($PSCmdlet.ParameterSetName)"
       foreach ($psbp in $PSBoundParameters.GetEnumerator()) { Write-Debug "$($psbp.Key)=$($psbp.Value)" }
+      $deployment = Get-ISHDeployment
    }
 
    process {
@@ -79,6 +80,15 @@ Function Test-ISHDeploymentConfiguration {
       }
       if (-not $keyValues.$ISHBootstrapVersion.Project.$Project.$Stage.ISH.Integration.Database.SQLServer.Password) {
          throw "Key $Project/$Stage/ISH/Integration/Database/SQLServer/Password does not exist."
+      }
+      if ($deployment.SoftwareVersion.Major -ge 15 -and -not $keyValues.$ISHBootstrapVersion.Project.$Project.$Stage.ISH.Integration.Database.SQLServer.AmInitialCatalog) {
+         throw "Key $Project/$Stage/ISH/Integration/Database/SQLServer/AmInitialCatalog does not exist."
+      }
+      if ($deployment.SoftwareVersion.Major -ge 15 -and -not $keyValues.$ISHBootstrapVersion.Project.$Project.$Stage.ISH.Integration.Database.SQLServer.AmUsername) {
+         throw "Key $Project/$Stage/ISH/Integration/Database/SQLServer/AmUsername does not exist."
+      }
+      if ($deployment.SoftwareVersion.Major -ge 15 -and -not $keyValues.$ISHBootstrapVersion.Project.$Project.$Stage.ISH.Integration.Database.SQLServer.AmPassword) {
+         throw "Key $Project/$Stage/ISH/Integration/Database/SQLServer/AmPassword does not exist."
       }
       if (-not $keyValues.$ISHBootstrapVersion.Project.$Project.$Stage.ISH.Integration.Database.SQLServer.Type) {
          throw "Key $Project/$Stage/ISH/Integration/Database/SQLServer/Type does not exist."

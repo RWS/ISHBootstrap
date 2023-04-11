@@ -32,7 +32,13 @@ param(
     [bool]$InstallISHApplicationServer=$true,
     [Parameter(Mandatory=$false,ParameterSetName="Default Authorization")]
     [Parameter(Mandatory=$false,ParameterSetName="Custom Authorization")]
-    [string]$MockAMConnectionString=$null
+    [string]$MockAMConnectionString=$null,
+    [Parameter(Mandatory=$false,ParameterSetName="Default Authorization")]
+    [Parameter(Mandatory=$false,ParameterSetName="Custom Authorization")]
+    [string]$MockBFFConnectionString=$null,
+    [Parameter(Mandatory=$false,ParameterSetName="Default Authorization")]
+    [Parameter(Mandatory=$false,ParameterSetName="Custom Authorization")]
+    [string]$MockIDConnectionString=$null
 )
 
 if ($PSBoundParameters['Debug']) {
@@ -63,4 +69,6 @@ if($PSCmdlet.ParameterSetName -eq "Custom Authorization")
 
 $hash.ConnectionString=$MockConnectionString
 $hash.AMConnectionString=$MockAMConnectionString
+$hash.BFFConnectionString=$MockBFFConnectionString
+$hash.IDConnectionString=$MockIDConnectionString
 & $buildersPath\Initialize-ISHImage.ps1 @hash -ISHVersion $ishVersion

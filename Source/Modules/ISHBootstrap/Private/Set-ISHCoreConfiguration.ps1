@@ -43,6 +43,7 @@ function Set-ISHCoreConfiguration {
     process {
         $configurationData = Get-ISHCoreConfiguration @ISHDeploymentSplat
         $testData = Test-ISHCoreConfiguration -ConfigurationData $configurationData @ISHDeploymentSplat
+        $deployment = Get-ISHDeployment @ISHDeploymentSplat
 
         #region logging
         Write-Debug "testData.HTTPSCertificate=$($testData.HTTPSCertificate)"
@@ -270,7 +271,12 @@ function Set-ISHCoreConfiguration {
                 If ($a -gt $max) { break }
                 Write-Verbose "Configuring Database integration - Attempt $($a) of $($max)"
                 try {
-                    Set-ISHIntegrationDB -ConnectionString $configurationData.Database.ConnectionString -Engine $configurationData.Database.Type @ISHDeploymentSplat
+                    if ($deployment.SoftwareVersion.Major -lt 15) {
+                        Set-ISHIntegrationDB -ConnectionString $configurationData.Database.ConnectionString -Engine $configurationData.Database.Type @ISHDeploymentSplat
+                    }
+                    else {
+                        Set-ISHConnectionString -ConnectionString $configurationData.Database.ConnectionString -DatabasePurpose ContentManager @ISHDeploymentSplat
+                    }
                     Write-Verbose "Configured Database integration - Attempt $($a) of $($max) - Successful"
                     break
                 }
@@ -288,7 +294,84 @@ function Set-ISHCoreConfiguration {
 
             Write-Verbose "Configured Database integration"
         }
+        if ((-not $testData.AMDatabase)) {
+            $a = 1
+            $max = 30
+            $sleep = 30
+            Do {
+                If ($a -gt $max) { break }
+                Write-Verbose "Configuring AM Database - Attempt $($a) of $($max)"
+                try {
+                    Set-ISHConnectionString -ConnectionString $configurationData.Database.AMConnectionString -DatabasePurpose AccessManagement @ISHDeploymentSplat
+                    Write-Verbose "Configured AM Database - Attempt $($a) of $($max) - Successful"
+                    break
+                }
+                catch {
+                    Write-Verbose "Configuring AM Database - Attempt $($a) of $($max) - Failed"
+                    write-Verbose "Exception Type: $($_.Exception.GetType().FullName)"
+                    write-Verbose "Exception Message: $($_.Exception.Message)"
+                    Write-Verbose "Going to sleep for $($sleep + $a) seconds"
+                    Start-Sleep -Seconds ($sleep + $a)
+                }
+                finally {
+                    $a++
+                }
+            } While ($a -le $max)
 
+            Write-Verbose "Configured AM Database"
+        }
+        if ((-not $testData.BFFDatabase)) {
+            $a = 1
+            $max = 30
+            $sleep = 30
+            Do {
+                If ($a -gt $max) { break }
+                Write-Verbose "Configuring BFF Database - Attempt $($a) of $($max)"
+                try {
+                    Set-ISHConnectionString -ConnectionString $configurationData.Database.BFFConnectionString -DatabasePurpose BackendForFrontend @ISHDeploymentSplat
+                    Write-Verbose "Configured BFF Database - Attempt $($a) of $($max) - Successful"
+                    break
+                }
+                catch {
+                    Write-Verbose "Configuring BFF Database - Attempt $($a) of $($max) - Failed"
+                    write-Verbose "Exception Type: $($_.Exception.GetType().FullName)"
+                    write-Verbose "Exception Message: $($_.Exception.Message)"
+                    Write-Verbose "Going to sleep for $($sleep + $a) seconds"
+                    Start-Sleep -Seconds ($sleep + $a)
+                }
+                finally {
+                    $a++
+                }
+            } While ($a -le $max)
+
+            Write-Verbose "Configured BFF Database"
+        }
+        if ((-not $testData.IDDatabase)) {
+            $a = 1
+            $max = 30
+            $sleep = 30
+            Do {
+                If ($a -gt $max) { break }
+                Write-Verbose "Configuring ID Database - Attempt $($a) of $($max)"
+                try {
+                    Set-ISHConnectionString -ConnectionString $configurationData.Database.IDConnectionString -DatabasePurpose IdentityServer @ISHDeploymentSplat
+                    Write-Verbose "Configured ID Database - Attempt $($a) of $($max) - Successful"
+                    break
+                }
+                catch {
+                    Write-Verbose "Configuring ID Database - Attempt $($a) of $($max) - Failed"
+                    write-Verbose "Exception Type: $($_.Exception.GetType().FullName)"
+                    write-Verbose "Exception Message: $($_.Exception.Message)"
+                    Write-Verbose "Going to sleep for $($sleep + $a) seconds"
+                    Start-Sleep -Seconds ($sleep + $a)
+                }
+                finally {
+                    $a++
+                }
+            } While ($a -le $max)
+
+            Write-Verbose "Configured ID Database"
+        }
         #endregion
 
         #region Service Count
@@ -347,7 +430,6 @@ function Set-ISHCoreConfiguration {
             Disable-ISHIISAppPool  @ISHDeploymentSplat
             Write-Verbose "Disabled IIS ISH Application pools"
         }
-        $deployment = Get-ISHDeployment @ISHDeploymentSplat
         if ($deployment.SoftwareVersion.Major -lt 15) {
             Enable-ISHCOMPlus  @ISHDeploymentSplat
             Write-Verbose "Enabled COM+"
@@ -403,16 +485,6 @@ function Set-ISHCoreConfiguration {
             Disable-ISHServiceTranslationOrganizer @ISHDeploymentSplat
             Write-Verbose "Disabled TranslationOrganizer component"
         }
-
-        foreach ($role in ((Get-ISHTag -Name ISHComponent-BackgroundTask @ISHDeploymentSplat) -split ',')) {
-            $backgroundTask = "BackgroundTask$role"
-            Write-Debug "configurationData.Service.$backgroundTask.Count=$($configurationData.Service."$backgroundTask".Count)"
-            if ($configurationData.Service."$backgroundTask".Count -gt 0) {
-                Enable-ISHServiceBackgroundTask -Role $role @ISHDeploymentSplat
-                Write-Verbose "Enabled BackgroundTask for role=$role component"
-            }
-        }
-
         #endregion
 
     }

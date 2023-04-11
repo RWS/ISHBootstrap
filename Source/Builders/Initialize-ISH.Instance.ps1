@@ -21,7 +21,11 @@ param(
     [Parameter(Mandatory=$false,ParameterSetName="Demo Database")]
     [switch]$InContainer=$false,
     [Parameter(Mandatory=$false,ParameterSetName="External Database")]
-    [string]$AMConnectionString
+    [string]$AMConnectionString,
+    [Parameter(Mandatory=$false,ParameterSetName="External Database")]
+    [string]$BFFConnectionString,
+    [Parameter(Mandatory=$false,ParameterSetName="External Database")]
+    [string]$IDConnectionString
 )
 
 $cmdletsPaths="$PSScriptRoot\..\Cmdlets"
@@ -294,6 +298,18 @@ if ($AMConnectionString){
     $replacementMatrix+=@{
         CurrentValue=$deploymentParameters|Where-Object -Property Name -EQ ishamconnectstring|Select-Object -ExpandProperty Value
         NewValue=$AMConnectionString
+    }
+}
+if ($BFFConnectionString){
+    $replacementMatrix+=@{
+        CurrentValue=$deploymentParameters|Where-Object -Property Name -EQ ishbffconnectstring|Select-Object -ExpandProperty Value
+        NewValue=$BFFConnectionString
+    }
+}
+if ($IDConnectionString){
+    $replacementMatrix+=@{
+        CurrentValue=$deploymentParameters|Where-Object -Property Name -EQ ishidconnectstring|Select-Object -ExpandProperty Value
+        NewValue=$IDConnectionString
     }
 }
 Write-Verbose "Replacement matrix is:"

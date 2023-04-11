@@ -51,11 +51,21 @@ function Get-ISHCoreConfiguration {
 
             #Database
             Database = @{
-                DataSource     = $configurationValues | Where-Object -Property Key -EQ "$ishKey/Integration/Database/SQLServer/DataSource" | Select-Object -ExpandProperty Value
-                InitialCatalog = $configurationValues | Where-Object -Property Key -EQ "$ishKey/Integration/Database/SQLServer/InitialCatalog" | Select-Object -ExpandProperty Value
-                Password       = $configurationValues | Where-Object -Property Key -EQ "$ishKey/Integration/Database/SQLServer/Password" | Select-Object -ExpandProperty Value
-                Username       = $configurationValues | Where-Object -Property Key -EQ "$ishKey/Integration/Database/SQLServer/Username" | Select-Object -ExpandProperty Value
-                Type           = $configurationValues | Where-Object -Property Key -EQ "$ishKey/Integration/Database/SQLServer/Type" | Select-Object -ExpandProperty Value
+                DataSource       = $configurationValues | Where-Object -Property Key -EQ "$ishKey/Integration/Database/SQLServer/DataSource" | Select-Object -ExpandProperty Value
+                InitialCatalog   = $configurationValues | Where-Object -Property Key -EQ "$ishKey/Integration/Database/SQLServer/InitialCatalog" | Select-Object -ExpandProperty Value
+                Password         = $configurationValues | Where-Object -Property Key -EQ "$ishKey/Integration/Database/SQLServer/Password" | Select-Object -ExpandProperty Value
+                Username         = $configurationValues | Where-Object -Property Key -EQ "$ishKey/Integration/Database/SQLServer/Username" | Select-Object -ExpandProperty Value
+                AmInitialCatalog = $configurationValues | Where-Object -Property Key -EQ "$ishKey/Integration/Database/SQLServer/AmInitialCatalog" | Select-Object -ExpandProperty Value
+                AmPassword       = $configurationValues | Where-Object -Property Key -EQ "$ishKey/Integration/Database/SQLServer/AmPassword" | Select-Object -ExpandProperty Value
+                AmUsername       = $configurationValues | Where-Object -Property Key -EQ "$ishKey/Integration/Database/SQLServer/AmUsername" | Select-Object -ExpandProperty Value
+                BffInitialCatalog= $configurationValues | Where-Object -Property Key -EQ "$ishKey/Integration/Database/SQLServer/BffInitialCatalog" | Select-Object -ExpandProperty Value
+                BffPassword      = $configurationValues | Where-Object -Property Key -EQ "$ishKey/Integration/Database/SQLServer/BffPassword" | Select-Object -ExpandProperty Value
+                BffUsername      = $configurationValues | Where-Object -Property Key -EQ "$ishKey/Integration/Database/SQLServer/BffUsername" | Select-Object -ExpandProperty Value
+                IdInitialCatalog = $configurationValues | Where-Object -Property Key -EQ "$ishKey/Integration/Database/SQLServer/IdInitialCatalog" | Select-Object -ExpandProperty Value
+                IdPassword       = $configurationValues | Where-Object -Property Key -EQ "$ishKey/Integration/Database/SQLServer/IdPassword" | Select-Object -ExpandProperty Value
+                IdUsername       = $configurationValues | Where-Object -Property Key -EQ "$ishKey/Integration/Database/SQLServer/IdUsername" | Select-Object -ExpandProperty Value
+                Type             = $configurationValues | Where-Object -Property Key -EQ "$ishKey/Integration/Database/SQLServer/Type" | Select-Object -ExpandProperty Value
+                TrustServerCert  = $configurationValues | Where-Object -Property Key -EQ "$ishKey/Integration/Database/SQLServer/TrustServerCertificate" | Select-Object -ExpandProperty Value
             }
             #Services
             Service  = @{
@@ -86,9 +96,21 @@ function Get-ISHCoreConfiguration {
         # E.g.Provider=MSOLEDBSQL.1;Password=*****;Persist Security Info=True;User ID=isource;Initial Catalog=ISH14DEV;Data Source=MECDEVDB05\SQL2017
         if ( $hash.Database.Type -eq 'oracle' ){
             $hash.Database.ConnectionString = "Provider=OraOLEDB.Oracle.1;Data Source=$($hash.Database.DataSource);Persist Security Info=True;User ID=$($hash.Database.Username);Password=$($hash.Database.Password)"
+            $hash.Database.AMConnectionString = "Provider=OraOLEDB.Oracle.1;Data Source=$($hash.Database.DataSource);Persist Security Info=True;User ID=$($hash.Database.AmUsername);Password=$($hash.Database.AmPassword)"
+            $hash.Database.BFFConnectionString = "Provider=OraOLEDB.Oracle.1;Data Source=$($hash.Database.DataSource);Persist Security Info=True;User ID=$($hash.Database.BffUsername);Password=$($hash.Database.BffPassword)"
+            $hash.Database.IDConnectionString = "Provider=OraOLEDB.Oracle.1;Data Source=$($hash.Database.DataSource);Persist Security Info=True;User ID=$($hash.Database.IdUsername);Password=$($hash.Database.IdPassword)"
         }
         else {
             $hash.Database.ConnectionString="Provider=MSOLEDBSQL.1;Data Source=$($hash.Database.DataSource);Initial Catalog=$($hash.Database.InitialCatalog);Persist Security Info=True;User ID=$($hash.Database.Username);Password=$($hash.Database.Password)"
+            $hash.Database.AMConnectionString="Provider=MSOLEDBSQL.1;Data Source=$($hash.Database.DataSource);Initial Catalog=$($hash.Database.AmInitialCatalog);Persist Security Info=True;User ID=$($hash.Database.AmUsername);Password=$($hash.Database.AmPassword)"
+            $hash.Database.BFFConnectionString="Provider=MSOLEDBSQL.1;Data Source=$($hash.Database.DataSource);Initial Catalog=$($hash.Database.BffInitialCatalog);Persist Security Info=True;User ID=$($hash.Database.BffUsername);Password=$($hash.Database.BffPassword)"
+            $hash.Database.IDConnectionString="Provider=MSOLEDBSQL.1;Data Source=$($hash.Database.DataSource);Initial Catalog=$($hash.Database.IdInitialCatalog);Persist Security Info=True;User ID=$($hash.Database.IdUsername);Password=$($hash.Database.IdPassword)"
+            if ($hash.Database.TrustServerCert -and  $hash.Database.TrustServerCert -eq 'True'){
+                $hash.Database.ConnectionString += ";TrustServerCertificate=True"
+                $hash.Database.AMConnectionString += ";TrustServerCertificate=True"
+                $hash.Database.BFFConnectionString += ";TrustServerCertificate=True"
+                $hash.Database.IDConnectionString += ";TrustServerCertificate=True"
+            }
         }
         #Credetnials
         if (Test-KeyValuePS -Folder "$ishKey/Credentials/OSUser" -FilePath $deploymentConfig) {

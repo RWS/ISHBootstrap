@@ -43,7 +43,11 @@ param (
     [Parameter(Mandatory=$false)]
     [string]$MachineName=$null,
     [Parameter(Mandatory=$false)]
-    $AMConnectionString
+    $AMConnectionString,
+    [Parameter(Mandatory=$false)]
+    $BFFConnectionString,
+    [Parameter(Mandatory=$false)]
+    $IDConnectionString
 )
 
 $cmdletsPaths="$PSScriptRoot\..\..\Cmdlets"
@@ -120,6 +124,8 @@ $newParameterScriptBlock={
     $inputParameters["connectstring"]=$ConnectionString
     if($major -ge 15){
         $inputParameters["ishamconnectstring"]=$AMConnectionString
+        $inputParameters["ishbffconnectstring"]=$BFFConnectionString
+        $inputParameters["ishidconnectstring"]=$IDConnectionString
         $inputParameters["serviceaccountclientsecret"]="MockServiceAccountClientSecret"
         $inputParameters["serviceaccountclientid"]="MockServiceAccountClientId"
     }

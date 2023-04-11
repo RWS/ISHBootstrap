@@ -43,7 +43,13 @@ function New-SqlServerQuerySplat {
         }
 
         if ( -not $ConnectionString ){
-            $ConnectionString = Get-ISHIntegrationDB @ISHDeploymentSplat | Select-Object -ExpandProperty RawConnectionString
+            $deployment = Get-ISHDeployment @ISHDeploymentSplat
+            if ($deployment.SoftwareVersion.Major -lt 15) {
+                $ConnectionString = Get-ISHIntegrationDB @ISHDeploymentSplat | Select-Object -ExpandProperty RawConnectionString
+            }
+            else {
+                $ConnectionString = Get-ISHConnectionString -DatabasePurpose ContentManager @ISHDeploymentSplat | Select-Object -ExpandProperty RawConnectionString
+            }
         }
     }
 

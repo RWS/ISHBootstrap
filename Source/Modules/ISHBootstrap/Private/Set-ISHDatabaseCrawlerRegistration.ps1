@@ -62,7 +62,13 @@ FROM ISH_CRAWLER
 WHERE HOSTNAME='InfoShare' AND CATALOG='InfoShare'
 "@
         Write-Debug "sqlValidCrawlerRegistrationCount=$(($sqlValidCrawlerRegistrationCount -split [System.Environment]::NewLine) -join ' ')"
-        $ishDB = Get-ISHIntegrationDB @ISHDeploymentSplat
+        $deployment = Get-ISHDeployment @ISHDeploymentSplat
+        if ($deployment.SoftwareVersion.Major -lt 15) {
+            $ishDB = Get-ISHIntegrationDB @ISHDeploymentSplat
+        }
+        else {
+            $ishDB = Get-ISHConnectionString -DatabasePurpose ContentManager @ISHDeploymentSplat
+        }
         $engin = $ishDB | Select-Object -ExpandProperty Engine
         $connectionString = $ishDB | Select-Object -ExpandProperty RawConnectionString
         if ( $engin -eq 'oracle' ) {

@@ -41,25 +41,26 @@ Function Wait-ISHWeb {
 
     process {
         $deployment = Get-ISHDeployment @ISHDeploymentNameSplat
+        $hostname = $deployment | Select-Object -ExpandProperty AccessHostName
         $urisToWaitFor = @(
             @{
-                Uri    = "https://localhost/"
+                Uri    = "https://$hostname/"
                 Status = 200
             }
             @{
-                Uri    = "https://localhost/$($deployment.WebAppNameWS)/ConnectionConfiguration.xml"
+                Uri    = "https://$hostname/$($deployment.WebAppNameWS)/ConnectionConfiguration.xml"
                 Status = 200
             }
             @{
-                Uri    = "https://localhost/$($deployment.WebAppNameWS)/Application25.asmx"
+                Uri    = "https://$hostname/$($deployment.WebAppNameWS)/Application25.asmx"
                 Status = 200
             }
             @{
-                Uri    = "https://localhost/$($deployment.WebAppNameWS)/Wcf/API25/Application.svc"
+                Uri    = "https://$hostname/$($deployment.WebAppNameWS)/Wcf/API25/Application.svc"
                 Status = 200
             }
             @{
-                Uri    = "https://localhost/$($deployment.WebAppNameSTS)/"
+                Uri    = "https://$hostname/$($deployment.WebAppNameSTS)/"
                 Status = 200
             }
         )
@@ -67,7 +68,7 @@ Function Wait-ISHWeb {
         if ($deployment.WebAppNameCS) {
             $urisToWaitFor += @(
                 @{
-                    Uri    = "https://localhost/$($deployment.WebAppNameCS)/"
+                    Uri    = "https://$hostname/$($deployment.WebAppNameCS)/"
                     Status = 302
                 }
             )
@@ -75,7 +76,7 @@ Function Wait-ISHWeb {
         if ($deployment.SoftwareVersion.Major -lt 15) {
             $urisToWaitFor += @(
                 @{
-                    Uri    = "https://localhost/$($deployment.WebAppNameCM)/"
+                    Uri    = "https://$hostname/$($deployment.WebAppNameCM)/"
                     Status = 302
                 }
             )

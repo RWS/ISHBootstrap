@@ -40,7 +40,13 @@ Function Get-ISHDatabaseVersion {
 
     # TODO - Replace SQL Server query with DBUT SaveInfoShareVersionHistoryXML (SCTCCM-300)
     process {
-        $ishDB = Get-ISHIntegrationDB @ISHDeploymentSplat
+        $deployment = Get-ISHDeployment @ISHDeploymentSplat
+        if ($deployment.SoftwareVersion.Major -lt 15) {
+            $ishDB = Get-ISHIntegrationDB @ISHDeploymentSplat
+        }
+        else {
+            $ishDB = Get-ISHConnectionString -DatabasePurpose ContentManager @ISHDeploymentSplat
+        }
         $engin = $ishDB | Select-Object -ExpandProperty Engine
         $connectionString = $ishDB | Select-Object -ExpandProperty RawConnectionString
 

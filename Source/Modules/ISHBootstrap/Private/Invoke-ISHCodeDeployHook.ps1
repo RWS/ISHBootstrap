@@ -159,8 +159,8 @@ Function Invoke-ISHCodeDeployHook {
 
                     #region Database update
                     try {
-                        Write-Verbose "Starting ISHCM Web application pools"
-                        Start-ISHWeb @ISHDeploymentSplat
+                        Write-Verbose "Starting ISHDeployment"
+                        Start-ISH @ISHDeploymentSplat
 
                         Write-Verbose "Waiting for ISHCM Web application pools"
                         Wait-ISHWeb @ISHDeploymentSplat
@@ -175,8 +175,8 @@ Function Invoke-ISHCodeDeployHook {
                         Invoke-ISHManifestEvent -ManifestHash $recipeManifest -EventName "DatabaseUpdateAfterCore" @ISHDeploymentSplat
                     }
                     finally {
-                        Write-Verbose "Stopping ISHCM Web application pools"
-                        Stop-ISHWeb @ISHDeploymentSplat
+                        Write-Verbose "Stopping ISHDeployment"
+                        Stop-ISH @ISHDeploymentSplat
                     }
 
                     #endregion
@@ -192,6 +192,11 @@ Function Invoke-ISHCodeDeployHook {
                     Invoke-ISHCrawlerReIndex @ISHDeploymentSplat
                 }
 
+                # Enable BackgroundTasks
+                foreach ($role in (Get-ISHServiceBackgroundTask).Role) {
+                    Enable-ISHServiceBackgroundTask -Role $role
+                    Write-Verbose "Enabled BackgroundTask for role=$role component"
+                }
                 Write-Verbose "Finished AfterInstall"
             }
             'ApplicationStart' {
