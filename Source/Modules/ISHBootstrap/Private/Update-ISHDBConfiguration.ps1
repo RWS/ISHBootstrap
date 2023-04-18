@@ -58,7 +58,6 @@ function Update-ISHDBConfiguration {
             "Admin.XMLStatusConfiguration.xml"           = "FSTATECONFIGURATION"
             "Admin.XMLTranslationConfiguration.xml"      = "FTRANSLATIONCONFIGURATION"
             "Admin.XMLWriteObjPluginConfig.xml"          = "FISHWRITEOBJPLUGINCFG"
-            "Admin.XMLPluginConfig.xml"                  = "FISHPLUGINCONFIGXML"
         }
         foreach ($fnfn in $fileNameFieldNameMap.GetEnumerator()) { Write-Debug "$($fnfn.Key)=$($fnfn.Value)" }
 

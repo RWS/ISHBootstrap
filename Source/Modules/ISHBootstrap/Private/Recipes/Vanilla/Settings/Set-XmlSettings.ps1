@@ -21,8 +21,6 @@ $filePath = Join-Path -Path $settingsFolderPath -ChildPath "Admin.XMLChangeTrack
 Set-IshSetting -IshSession $ishSession -FieldName "FISHCHANGETRACKERCONFIG" -FilePath $filePath
 $filePath = Join-Path -Path $settingsFolderPath -ChildPath "Admin.XMLExtensionConfiguration.xml"
 Set-IshSetting -IshSession $ishSession -FieldName "FISHEXTENSIONCONFIG" -FilePath $filePath
-$filePath = Join-Path -Path $settingsFolderPath -ChildPath "Admin.XMLPluginConfig.xml"
-Set-IshSetting -IshSession $ishSession -FieldName "FISHPLUGINCONFIGXML" -FilePath $filePath
 $filePath = Join-Path -Path $settingsFolderPath -ChildPath "Admin.XMLStatusConfiguration.xml"
 Set-IshSetting -IshSession $ishSession -FieldName "FSTATECONFIGURATION" -FilePath $filePath
 $filePath = Join-Path -Path $settingsFolderPath -ChildPath "Admin.XMLTranslationConfiguration.xml"

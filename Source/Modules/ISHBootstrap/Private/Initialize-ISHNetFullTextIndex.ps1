@@ -85,7 +85,7 @@ Function Initialize-ISHNetFullTextIndex {
 			$fileContent += @"
 set SOLR_OPTS=%SOLR_OPTS% -Dsolr.dns.prevent.reverse.lookup=true
 set SOLR_JETTY_HOST=0.0.0.0
-set SOLR_IP_ALLOWLIST=0.0.0.0/0, 127.0.0.1, 127.0.0.2/*.html
+set SOLR_IP_ALLOWLIST=0.0.0.0/0, 127.0.0.1, 127.0.0.2
 "@
             Set-Content -Path $SolrInCmdPath.AbsolutePath -Value $fileContent
             $filePath = $SolrInCmdPath.AbsolutePath
