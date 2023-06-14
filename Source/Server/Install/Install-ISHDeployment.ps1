@@ -189,25 +189,19 @@ $newParameterScriptBlock={
     {
         $inputParameters["machinename"]=$MachineName
     }
-    
-    if($major -eq 13 -and $revision -ge 2)
-    {
-        # With the introduction of AdoptOpenJDK/JRE as the default for 13.0.2, we need to set the ps_java_home when using JDK8
-        # We cannot use AdoptOpenJDK, since ISHServer that drives the download/install of prerequisites does not (yet) have a notion of SPs
-        $value=Get-ChildItem -Path $Env:ProgramFiles\Java |Sort-Object -Property Name -Descending|Select-Object -First 1 -ExpandProperty FullName
-        $inputParameters["ps_java_home"]="$value"
-        $inputParameters["ps_java_jvmdll"]="$value\bin\server\jvm.dll"
+
+    if ($major -eq 14) {
+        $javaLocation = "C:\AdoptOpenJDK"
+    } elseif ($major -eq 15) {
+        $javaLocation = "C:\EclipseAdoptiumOpenJDK"
     }
+
+    $value=Get-ChildItem -Path $javaLocation |Sort-Object -Property Name -Descending|Select-Object -First 1 -ExpandProperty FullName
+    $inputParameters["ps_java_home"]="$value"
+    $inputParameters["ps_java_jvmdll"]="$value\bin\server\jvm.dll"
 
     $inputParametersPath=Join-Path $CDPath "__InstallTool\inputparameters.xml"
     [xml]$xml=Get-Content $inputParametersPath
-    
-    if($major -eq 15)
-    {
-        $value = ($xml | Select-Xml -XPath "//param[@name='ps_java_home']/defaultvalue").Node.InnerText
-        $inputParameters["ps_java_home"]="$value"
-        $inputParameters["ps_java_jvmdll"]="$value\bin\server\jvm.dll"
-    }
 
     #region Add the missing xml elements
 

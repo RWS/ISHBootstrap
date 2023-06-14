@@ -50,12 +50,18 @@ Function Invoke-ISHCrawlerReIndex {
 
         if (-not (Test-ISHRequirement -Marker -Name "ISH.EC2InvokedCrawlerReindex" @ISHDeploymentSplat)) {
             # Reindex has never been invoked by this host
-            Invoke-ISHMaintenance -Crawler -ReIndex @ISHDeploymentSplat
+            $deployment = Get-ISHDeployment @ISHDeploymentNameSplat
+
+            if ($deployment.SoftwareVersion.Major -lt 15) {
+                Invoke-ISHMaintenance -Crawler -ReIndex @ISHDeploymentSplat
+            }
+            else {
+                Invoke-ISHFullTextIndexMaintenance -ReIndex @ISHDeploymentSplat
+            }
 
             #region TODO Invoke-ISHMaintenance-Reindex
             # Although Invoke-ISHMaintenance -Crawler -ReIndex never raised an error, because of SCTCM-307 it really didn't reindex.
             # For this reason we execute the actual executable correctly
-            $deployment = Get-ISHDeployment @ISHDeploymentNameSplat
 
             $crawlerFolder = Join-Path -Path $deployment.AppPath -ChildPath Crawler\Bin
             Write-Debug "crawlerFolder=$crawlerFolder"

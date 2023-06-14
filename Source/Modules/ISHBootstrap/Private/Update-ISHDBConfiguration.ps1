@@ -53,12 +53,14 @@ function Update-ISHDBConfiguration {
             "Admin.XMLChangeTrackerConfig.xml"           = "FISHCHANGETRACKERCONFIG"
             "Admin.XMLCollectiveSpacesConfiguration.xml" = "FISHCOLLECTIVESPACESCFG"
             "Admin.XMLExtensionConfiguration.xml"        = "FISHEXTENSIONCONFIG"
-            "Admin.XMLInboxConfiguration.xml"            = "FINBOXCONFIGURATION"
+            "Admin.XMLInboxConfiguration.xml"            = "FISHINBOXCONFIGURATION"
+            "Admin.XMLReportConfiguration.xml"           = "FISHREPORTCONFIGURATION"
             "Admin.XMLPublishPluginConfiguration.xml"    = "FISHPUBLISHPLUGINCONFIG"
             "Admin.XMLStatusConfiguration.xml"           = "FSTATECONFIGURATION"
             "Admin.XMLTranslationConfiguration.xml"      = "FTRANSLATIONCONFIGURATION"
             "Admin.XMLWriteObjPluginConfig.xml"          = "FISHWRITEOBJPLUGINCFG"
         }
+
         foreach ($fnfn in $fileNameFieldNameMap.GetEnumerator()) { Write-Debug "$($fnfn.Key)=$($fnfn.Value)" }
 
     }
@@ -69,7 +71,7 @@ function Update-ISHDBConfiguration {
             Write-Debug "Creating ISHRemote remote session"
             $session = New-ISHWSSession -ServiceAdmin @ISHDeploymentSplat
             Write-Verbose "ISHRemote remote session created"
-
+            $typeDefinition = (Get-IshTypeFieldDefinition -IshSession $session |Where-Object -Property ISHType -EQ ISHConfiguration).Name
             # Process each xml file inside enterviaui folder
             # TODO XMLAdminOrder Should there be a order in the files?
             Get-ChildItem -Path $enterViaUIPath.AbsolutePath -Filter "*.xml" | ForEach-Object {
@@ -79,10 +81,9 @@ function Update-ISHDBConfiguration {
                 Write-Debug "fileName=$fileName"
                 Write-Debug "filePath=$filePath"
 
-
+                $fieldName = $fileNameFieldNameMap[$fileName]
                 # Check if the filename has a known field mapping
-                if ($fileNameFieldNameMap.ContainsKey($fileName)) {
-                    $fieldName = $fileNameFieldNameMap[$fileName]
+                if ($fileNameFieldNameMap.ContainsKey($fileName) -and $typeDefinition -contains $fieldName) {
                     Write-Debug "fieldName=$fieldName"
                     $xmlFromDatabase = Get-IshSetting -FieldName $fieldName -IshSession $session
                     $xmlFromFile = Get-Content -Path $filePath -Raw
