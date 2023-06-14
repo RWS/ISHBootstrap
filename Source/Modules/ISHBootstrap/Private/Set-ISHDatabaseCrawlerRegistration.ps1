@@ -91,22 +91,38 @@ WHERE HOSTNAME='InfoShare' AND CATALOG='InfoShare'
         }
         if ($cralweRegistrationCount -gt 1) {
             Write-Warning "More than 1 crawer registrations found in database"
-            Invoke-ISHMaintenance -Crawler -UnRegisterAll @ISHDeploymentSplat
-            Invoke-ISHMaintenance -Crawler -Register @ISHDeploymentSplat
+            if ($deployment.SoftwareVersion.Major -lt 15) {
+                Invoke-ISHMaintenance -Crawler -UnRegisterAll @ISHDeploymentSplat
+                Invoke-ISHMaintenance -Crawler -Register @ISHDeploymentSplat
+            }
+            else {
+                Invoke-ISHFullTextIndexMaintenance -UnRegister @ISHDeploymentSplat
+                Invoke-ISHFullTextIndexMaintenance -Register @ISHDeploymentSplat
+            }
         }
         elseif (($cralweRegistrationCount -eq 1) -and ($validCralweRegistrationCount -eq 1)) {
             Write-Verbose "Found proper crawler registrations"
         }
         elseif (($cralweRegistrationCount -eq 1) -and ($validCralweRegistrationCount -eq 0)) {
             Write-Warning "Found 1 invalid crawer registration found in database"
-            Invoke-ISHMaintenance -Crawler -UnRegisterAll @ISHDeploymentSplat
-            Invoke-ISHMaintenance -Crawler -Register @ISHDeploymentSplat
+            if ($deployment.SoftwareVersion.Major -lt 15) {
+                Invoke-ISHMaintenance -Crawler -UnRegisterAll @ISHDeploymentSplat
+                Invoke-ISHMaintenance -Crawler -Register @ISHDeploymentSplat
+            }
+            else {
+                Invoke-ISHFullTextIndexMaintenance -UnRegister @ISHDeploymentSplat
+                Invoke-ISHFullTextIndexMaintenance -Register @ISHDeploymentSplat
+            }
         }
         else {
             Write-Warning "No crawer registrations found in database"
-            Invoke-ISHMaintenance -Crawler -Register @ISHDeploymentSplat
+            if ($deployment.SoftwareVersion.Major -lt 15) {
+                Invoke-ISHMaintenance -Crawler -Register @ISHDeploymentSplat
+            }
+            else {
+                Invoke-ISHFullTextIndexMaintenance -Register @ISHDeploymentSplat
+            }
         }
-
     }
 
     end {
