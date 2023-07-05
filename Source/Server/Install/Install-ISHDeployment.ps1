@@ -61,9 +61,13 @@ $scriptProgress=Get-ProgressHash -Invocation $MyInvocation
 
 $findCDPath={
     $major=($ISHVersion -split '\.')[0]
+    $minor=($ISHVersion -split '\.')[1]
     $revision=($ISHVersion -split '\.')[2]
+    if(-not $revision){
+        $revision=0
+    }
     $expandedCDs=Get-ISHCD -ListAvailable|Where-Object -Property IsExpanded -EQ $true
-    $matchingVersionCDs=$expandedCDs|Where-Object -Property Major -EQ $major |Where-Object -Property Revision -EQ $revision
+    $matchingVersionCDs=$expandedCDs|Where-Object -Property Major -EQ $major | Where-Object -Property Minor -EQ $minor | Where-Object -Property Revision -EQ $revision
     $availableCD=$matchingVersionCDs|Sort-Object -Descending -Property Build
     if(-not $availableCD)
     {

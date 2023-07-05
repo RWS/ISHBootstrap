@@ -27,12 +27,12 @@ param (
     [Parameter(Mandatory=$true,ParameterSetName="From FTP")]
     [pscredential]$FTPCredential,
     [Parameter(Mandatory=$true,ParameterSetName="From FTP")]
-    [ValidatePattern(".+\.[0-9]+\.0\.[0-9]+\.[0-9]+.*\.exe")]
+    [ValidatePattern(".+\.[0-9]+\.[0-9]\.[0-9]+\.[0-9]+.*\.exe")]
     [string]$FTPPath,
     [Parameter(Mandatory=$true,ParameterSetName="From AWS S3")]
     [string]$BucketName,
     [Parameter(Mandatory=$true,ParameterSetName="From AWS S3")]
-    [ValidatePattern(".+\.[0-9]+\.0\.[0-9]+\.[0-9]+.*\.exe")]
+    [ValidatePattern(".+\.[0-9]+\.[0-9]\.[0-9]+\.[0-9]+.*\.exe")]
     [string]$Key,
     [Parameter(Mandatory=$false,ParameterSetName="From AWS S3")]
     [string]$AccessKey,
@@ -49,12 +49,12 @@ param (
     [Parameter(Mandatory=$true,ParameterSetName="From Azure FileStorage")]
     [string]$ShareName,
     [Parameter(Mandatory=$true,ParameterSetName="From Azure FileStorage")]
-    [ValidatePattern(".+\.[0-9]+\.0\.[0-9]+\.[0-9]+.*\.exe")]
+    [ValidatePattern(".+\.[0-9]+\.[0-9]\.[0-9]+\.[0-9]+.*\.exe")]
     [string]$Path,
     [Parameter(Mandatory=$true,ParameterSetName="From Azure BlobStorage")]
     [string]$ContainerName,
     [Parameter(Mandatory=$true,ParameterSetName="From Azure BlobStorage")]
-    [ValidatePattern(".+\.[0-9]+\.0\.[0-9]+\.[0-9]+.*\.exe")]
+    [ValidatePattern(".+\.[0-9]+\.[0-9]\.[0-9]+\.[0-9]+.*\.exe")]
     [string]$BlobName,
     [Parameter(Mandatory=$false,ParameterSetName="From Azure FileStorage")]
     [Parameter(Mandatory=$false,ParameterSetName="From Azure BlobStorage")]
