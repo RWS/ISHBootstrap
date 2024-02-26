@@ -64,6 +64,9 @@ function Get-ISHCoreConfiguration {
                 IdInitialCatalog = $configurationValues | Where-Object -Property Key -EQ "$ishKey/Integration/Database/SQLServer/IdInitialCatalog" | Select-Object -ExpandProperty Value
                 IdPassword       = $configurationValues | Where-Object -Property Key -EQ "$ishKey/Integration/Database/SQLServer/IdPassword" | Select-Object -ExpandProperty Value
                 IdUsername       = $configurationValues | Where-Object -Property Key -EQ "$ishKey/Integration/Database/SQLServer/IdUsername" | Select-Object -ExpandProperty Value
+                MetricsInitialCatalog = $configurationValues | Where-Object -Property Key -EQ "$ishKey/Integration/Database/SQLServer/MetricsInitialCatalog" | Select-Object -ExpandProperty Value
+                MetricsPassword       = $configurationValues | Where-Object -Property Key -EQ "$ishKey/Integration/Database/SQLServer/MetricsPassword" | Select-Object -ExpandProperty Value
+                MetricsUsername       = $configurationValues | Where-Object -Property Key -EQ "$ishKey/Integration/Database/SQLServer/MetricsUsername" | Select-Object -ExpandProperty Value
                 Type             = $configurationValues | Where-Object -Property Key -EQ "$ishKey/Integration/Database/SQLServer/Type" | Select-Object -ExpandProperty Value
                 TrustServerCert  = $configurationValues | Where-Object -Property Key -EQ "$ishKey/Integration/Database/SQLServer/TrustServerCertificate" | Select-Object -ExpandProperty Value
             }
@@ -99,17 +102,20 @@ function Get-ISHCoreConfiguration {
             $hash.Database.AMConnectionString = "Provider=OraOLEDB.Oracle.1;Data Source=$($hash.Database.DataSource);Persist Security Info=True;User ID=$($hash.Database.AmUsername);Password=$($hash.Database.AmPassword)"
             $hash.Database.BFFConnectionString = "Provider=OraOLEDB.Oracle.1;Data Source=$($hash.Database.DataSource);Persist Security Info=True;User ID=$($hash.Database.BffUsername);Password=$($hash.Database.BffPassword)"
             $hash.Database.IDConnectionString = "Provider=OraOLEDB.Oracle.1;Data Source=$($hash.Database.DataSource);Persist Security Info=True;User ID=$($hash.Database.IdUsername);Password=$($hash.Database.IdPassword)"
+            $hash.Database.MetricsConnectionString = "Provider=OraOLEDB.Oracle.1;Data Source=$($hash.Database.DataSource);Persist Security Info=True;User ID=$($hash.Database.MetricsUsername);Password=$($hash.Database.MetricsPassword)"
         }
         else {
             $hash.Database.ConnectionString="Provider=MSOLEDBSQL.1;Data Source=$($hash.Database.DataSource);Initial Catalog=$($hash.Database.InitialCatalog);Persist Security Info=True;User ID=$($hash.Database.Username);Password=$($hash.Database.Password)"
             $hash.Database.AMConnectionString="Provider=MSOLEDBSQL.1;Data Source=$($hash.Database.DataSource);Initial Catalog=$($hash.Database.AmInitialCatalog);Persist Security Info=True;User ID=$($hash.Database.AmUsername);Password=$($hash.Database.AmPassword)"
             $hash.Database.BFFConnectionString="Provider=MSOLEDBSQL.1;Data Source=$($hash.Database.DataSource);Initial Catalog=$($hash.Database.BffInitialCatalog);Persist Security Info=True;User ID=$($hash.Database.BffUsername);Password=$($hash.Database.BffPassword)"
             $hash.Database.IDConnectionString="Provider=MSOLEDBSQL.1;Data Source=$($hash.Database.DataSource);Initial Catalog=$($hash.Database.IdInitialCatalog);Persist Security Info=True;User ID=$($hash.Database.IdUsername);Password=$($hash.Database.IdPassword)"
+            $hash.Database.MetricsConnectionString="Provider=MSOLEDBSQL.1;Data Source=$($hash.Database.DataSource);Initial Catalog=$($hash.Database.MetricsInitialCatalog);Persist Security Info=True;User ID=$($hash.Database.MetricsUsername);Password=$($hash.Database.MetricsPassword)"
             if ($hash.Database.TrustServerCert -and  $hash.Database.TrustServerCert -eq 'True'){
                 $hash.Database.ConnectionString += ";TrustServerCertificate=True"
                 $hash.Database.AMConnectionString += ";TrustServerCertificate=True"
                 $hash.Database.BFFConnectionString += ";TrustServerCertificate=True"
                 $hash.Database.IDConnectionString += ";TrustServerCertificate=True"
+                $hash.Database.MetricsConnectionString += ";TrustServerCertificate=True"
             }
         }
         #Credetnials

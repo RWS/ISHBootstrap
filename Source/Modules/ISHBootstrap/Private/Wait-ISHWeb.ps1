@@ -85,7 +85,7 @@ Function Wait-ISHWeb {
         $urisToWaitFor | ForEach-Object {
             Write-Verbose "Waiting for $($_.Uri) to respond with status $($_.Status)."
             $splat = $_
-            Wait-UriStatus @splat -MilliSeconds 500
+            Wait-UriStatus @splat -MilliSeconds 500 -Timeout 600
         }
     }
 

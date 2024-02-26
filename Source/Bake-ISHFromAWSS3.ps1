@@ -38,7 +38,10 @@ param(
     [string]$MockBFFConnectionString=$null,
     [Parameter(Mandatory=$false,ParameterSetName="Default Authorization")]
     [Parameter(Mandatory=$false,ParameterSetName="Custom Authorization")]
-    [string]$MockIDConnectionString=$null
+    [string]$MockIDConnectionString=$null,
+    [Parameter(Mandatory=$false,ParameterSetName="Default Authorization")]
+    [Parameter(Mandatory=$false,ParameterSetName="Custom Authorization")]
+    [string]$MockMetricsConnectionString=$null
 )
 
 if ($PSBoundParameters['Debug']) {
@@ -71,4 +74,5 @@ $hash.ConnectionString=$MockConnectionString
 $hash.AMConnectionString=$MockAMConnectionString
 $hash.BFFConnectionString=$MockBFFConnectionString
 $hash.IDConnectionString=$MockIDConnectionString
+$hash.MetricsConnectionString=$MockMetricsConnectionString
 & $buildersPath\Initialize-ISHImage.ps1 @hash -ISHVersion $ishVersion
