@@ -372,6 +372,32 @@ function Set-ISHCoreConfiguration {
 
             Write-Verbose "Configured ID Database"
         }
+        if ((-not $testData.MetricsDatabase)) {
+            $a = 1
+            $max = 30
+            $sleep = 30
+            Do {
+                If ($a -gt $max) { break }
+                Write-Verbose "Configuring Metrics Database - Attempt $($a) of $($max)"
+                try {
+                    Set-ISHConnectionString -ConnectionString $configurationData.Database.MetricsConnectionString -DatabasePurpose Metrics @ISHDeploymentSplat
+                    Write-Verbose "Configured Metrics Database - Attempt $($a) of $($max) - Successful"
+                    break
+                }
+                catch {
+                    Write-Verbose "Configuring Metrics Database - Attempt $($a) of $($max) - Failed"
+                    write-Verbose "Exception Type: $($_.Exception.GetType().FullName)"
+                    write-Verbose "Exception Message: $($_.Exception.Message)"
+                    Write-Verbose "Going to sleep for $($sleep + $a) seconds"
+                    Start-Sleep -Seconds ($sleep + $a)
+                }
+                finally {
+                    $a++
+                }
+            } While ($a -le $max)
+
+            Write-Verbose "Configured Metrics Database"
+        }
         #endregion
 
         #region Service Count

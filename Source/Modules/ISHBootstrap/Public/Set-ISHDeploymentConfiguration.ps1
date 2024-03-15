@@ -54,6 +54,12 @@
     Database user name. By default value from ishidconnectstring deployment parameter will be used.
 .PARAMETER IdPassword
     Database user password. By default value from ishidconnectstring deployment parameter will be used.
+.PARAMETER MetricsInitialCatalog
+    Database name. By default value from ishmetricsconnectstring deployment parameter will be used.
+.PARAMETER MetricsUsername
+    Database user name. By default value from ishmetricsconnectstring deployment parameter will be used.
+.PARAMETER MetricsPassword
+    Database user password. By default value from ishmetricsconnectstring deployment parameter will be used.
 .PARAMETER Type
     Database type. By default databasetype deployment parameter will be used.
 .PARAMETER ISHDeployment
@@ -101,6 +107,12 @@ Function Set-ISHDeploymentConfiguration {
         [string]$IdUsername,
         [Parameter(Mandatory = $false)]
         [string]$IdPassword,
+        [Parameter(Mandatory = $false)]
+        [string]$MetricsInitialCatalog,
+        [Parameter(Mandatory = $false)]
+        [string]$MetricsUsername,
+        [Parameter(Mandatory = $false)]
+        [string]$MetricsPassword,
         [Parameter(Mandatory = $false)]
         [string]$Type,
         [Parameter(Mandatory = $false)]
@@ -171,6 +183,20 @@ Function Set-ISHDeploymentConfiguration {
                 $IdPassword = $iddb.password
             }
         }
+        if ([float]"$($deployment.SoftwareVersion.Major).$($deployment.SoftwareVersion.Minor)" -ge 15.1) {
+            $ishmetricsconnectstring = Get-ISHDeploymentParameters -Name ishmetricsconnectstring -ValueOnly @ISHDeploymentSplat
+            $metricsdb = New-Object System.Data.Common.DbConnectionStringBuilder
+            $metricsdb.set_ConnectionString($ishmetricsconnectstring)
+            if(-not $MetricsInitialCatalog -and $Type -eq "sqlserver"){
+                $MetricsInitialCatalog = $metricsdb.'initial catalog'
+            }
+            if(-not $MetricsUsername){
+                $MetricsUsername = $metricsdb.'user id'
+            }
+            if(-not $MetricsPassword){
+                $MetricsPassword = $metricsdb.password
+            }
+        }
     }
 
     process {
@@ -199,6 +225,13 @@ Function Set-ISHDeploymentConfiguration {
                 IdInitialCatalog = $IdInitialCatalog
                 IdUsername       = $IdUsername
                 IdPassword       = $IdPassword
+            }
+        }
+        if ([float]"$($deployment.SoftwareVersion.Major).$($deployment.SoftwareVersion.Minor)" -ge 15.1) {
+            $dbKV += @{
+                MetricsInitialCatalog = $MetricsInitialCatalog
+                MetricsUsername       = $MetricsUsername
+                MetricsPassword       = $MetricsPassword
             }
         }
         $path = $keyValues.$ISHBootstrapVersion.Project.$Project.$Stage.ISH

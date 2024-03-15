@@ -25,7 +25,9 @@ param(
     [Parameter(Mandatory=$false,ParameterSetName="External Database")]
     [string]$BFFConnectionString,
     [Parameter(Mandatory=$false,ParameterSetName="External Database")]
-    [string]$IDConnectionString
+    [string]$IDConnectionString,
+    [Parameter(Mandatory=$false,ParameterSetName="External Database")]
+    [string]$MetricsConnectionString
 )
 
 $cmdletsPaths="$PSScriptRoot\..\Cmdlets"
@@ -310,6 +312,12 @@ if ($IDConnectionString){
     $replacementMatrix+=@{
         CurrentValue=$deploymentParameters|Where-Object -Property Name -EQ ishidconnectstring|Select-Object -ExpandProperty Value
         NewValue=$IDConnectionString
+    }
+}
+if ($MetricsConnectionString){
+    $replacementMatrix+=@{
+        CurrentValue=$deploymentParameters|Where-Object -Property Name -EQ ishmetricsconnectstring|Select-Object -ExpandProperty Value
+        NewValue=$MetricsConnectionString
     }
 }
 Write-Verbose "Replacement matrix is:"

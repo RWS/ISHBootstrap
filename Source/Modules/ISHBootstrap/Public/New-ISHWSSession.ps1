@@ -40,7 +40,10 @@ Function New-ISHWSSession {
         [switch]$ServiceAdmin,
         [Parameter(Mandatory = $false, ParameterSetName = "Custom credential")]
         [Parameter(Mandatory = $false, ParameterSetName = "Service administrator credential")]
-        [string]$ISHDeployment
+        [string]$ISHDeployment,
+        [Parameter(Mandatory = $false, ParameterSetName = "Custom credential")]
+        [Parameter(Mandatory = $false, ParameterSetName = "Service administrator credential")]
+        [string]$Protocol
     )
 
     begin {
@@ -79,12 +82,16 @@ Function New-ISHWSSession {
         }
 
         $newIshSessionSplat = @{
-            WsBaseUrl           = $ishWSUrl
-            PSCredential        = $Credential
+            WsBaseUrl               = $ishWSUrl
+            PSCredential            = $Credential
+            IgnoreSslPolicyErrors   = $true
         }
 
-        New-IshSession @newIshSessionSplat -IgnoreSslPolicyErrors
+        if ($Protocol){
+            $newIshSessionSplat['Protocol'] = $Protocol
+        }
 
+        New-IshSession @newIshSessionSplat
     }
 
     end {

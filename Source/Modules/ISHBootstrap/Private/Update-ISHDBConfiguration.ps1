@@ -36,9 +36,16 @@ function Update-ISHDBConfiguration {
         Write-Debug "PSCmdlet.ParameterSetName=$($PSCmdlet.ParameterSetName)"
         foreach ($psbp in $PSBoundParameters.GetEnumerator()) { Write-Debug "$($psbp.Key)=$($psbp.Value)" }
         $ISHDeploymentSplat = @{}
+        $newIshWsSessionSplat = @{}
         if ($ISHDeployment) {
             $ISHDeploymentSplat = @{ISHDeployment = $ISHDeployment}
+			$newIshWsSessionSplat = @{ISHDeployment = $ISHDeployment}
         }
+        $deployment = Get-ISHDeployment @ISHDeploymentSplat
+        if (($deployment.SoftwareVersion.Major -gt 15) -or (($deployment.SoftwareVersion.Major -eq 15) -and ($deployment.SoftwareVersion.Minor -ge 1))) {
+            $newIshWsSessionSplat['Protocol'] = 'WcfSoapWithWsTrust'
+        }
+
         # The EnterViaUI xml files,
         $enterViaUIPath = Get-ISHDeploymentPath -EnterViaUI @ISHDeploymentSplat
         Write-Debug "enterViaUIPath.AbsolutePath=$($enterViaUIPath.AbsolutePath)"
@@ -69,7 +76,8 @@ function Update-ISHDBConfiguration {
         try {
             # Create new ishremote session
             Write-Debug "Creating ISHRemote remote session"
-            $session = New-ISHWSSession -ServiceAdmin @ISHDeploymentSplat
+
+            $session = New-ISHWSSession -ServiceAdmin @newIshWsSessionSplat
             Write-Verbose "ISHRemote remote session created"
             $typeDefinition = (Get-IshTypeFieldDefinition -IshSession $session |Where-Object -Property ISHType -EQ ISHConfiguration).Name
             # Process each xml file inside enterviaui folder

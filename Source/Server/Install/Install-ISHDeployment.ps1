@@ -47,7 +47,9 @@ param (
     [Parameter(Mandatory=$false)]
     $BFFConnectionString,
     [Parameter(Mandatory=$false)]
-    $IDConnectionString
+    $IDConnectionString,
+    [Parameter(Mandatory=$false)]
+    $MetricsConnectionString
 )
 
 $cmdletsPaths="$PSScriptRoot\..\..\Cmdlets"
@@ -88,7 +90,7 @@ $newParameterScriptBlock={
     $isMatch=$Name -match "InfoShare(?<suffix>.*)"
     $suffix=$Matches["suffix"]
     $major=($ISHVersion -split '\.')[0]
-
+    $minor=($ISHVersion -split '\.')[1]
     $revision=($ISHVersion -split '\.')[2]
     
     $computerName=$env:COMPUTERNAME.ToLower()
@@ -132,6 +134,9 @@ $newParameterScriptBlock={
         $inputParameters["ishidconnectstring"]=$IDConnectionString
         $inputParameters["serviceaccountclientsecret"]="MockServiceAccountClientSecret"
         $inputParameters["serviceaccountclientid"]="MockServiceAccountClientId"
+    }
+    if([float]"$major.$minor" -ge 15.1){
+        $inputParameters["ishmetricsconnectstring"]=$MetricsConnectionString
     }
     
     if($IsOracle)
