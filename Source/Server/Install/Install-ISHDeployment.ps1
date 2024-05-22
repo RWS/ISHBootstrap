@@ -136,6 +136,7 @@ $newParameterScriptBlock={
         $inputParameters["serviceaccountclientid"]="MockServiceAccountClientId"
         $inputParameters["metricsserviceclientsecret"]="MockMetricsServiceClientSecret"
         $inputParameters["metricsserviceclientid"]="MockMetricsServiceClientId"
+        $inputParameters["servicepassword"]="MockServicePassword"
     }
     if([float]"$major.$minor" -ge 15.1){
         $inputParameters["ishmetricsconnectstring"]=$MetricsConnectionString
