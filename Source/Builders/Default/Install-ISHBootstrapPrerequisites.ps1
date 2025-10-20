@@ -55,6 +55,7 @@ if(-not $DebugISHServer)
 switch($PSCmdlet.ParameterSetName) {
     'From AWS S3' {
         $moduleNames+="AWSPowerShell"
+        $moduleNames+="AWS.Tools.S3"
     }
     'From FTP' {
         $moduleNames+="PSFTP"
